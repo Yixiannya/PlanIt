@@ -12,10 +12,11 @@ const EventSchema = mongoose.Schema(
             required: true
         },
 
-        group: {
-            type: String,
-            required: false
-        },
+        groups: [{
+            type: mongoose.Schema.Types.ObjectId,
+            required: false,
+            ref: "Group"
+        }],
 
         startDate: {
             type: Date,
@@ -29,6 +30,8 @@ const EventSchema = mongoose.Schema(
 );
 
 
+const User = mongoose.model("User", UserSchema);
+const Group = mongoose.model("Group", GroupSchema);
 const Event = mongoose.model("Event", EventSchema);
 
 module.exports = Event;
