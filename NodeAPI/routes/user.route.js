@@ -8,6 +8,10 @@ router.get('/', getAllUsers);
 // Get user by id
 router.get('/:id', getSpecificUser);
 
+// Get all events the user has
+router.get('/', getAllEvents);
+
+
 // Create user
 router.post('/', postUser);
 
