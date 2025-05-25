@@ -97,6 +97,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
     getAllUsers, 
     getSpecificUser,
+    getAllUserEvents,
     postUser,
     putUser,
     deleteUser
