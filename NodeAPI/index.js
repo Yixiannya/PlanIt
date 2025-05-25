@@ -1,7 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const User = require('./models/user.model.js');
+const Event = require('./models/event.model.js');
 const userRoute = require('./routes/user.route.js');
+const eventRoute = require('./routes/event.route.js');
 const app = express();
 
 
@@ -11,6 +13,7 @@ app.use(express.urlencoded({extended: false}));
 
 // Routes
 app.use("/api/users", userRoute);
+app.use("/api/events", eventRoute);
 
 
 // Testing commands

@@ -1,15 +1,16 @@
 const express = require('express');
 const User = require('../models/user.model.js');
 const router = express.Router();
-const {getAllUsers, getSpecificUser, postUser, putUser, deleteUser} = require('../controllers/user.controller.js');
+const {getAllUsers, getSpecificUser, getAllUserEvents, postUser, putUser, deleteUser} = require('../controllers/user.controller.js');
 
 // Get all users
 router.get('/', getAllUsers);
 // Get user by id
 router.get('/:id', getSpecificUser);
 
+
 // Get all events the user has
-router.get('/', getAllEvents);
+router.get('/', getAllUserEvents);
 
 
 // Create user

@@ -33,8 +33,6 @@ const GroupSchema = mongoose.Schema(
 );
 
 
-const User = mongoose.model("User", UserSchema);
 const Group = mongoose.model("Group", GroupSchema);
-const Event = mongoose.model("Event", EventSchema);
 
 module.exports = Group;
