@@ -32,12 +32,16 @@ const getSpecificUser = async (req, res) => {
 const getAllUserEvents = async (req, res) => {
     try {
         const {id} = req.params;
-        const events = await User.findById(id).select('events');
+        const user = await User.findById(id);
 
         // If user doesn't exist
         if (!user) {
             return res.status(404).json({message: "User not found"});
         }
+        
+        const events = await user.select('events');
+
+        
         
         res.status(200).json(events);
     } catch (error) {
