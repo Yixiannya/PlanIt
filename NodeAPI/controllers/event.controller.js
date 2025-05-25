@@ -28,6 +28,7 @@ const getSpecificEvent = async (req, res) => {
 };
 
 // Controls to create a event
+// Add a way to update owner to contain new event when event is created
 const postEvent = async (req, res) => {
     try {
         const event = await Event.create(req.body);
