@@ -24,11 +24,6 @@ const EventSchema = mongoose.Schema(
             required: [true,"Select a due date"]
         },
 
-        dueTime: {
-            type: String,
-            required: true
-        },
-
         description: {
             type: String,
             required: false
