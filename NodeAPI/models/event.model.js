@@ -19,9 +19,19 @@ const EventSchema = mongoose.Schema(
             ref: "Group"
         }],
 
-        startDate: {
+        dueDate: {
             type: Date,
-            required: [true,"Select a starting date"]
+            required: [true,"Select a due date"]
+        },
+
+        dueTime: {
+            type: String,
+            required: true
+        },
+
+        description: {
+            type: String,
+            required: false
         }
 
     },
