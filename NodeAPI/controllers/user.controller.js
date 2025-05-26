@@ -32,18 +32,14 @@ const getSpecificUser = async (req, res) => {
 const getAllUserEvents = async (req, res) => {
     try {
         const {id} = req.params;
-        const user = await User.findById(id);
+        const userEvents = await User.findById(id, '-_id events').populate('events');
 
         // If user doesn't exist
-        if (!user) {
+        if (!userEvents) {
             return res.status(404).json({message: "User not found"});
         }
         
-        const events = await user.select('events');
-
-        
-        
-        res.status(200).json(events);
+        res.status(200).json(userEvents);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -80,6 +76,7 @@ const putUser = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
 
 // Controls to delete a user
 const deleteUser = async (req, res) => {

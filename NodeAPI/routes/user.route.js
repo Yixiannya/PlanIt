@@ -10,7 +10,7 @@ router.get('/:id', getSpecificUser);
 
 
 // Get all events the user has
-router.get('/', getAllUserEvents);
+router.get('/:id/events', getAllUserEvents);
 
 
 // Create user

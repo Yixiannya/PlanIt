@@ -9,7 +9,7 @@ const EventSchema = mongoose.Schema(
 
         owner: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
+            required: [true, "Please enter owner's id"],
             ref: "User"
         },
 
