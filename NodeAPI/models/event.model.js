@@ -21,7 +21,7 @@ const EventSchema = mongoose.Schema(
 
         dueDate: {
             type: Date,
-            required: [true,"Select a due date"]
+            required: [true, "Select a due date"]
         },
 
         description: {
