@@ -1,4 +1,5 @@
 const Event = require('../models/event.model.js');
+const User = require('../models/user.model.js');
 
 // Controls to get all events
 const getAllEvents = async (req, res) => {
@@ -50,6 +51,16 @@ const getSpecificEventOwner = async (req, res) => {
 const postEvent = async (req, res) => {
     try {
         const event = await Event.create(req.body);
+        /* const user = await User.findByIdAndUpdate(id, req.body);
+        
+        // If user doesn't exist
+        if (!user) {
+            return res.status(404).json({message: "User not found"});
+        }
+
+        // Check user again
+        const updatedUser = await User.findById(id);
+        res.status(200).json(updatedUser); */
         res.status(200).json(event);
     } catch (error) {
         res.status(500).json({message: error.message});

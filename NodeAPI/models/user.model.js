@@ -7,6 +7,12 @@ const UserSchema = mongoose.Schema(
             required: [true, "Please enter username"]
         },
 
+        // Use OAuth libraries, obtain access through email
+        email: {
+            type: String,
+            required: true
+        },
+
         groups: [{
             type: mongoose.Schema.Types.ObjectId,
             required: false,
