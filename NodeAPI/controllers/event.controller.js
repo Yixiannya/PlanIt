@@ -31,7 +31,7 @@ const getSpecificEvent = async (req, res) => {
 const getSpecificEventOwner = async (req, res) => {
     try {
         const {id} = req.params;
-        const eventOwner = await Event.findById(id, 'owner').populate('owner');
+        const eventOwner = await Event.findById(id, '-_id owner').populate('owner');
 
         // If event doesn't exist
         if (!eventOwner) {
@@ -56,7 +56,7 @@ const postEvent = async (req, res) => {
     }
 };
 
-// Controls to update a event
+// Controls to update an event
 const putEvent = async (req, res) => {
     try {
         const {id} = req.params;
