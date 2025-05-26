@@ -1,3 +1,6 @@
+// Run npm install
+// Deploy on AWS by Milestone 2 to connect frontend to backend remotely
+
 const express = require('express');
 const mongoose = require('mongoose');
 const User = require('./models/user.model.js');
