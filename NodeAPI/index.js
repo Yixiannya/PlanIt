@@ -1,4 +1,6 @@
 // Run npm install
+// npm run dev for dev server
+
 // Deploy on AWS by Milestone 2 to connect frontend to backend remotely
 
 const express = require('express');
