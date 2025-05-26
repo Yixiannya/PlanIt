@@ -7,15 +7,23 @@ const UserSchema = mongoose.Schema(
             required: [true, "Please enter username"]
         },
 
-        group: {
+        // Use OAuth libraries, obtain access through email
+        email: {
             type: String,
-            required: false
+            required: true
         },
 
-        event: {
-            type: String,
-            required: false
-        },
+        groups: [{
+            type: mongoose.Schema.Types.ObjectId,
+            required: false,
+            ref: "Group"
+        }],
+
+        events: [{
+            type: mongoose.Schema.Types.ObjectId,
+            required: false,
+            ref: "Event"
+        }],
     },
     {
         timestamps: true

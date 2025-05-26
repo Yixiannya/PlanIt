@@ -27,6 +27,27 @@ const getSpecificUser = async (req, res) => {
     }
 };
 
+
+// Get all events a user has
+const getAllUserEvents = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const userEvents = await User.findById(id, '-_id events').populate('events');
+
+        // If user doesn't exist
+        if (!userEvents) {
+            return res.status(404).json({message: "User not found"});
+        }
+        
+        res.status(200).json(userEvents);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+
+
 // Controls to create a user
 const postUser = async (req, res) => {
     try {
@@ -56,6 +77,7 @@ const putUser = async (req, res) => {
     }
 };
 
+
 // Controls to delete a user
 const deleteUser = async (req, res) => {
     try {
@@ -76,6 +98,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
     getAllUsers, 
     getSpecificUser,
+    getAllUserEvents,
     postUser,
     putUser,
     deleteUser
