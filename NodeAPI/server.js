@@ -41,7 +41,7 @@ app.listen(PORT, () => {
 
 
 // Connection
-mongoose.connect("mongodb+srv://admin:1IzQgnVdhN080w9h@backend.q8evqiu.mongodb.net/Node-API?retryWrites=true&w=majority&appName=Backend")
+mongoose.connect(mongoUri)
 .then(() => {
     console.log("Connected to database!");
 })
