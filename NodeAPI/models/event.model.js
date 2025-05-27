@@ -13,11 +13,11 @@ const EventSchema = mongoose.Schema(
             ref: "User"
         },
 
-        groups: [{
+        group: {
             type: mongoose.Schema.Types.ObjectId,
             required: false,
             ref: "Group"
-        }],
+        },
 
         description: {
             type: String,
@@ -43,4 +43,4 @@ const EventSchema = mongoose.Schema(
 
 const Event = mongoose.model("Event", EventSchema);
 
-module.exports = Event;
+module.exports = Event;c
