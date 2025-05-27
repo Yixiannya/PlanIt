@@ -47,13 +47,15 @@ const getSpecificEventOwner = async (req, res) => {
 
 
 // Controls to create a event
-// Add a way to update owner to contain new event when event is created
+// Updates owner to contain new event when event is created
 const postEvent = async (req, res) => {
     try {
         const event = await Event.create(req.body);
-        const {owner} = req.params;
-        const user = User.findByIdAndUpdate(
-            owner, 
+
+        const owner = event.owner;
+        
+        const user = await User.findByIdAndUpdate(
+            owner,
             { $push: { events: event } }
         );
         
@@ -87,15 +89,49 @@ const putEvent = async (req, res) => {
     }
 };
 
-// Controls to delete a event
-const deleteEvent = async (req, res) => {
+// Controls to patch an event
+const patchEvent = async (req, res) => {
     try {
+        const updateObject = req.body; // e.g. {name: "dog", dueDate: 2025-10-10T01:00:00.000+00:00}
         const {id} = req.params;
-        const event = await Event.findByIdAndDelete(id, req.body);
+        const event = await Event.findByIdAndUpdate(id, {$set: updateObject});
         
         // If event doesn't exist
         if (!event) {
             return res.status(404).json({message: "Event not found"});
+        }
+
+        // Check event again
+        const updatedEvent = await Event.findById(id);
+        res.status(200).json(updatedEvent);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// Controls to delete a event
+// Also deletes it from owner of this event
+const deleteEvent = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const event = await Event.findByIdAndDelete(id, req.body);
+
+        // If event doesn't exist
+        if (!event) {
+            return res.status(404).json({message: "Event not found"});
+        }
+        
+        const owner = event.owner;
+
+        const user = await User.findByIdAndUpdate(
+            owner,
+            { $pull: { events: id } }
+        );
+
+        // If user doesn't exist
+        if (!user) {
+            return res.status(404).json({message: "User not found"});
         }
 
         res.status(200).json({message: "Event deleted successfully"});
@@ -110,5 +146,6 @@ module.exports = {
     getSpecificEventOwner,
     postEvent,
     putEvent,
+    patchEvent,
     deleteEvent
 }

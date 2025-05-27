@@ -1,7 +1,7 @@
 const express = require('express');
 const Event = require('../models/event.model.js');
 const router = express.Router();
-const {getAllEvents, getSpecificEvent, getSpecificEventOwner, postEvent, putEvent, deleteEvent} = require('../controllers/event.controller.js');
+const {getAllEvents, getSpecificEvent, getSpecificEventOwner, postEvent, putEvent, patchEvent, deleteEvent} = require('../controllers/event.controller.js');
 
 // Get all events
 router.get('/', getAllEvents);
@@ -16,6 +16,9 @@ router.post('/', postEvent);
 
 // Update event by id
 router.put('/:id', putEvent);
+
+// Update event by id (Patch)
+router.patch('/:id', patchEvent);
 
 // Delete event by id
 router.delete('/:id', deleteEvent);

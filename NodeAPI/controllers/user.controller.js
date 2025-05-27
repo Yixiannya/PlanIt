@@ -77,6 +77,25 @@ const putUser = async (req, res) => {
     }
 };
 
+// Controls to patch a user
+const patchUser = async (req, res) => {
+    try {
+        const updateObject = req.body; // e.g. {name: "John", group: "Doe"}
+        const {id} = req.params;
+        const user = await User.findByIdAndUpdate(id, {$set: updateObject});
+        
+        // If user doesn't exist
+        if (!user) {
+            return res.status(404).json({message: "User not found"});
+        }
+
+        // Check user again
+        const updatedUser = await User.findById(id);
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
 
 // Controls to delete a user
 const deleteUser = async (req, res) => {
@@ -101,5 +120,6 @@ module.exports = {
     getAllUserEvents,
     postUser,
     putUser,
+    patchUser,
     deleteUser
 }
