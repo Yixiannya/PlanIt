@@ -13,32 +13,41 @@ dotenv.config();
 
 const passport = require('passport');
 const express = require('express');
+const session = require('express-session');
 const mongoose = require('mongoose');
+require('./auth/passport');
 
 const User = require('./models/user.model.js');
 const Event = require('./models/event.model.js');
 const userRoute = require('./routes/user.route.js');
 const eventRoute = require('./routes/event.route.js');
-const authRoutes = require('./routes/authRoutes.js');
+const authRoute = require('./routes/auth.route.js');
 
 const app = express();
 
 const PORT = process.env.PORT;
 const mongoUri = process.env.MONGODB_URI;
-
+const sessionSecret = process.env.SESSION_SECRET;
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+app.use(session({ secret: sessionSecret, resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes
 app.use("/api/users", userRoute);
 app.use("/api/events", eventRoute);
-app.use('/', authRoutes);
+app.use('/', authRoute);
 
 // Initialise server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+});
+
+app.get('/', async (req, res) => {
+  res.send("Sign in with Google");
 });
 
 // Connection to MongoDB

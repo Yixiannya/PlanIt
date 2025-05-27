@@ -10,7 +10,8 @@ const UserSchema = mongoose.Schema(
         // Use OAuth libraries, obtain access through email
         email: {
             type: String,
-            required: true
+            required: true,
+            unique: true
         },
 
         groups: [{
