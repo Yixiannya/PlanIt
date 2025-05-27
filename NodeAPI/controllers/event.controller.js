@@ -89,6 +89,27 @@ const putEvent = async (req, res) => {
     }
 };
 
+// Controls to patch an event
+const patchEvent = async (req, res) => {
+    try {
+        const updateObject = req.body; // e.g. {name: "dog", dueDate: 2025-10-10T01:00:00.000+00:00}
+        const {id} = req.params;
+        const event = await Event.findByIdAndUpdate(id, {$set: updateObject});
+        
+        // If event doesn't exist
+        if (!event) {
+            return res.status(404).json({message: "Event not found"});
+        }
+
+        // Check event again
+        const updatedEvent = await Event.findById(id);
+        res.status(200).json(updatedEvent);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+
 // Controls to delete a event
 // Also deletes it from owner of this event
 const deleteEvent = async (req, res) => {
@@ -125,5 +146,6 @@ module.exports = {
     getSpecificEventOwner,
     postEvent,
     putEvent,
+    patchEvent,
     deleteEvent
 }
