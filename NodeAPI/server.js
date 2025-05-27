@@ -6,7 +6,7 @@
 // Call exposed endpoint in backend, which routes to frontend
 // Send frontend an 'ok', which routes to Oauth login screen
 
-// Deploy on AWS by Milestone 2 to connect frontend to backend remotely
+// Deployed on Render to connect frontend to backend remotely
 
 const dotenv = require('dotenv');
 dotenv.config();
