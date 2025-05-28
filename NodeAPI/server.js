@@ -47,7 +47,7 @@ app.listen(PORT, () => {
 });
 
 app.get('/', async (req, res) => {
-  res.send("Sign in with Google");
+  res.send('<a href="/auth/google">Sign in with Google</a>');
 });
 
 // Connection to MongoDB
