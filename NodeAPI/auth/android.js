@@ -15,6 +15,5 @@ module.exports = async function verifyGoogleToken(idToken) {
     googleId: payload.sub,
     email: payload.email,
     name: payload.name,
-    picture: payload.picture
   };
 };

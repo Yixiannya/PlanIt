@@ -22,8 +22,11 @@ router.get('/auth/google/callback', passport.authenticate('google', {
 
 
 // Android Google Oauth 2.0
-// Returns a user with the associated GoogleId
-router.post('/google', async (req, res) => {
+// Frontend should have an implementation of Google sign in,
+// then it will be posting a request to /auth/google, with the id token.
+// If all goes well, it should return a user with the associated GoogleId.
+// If no such user exists, it will create a new user with the given GoogleId.
+router.post('/auth/google', async (req, res) => {
   try {
     const { idToken } = req.body;
 
