@@ -1,7 +1,7 @@
 import { Text, View, Button, Image, Alert, TouchableOpacity } from 'react-native';
-import { sendEvent } from '../Data/sendEvent';
+import { editEvent } from '../Data/editEvent';
 
-const CreateEventButton = ({ Name, Owner, Date, Hour, Minute, Description, Group, Location }) => {
+const EditEventButton = ({ ID, Name, Owner, Date, Hour, Minute, Description, Group, Location }) => {
     const iconPressed = async () => {
         if (!Name?.trim() || !Date?.trim() || !Hour?.trim() || !Minute?.trim()) {
         Alert.alert(
@@ -18,13 +18,13 @@ const CreateEventButton = ({ Name, Owner, Date, Hour, Minute, Description, Group
             groups: Group,
         };
         try {
-            await sendEvent(Event);
-            Alert.alert('Success', 'Event created!',
+            await editEvent(ID, Event);
+            Alert.alert('Success', 'Event edited!',
             [ { text: 'OK', onPress: () => Location() }, ],
             { cancelable: false },
             );
         } catch (error) {
-            Alert.alert('Error', 'Failed to create event');
+            Alert.alert('Error', 'Failed to edit event');
             console.error('Error:', error);
         }
     }
@@ -32,10 +32,10 @@ const CreateEventButton = ({ Name, Owner, Date, Hour, Minute, Description, Group
     return (
         <TouchableOpacity onPress = {iconPressed}>
         <View className = "h-64 bg-orange-50 flex-col justify-center items-center">
-            <Text className = "pb-5 text-4xl text-gray-800 font-bold"> Add new event </Text>
+            <Text className = "pb-5 text-4xl text-gray-800 font-bold"> Edit event </Text>
         </View>
          </TouchableOpacity>
     );
 };
 
-export default CreateEventButton;
+export default EditEventButton;

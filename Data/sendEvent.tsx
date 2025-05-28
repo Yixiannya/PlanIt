@@ -1,8 +1,9 @@
-export async function getEvent(information) {
+export async function sendEvent(information) {
   try {
      const response = await fetch('https://planit-40q0.onrender.com/api/events', {
         method: "POST",
         headers: {
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify(information),
         });
