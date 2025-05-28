@@ -7,15 +7,50 @@ router.get('/login', function(req, res, next) {
   res.render('login');
 });
 
+
+// Web Google Oauth 2.0
 // Initiates the Google OAuth 2.0 authentication flow
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 // Callback URL for handling the OAuth 2.0 response
 router.get('/auth/google/callback', passport.authenticate('google', { 
-  failureRedirect: '/login' }), (req, res) => {
+  failureRedirect: '/login' }), 
   // Successful authentication, redirect or handle the user as desired
-  res.redirect('/profile');
+  (req, res) => {
+    res.redirect('/profile');
 });
+
+
+// Android Google Oauth 2.0
+// Returns a user with the associated GoogleId
+router.post('/google', async (req, res) => {
+  try {
+    const { idToken } = req.body;
+
+    if (!idToken) return res.status(400).json({ error: 'ID token required' });
+
+    const googleUser = await verifyGoogleToken(idToken);
+
+    let user = await User.findOne({ googleId: googleUser.googleId });
+
+    // User doesn't exist, so we create one
+    if (!user) {
+      user = await User.create({
+        googleId: googleUser.googleId,
+        name: googleUser.name,
+        email: googleUser.email,
+      });
+    }
+
+    // const token = createJWT(user);
+    res.json({ user });
+
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
 
 router.get('/profile', (req, res) => {
   console.log(req.user);
