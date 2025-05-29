@@ -57,7 +57,7 @@ router.post('/auth/google', async (req, res) => {
 
 router.get('/profile', (req, res) => {
   console.log(req.user);
-  res.send(`<pre>${JSON.stringify(req.user, null, 2)}</pre>`);
+  res.send(req.user);
 });
 
 // Logout route
