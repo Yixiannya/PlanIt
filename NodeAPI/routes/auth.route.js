@@ -14,7 +14,7 @@ router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 
 
 // Callback URL for handling the OAuth 2.0 response
 router.get('/auth/google/callback', passport.authenticate('google', { 
-  failureRedirect: '/login' }), 
+  failureRedirect: '/' }), 
   // Successful authentication, redirect or handle the user as desired
   (req, res) => {
     res.redirect('/profile');
