@@ -15,10 +15,16 @@ router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 
 // Callback URL for handling the OAuth 2.0 response
 router.get('/auth/google/callback', passport.authenticate('google', { 
   failureRedirect: '/' }), 
-  // Successful authentication, redirect or handle the user as desired
-  (req, res) => {
-    res.redirect('/profile');
-});
+  // Successful authentication, redirect to profile page
+  /* (req, res) => {
+    res.redirect('/profile'); */
+    (req, res) => {
+      res.json({
+        message: 'Login successful',
+        user: req.user
+      })
+    }
+);
 
 
 // Android Google Oauth 2.0
@@ -54,16 +60,20 @@ router.post('/auth/google', async (req, res) => {
   }
 });
 
-
+// How profile page works
 router.get('/profile', (req, res) => {
-  console.log(req.user);
+  if (!req.user) {
+    res.redirect('/');
+  }
   res.send(req.user);
 });
 
 // Logout route
 router.get('/logout', (req, res) => {
-  req.logout();
-  res.redirect('/');
+  req.logout(function(err){
+      if(err) return next(err);
+      res.redirect('/');
+    });
 });
 
 module.exports = router;
