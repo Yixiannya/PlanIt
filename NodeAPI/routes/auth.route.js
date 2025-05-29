@@ -16,14 +16,22 @@ router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 
 router.get('/auth/google/callback', passport.authenticate('google', { 
   failureRedirect: '/' }), 
   // Successful authentication, redirect to profile page
+
   /* (req, res) => {
     res.redirect('/profile'); */
-    (req, res) => {
+
+    // How about directly returning the user as a JSON?
+    /* (req, res) => {
       res.json({
         message: 'Login successful',
         user: req.user
       })
-    }
+    } */
+
+  // Shane's suggestion
+  (req, res) => {
+    res.redirect('planit://login-success');
+  }
 );
 
 
