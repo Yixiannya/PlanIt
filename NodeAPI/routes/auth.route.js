@@ -46,7 +46,9 @@ router.post('/auth/google', async (req, res) => {
   try {
     const { idToken } = req.body;
 
-    if (!idToken) return res.status(400).json({ error: 'ID token required' });
+    if (!idToken) {
+      return res.status(400).json({ error: 'ID token required' });
+    }
 
     const googleUser = await verifyGoogleToken(idToken);
 

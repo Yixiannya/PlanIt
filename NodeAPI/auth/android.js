@@ -7,7 +7,9 @@ module.exports = async function verifyGoogleToken(idToken) {
     idToken,
     // Accepted Client IDs, from the web test client in passport and the android client
     audience: [
-      process.env.GOOGLE_ANDROID_CLIENT_ID,
+      process.env.SHANE_WEB_CLIENT_ID,
+      process.env.SHANE_ANDROID_CLIENT_ID,
+      process.env.SHANE_IOS_CLIENT_ID,
       process.env.GOOGLE_CLIENT_ID
     ]
   });
