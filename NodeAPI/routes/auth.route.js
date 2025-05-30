@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('passport');
+const User = require('../models/user.model.js');
 const router = express.Router();
 
 // Renders login screen
@@ -22,22 +23,22 @@ router.get('/auth/google/callback', passport.authenticate('google', {
   } */
 
     // How about directly returning the user as a JSON?
-    /* (req, res) => {
+    (req, res) => {
       res.json({
         message: 'Login successful',
         user: req.user
       })
-    } */
+    }
 
   // Shane's suggestion
-  (req, res) => {
+  /* (req, res) => {
     res.redirect('myapp://login-success');
-  }
+  } */
 );
 
 
 // Android Google Oauth 2.0
-// Frontend should have an implementation of Google sign in,
+// Frontend should have an implementation of Google sign in?,
 // then it will be posting a request to /auth/google, with the id token.
 // If all goes well, it should return a user with the associated GoogleId.
 // If no such user exists, it will create a new user with the given GoogleId.
@@ -60,8 +61,9 @@ router.post('/auth/google', async (req, res) => {
       });
     }
 
-    // const token = createJWT(user);
-    res.json({ user });
+    // Do we need to create JWT?
+    const token = createJWT(user);
+    res.json({ token, user });
 
   } catch (err) {
     console.error(err);
@@ -69,11 +71,37 @@ router.post('/auth/google', async (req, res) => {
   }
 });
 
-// How profile page works
+// Basic authentication
+// Sort and Hash for basic String password
+// Or just directly store it -> will be directly storing it for now.
+router.post('/login', async (req, res) => {
+  try {
+    const requestedEmail = req.body.email;
+    const requestedPassword = req.body.password;
+    
+    const user = await User.findOne({ email: requestedEmail });
+
+    if (!user) {
+      return res.status(404).json({message: "User not found"});
+    }
+
+    if (requestedPassword != user.password) {
+      return res.status(401).json({message: "Incorrect password"});
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({message: error.message});
+  }
+});
+
+// How profile page works for passportjs
 router.get('/profile', (req, res) => {
+  // User doesn't exist, go back to main page
   if (!req.user) {
     res.redirect('/');
   }
+  // User exists, send user info
   res.send(req.user);
 });
 
