@@ -2,6 +2,7 @@
   "expo": {
     "name": "MyNewApp",
     "slug": "MyNewApp",
+    "scheme": "myapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,7 +14,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.raylong268.planit",
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +23,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.raylong268.planit"
+      "package": "com.raylong268.planit",
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -32,6 +34,14 @@
         "projectId": "6ac8d5db-e62d-4daf-98e1-85516c76e31a"
       }
     },
-    "owner": "raylong268"
+    "plugins" : [
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.1058453984266-39br9cbp3sc3k8r7a0ukdm06v5735i9m"
+        }
+      ]
+    ]
   }
+
 }

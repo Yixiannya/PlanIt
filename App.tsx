@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import "./global.css";
 import { StyleSheet, Text, View, Button, Image, TouchableOpacity, ImageSourcePropType, ScrollView } from 'react-native';
 import MainPage from './component/Main-page';
@@ -58,8 +59,15 @@ function BottomTabs() {
 }
 
 export default function App() {
-    const Pages = createStackNavigator();
 
+     useEffect(() => {
+        GoogleSignin.configure({
+            iosClientId: "1058453984266-39br9cbp3sc3k8r7a0ukdm06v5735i9m.apps.googleusercontent.com",
+            webClientId: "1058453984266-m04g8chf7p1fc88oj0ldmfq1t78julra.apps.googleusercontent.com",
+            profileImageSize: 50,
+        });
+    });
+    const Pages = createStackNavigator();
     return (
         <NavigationContainer>
             <Pages.Navigator screenOptions={{ headerShown: false }}>

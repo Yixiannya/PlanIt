@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Button, Image, TouchableOpacity, ImageSourcePropType, ScrollView } from 'react-native';
 import Header from '../REUSABLES/HeaderBanner';
 import { useNavigation } from '@react-navigation/native';
-import { getEvent } from '../Data/getEvent';
 
 type Group = {
     id: number;
