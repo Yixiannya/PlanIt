@@ -2,7 +2,7 @@
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client();
 
-module.exports = async function verifyGoogleToken(idToken) {
+async function verifyGoogleToken(idToken) {
   const ticket = await client.verifyIdToken({
     idToken,
     // Accepted Client IDs, from the web test client in passport and the android client
@@ -21,3 +21,7 @@ module.exports = async function verifyGoogleToken(idToken) {
     name: payload.name,
   };
 };
+
+module.exports = {
+  verifyGoogleToken
+}

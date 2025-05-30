@@ -1,8 +1,10 @@
 const express = require('express');
 const passport = require('passport');
-const verifyGoogleToken = require('../auth/android');
 const User = require('../models/user.model.js');
-const createJWT = require('../utils/createJWT');
+
+const {verifyGoogleToken} = require('../auth/android');
+const {createJWT} = require('../utils/createJWT');
+
 const router = express.Router();
 
 // Renders login screen
