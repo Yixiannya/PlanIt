@@ -2,11 +2,12 @@ import { Linking, Text, View, Image, Alert, TouchableOpacity } from 'react-nativ
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { GoogleSignin, isSuccessResponse, isErrorwithCode, statusCodes } from "@react-native-google-signin/google-signin";
+import { useUserStore } from '../Data/userStore';
 
 export default function LoginPage() {
   const navigation = useNavigation();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const setUser =  useUserStore((state) => state.setUser);
 
   const handleGoogleSignIn = async () => {
       await GoogleSignin.signOut();
@@ -16,7 +17,6 @@ export default function LoginPage() {
           const response = await GoogleSignin.signIn();
           if (isSuccessResponse(response)) {
               const { idToken } = response.data;
-              console.log('ID Token:', idToken);
               const passable = { idToken };
               const responseBack = await fetch('https://planit-40q0.onrender.com/auth/google', {
                   method: "POST",
@@ -28,20 +28,18 @@ export default function LoginPage() {
 
               if (responseBack.ok) {
                 const data = await responseBack.json();
-                console.log('Success:', data);
+                console.log(data);
+                setUser(data.user);
                 navigation.navigate('BottomTabs', { screen: 'Main-page' });
               } else {
                 const errorData = await responseBack.json();
                 console.error('Error:', responseBack.status, errorData);
                 Alert.alert('Login failed', errorData.message || 'Unauthorized');
-
               }
-
-              console.log(responseBack);
           } else {
               showMessage("Google SignIn cancelled")
               }
-          setIsSubmitting(false);
+            setIsSubmitting(false);
           } catch (error) {
           if (isErrorwithCode(error)) {
               switch (error.code) {
@@ -57,7 +55,7 @@ export default function LoginPage() {
               } else {
                   showMessage("An error occured");
               }
-          setIsSubmitting(false)
+          setIsSubmitting(false);
       }
   };
 

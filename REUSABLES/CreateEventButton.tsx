@@ -1,7 +1,9 @@
 import { Text, View, Button, Image, Alert, TouchableOpacity } from 'react-native';
 import { sendEvent } from '../Data/sendEvent';
+import { useUserStore } from '../Data/userStore';
 
-const CreateEventButton = ({ Name, Owner, Date, Hour, Minute, Description, Group, Location }) => {
+const CreateEventButton = ({ Name, Date, Hour, Minute, Description, Group, Location }) => {
+    const user = useUserStore((state) => state.user);
     const iconPressed = async () => {
         if (!Name?.trim() || !Date?.trim() || !Hour?.trim() || !Minute?.trim()) {
         Alert.alert(
@@ -12,10 +14,10 @@ const CreateEventButton = ({ Name, Owner, Date, Hour, Minute, Description, Group
         }
         const Event = {
             name: Name,
-            owner: Owner,
+            owner: user._id,
             dueDate: `${Date}T${Hour}:${Minute}:00.000Z`,
             description: Description,
-            groups: Group,
+            group: Group,
         };
         try {
             await sendEvent(Event);

@@ -25,7 +25,9 @@ export default function EditDeletePage ({ route }) {
         <View className = "px-3 pt-3">
         <Text className = "py-3 text-4xl text-gray-800 font-bold">Name: {event.name}</Text>
         <Text className = "py-3 text-4xl text-gray-800 font-bold">Description: {event.description}</Text>
-        <Text className = "py-3 text-4xl text-gray-800 font-bold">Time: {event.dueDate}</Text>
+        <Text className = "py-3 text-4xl text-gray-800 font-bold">
+            Time: {event.dueDate.split('T')[0]},{" "}
+            {event.dueDate.split('T')[1].split('.')[0]}</Text>
         </View>
         <View className="px-3 pt-3 flex-row flex-1 h-[30%]">
             <TouchableOpacity onPress = {() => navigation.replace('EditEventPage', {event, location} )}

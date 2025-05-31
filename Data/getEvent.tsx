@@ -1,13 +1,13 @@
-export async function getEvent() {
-  try {
-        const response = await fetch(
-          'https://planit-40q0.onrender.com/api/events'
+export async function getEvent(userId) {
+    try {
+        const eventfetch = await fetch(
+          `https://planit-40q0.onrender.com/api/users/${userId}/events`
         );
-        if (!response.ok) {
-        throw new Error(`Response Error status: ${response.status}`);
+        if (!eventfetch.ok) {
+        throw new Error(`Response Error status: ${eventfetch.status}`);
         }
-        const data = await response.json();
-        return data;
+        const data = await eventfetch.json();
+        return data.events;
       } catch (error) {
          console.error('Fetch error:', error);
      }

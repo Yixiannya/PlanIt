@@ -73,7 +73,7 @@ export default function AddEvent() {
               className = "px-4 text-[30px]"
         />
           </View>
-    <CreateEventButton Name = {searchName} Owner = {"682d94e2d4a61bd5fda3a5e6"}  Date = {actualDate}
+    <CreateEventButton Name = {searchName} Date = {actualDate}
     Hour = {searchHour} Minute = {searchMinute} Description = {searchDesc}
     Group = {"Testing"} Location = { () => navigation.replace('BottomTabs', { screen: 'Calendar' })} />
     </ScrollView>

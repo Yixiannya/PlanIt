@@ -1,11 +1,11 @@
 export async function deleteEvent(information) {
   try {
-     const response = await fetch(`https://planit-40q0.onrender.com/api/events/${information}`, {
+     const deletefetch = await fetch(`https://planit-40q0.onrender.com/api/events/${information}`, {
         method: "DELETE",
      });
 
      if (!response.ok) {
-        throw new Error(`Cannot delete: ${response.status}`);
+        throw new Error(`Cannot delete: ${deletefetch.status}`);
      }
 
      } catch (error) {

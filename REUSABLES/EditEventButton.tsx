@@ -1,7 +1,7 @@
 import { Text, View, Button, Image, Alert, TouchableOpacity } from 'react-native';
 import { editEvent } from '../Data/editEvent';
 
-const EditEventButton = ({ ID, Name, Owner, Date, Hour, Minute, Description, Group, Location }) => {
+const EditEventButton = ({ ID, Name, Date, Hour, Minute, Description, Group, Location }) => {
     const iconPressed = async () => {
         if (!Name?.trim() || !Date?.trim() || !Hour?.trim() || !Minute?.trim()) {
         Alert.alert(
@@ -12,7 +12,6 @@ const EditEventButton = ({ ID, Name, Owner, Date, Hour, Minute, Description, Gro
         }
         const Event = {
             name: Name,
-            owner: Owner,
             dueDate: `${Date}T${Hour}:${Minute}:00.000Z`,
             description: Description,
             groups: Group,

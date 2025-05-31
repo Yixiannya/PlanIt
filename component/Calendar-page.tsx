@@ -4,12 +4,7 @@ import { Text, View, Dimensions, ScrollView, TouchableOpacity, Image} from 'reac
 import Header from '../REUSABLES/HeaderBanner';
 import { getEvent } from '../Data/getEvent';
 import { useNavigation } from '@react-navigation/native';
-
-
-type event = {
-    date: Date;
-    description: string;
-}
+import { useUserStore } from '../Data/userStore';
 
 export default function CalendarFunc() {
   const today = new Date().toISOString().split('T')[0];
@@ -18,12 +13,14 @@ export default function CalendarFunc() {
   const [actualEvents, setActualEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const user = useUserStore((state) => state.user);
+
 
   useEffect(() => {
       async function fetchEvents() {
           setLoading(true);
-          const events = await getEvent();
-          setActualEvents(events || []);
+          const events = await getEvent(user._id);
+          setActualEvents(Array.isArray(events) ? events : []);
           setLoading(false);
       }
       fetchEvents();
@@ -66,11 +63,11 @@ export default function CalendarFunc() {
                    <TouchableOpacity onPress = {() => navigation.navigate('EditDeletePage',
                        {event,
                            location: () => navigation.replace('BottomTabs', { screen: 'Calendar' })} )}>
-                   <View key={event._id} className="flex-col">
+                   <View className="flex-col">
                    <View className = "flex-row border border-black">
                      <View className = "flex-col flex-1 px-2 py-5 w-4/5">
                      <Text className="text-3xl font-bold ml-1 mb-1">Name: {event.name}</Text>
-                     <Text className="text-xl"> Due Date: {event.dueDate}</Text>
+                     <Text className="text-xl"> Due by: {event.dueDate.split('T')[1].split('.')[0]}</Text>
                      <Text className="text-xl"> Description: {event.description}</Text>
                      </View>
                      <View className = "px-3 justify-center items-center">

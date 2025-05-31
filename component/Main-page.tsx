@@ -2,29 +2,24 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Button, Image, TouchableOpacity, ImageSourcePropType, ScrollView } from 'react-native';
 import Header from '../REUSABLES/HeaderBanner';
 import { useNavigation } from '@react-navigation/native';
-
-type Group = {
-    id: number;
-    groupicon: Image;
-    name: string;
-    deadline: string;
-    duedate: string;
-}
+import { getEvent } from '../Data/getEvent';
+import { useUserStore } from '../Data/userStore';
 
 export default function MainPage() {
     const navigation = useNavigation();
     const [actualEvents, setActualEvents] = useState([]);
     const [loading, setLoading] = useState(true);
+    const user = useUserStore((state) => state.user);
 
-    useEffect(() => {
-          async function fetchEvents() {
-              setLoading(true);
-              const events = await getEvent();
-              setActualEvents(events || []);
-              setLoading(false);
-          }
-          fetchEvents();
-    }, []);
+useEffect(() => {
+  async function fetchEvents() {
+    setLoading(true);
+    const events = await getEvent(user._id);
+    setActualEvents(Array.isArray(events) ? events : []);
+    setLoading(false);
+  }
+  fetchEvents();
+}, []);
 
     const sortedEvents = !loading
     ? actualEvents.sort( (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
@@ -62,7 +57,10 @@ const Carousel = ({ loading, events}) => {
                      <Image source = {require('../assets/ICON.png')} />
                    </View>
                      <Text className="py-2 justify-center text-center font-bold text-2xl">{event.name}</Text>
-                     <Text className="py-2 justify-center text-center">{event.dueDate}</Text>
+                     <Text className="py-2 justify-center text-center">
+                     {event.dueDate.split('T')[0]},{" "}
+                     {event.dueDate.split('T')[1].split('.')[0]}
+                     </Text>
                    </View>
                    </TouchableOpacity>
                ))}
@@ -131,7 +129,10 @@ const GroupComponent = ({ indivEvent }) => {
             <View className="w-full flex-col justify-center ml-2 flex-1 py-2" >
                 <Text className="font-bold text-xl">{indivEvent.group}</Text>
                 <Text>Description: {indivEvent.description}</Text>
-                <Text>Due date: {indivEvent.dueDate}</Text>
+                <Text>Due date:{" "}
+                    {indivEvent.dueDate.split('T')[0]},{" "}
+                    {indivEvent.dueDate.split('T')[1].split('.')[0]}
+                </Text>
             </View>
 
             <TouchableOpacity onPress={GroupIconPressed} className="h-20 w-20 items-center mt-2">

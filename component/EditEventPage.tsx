@@ -86,7 +86,7 @@ export default function EditEventPage( { route } ) {
               className = "px-4 text-[30px]"
         />
           </View>
-    <EditEventButton ID = {event._id} Name = {searchName} Owner = {"682d94e2d4a61bd5fda3a5e6"}
+    <EditEventButton ID = {event._id} Name = {searchName}
     Date = {actualDate} Hour = {searchHour} Minute = {searchMinute} Description = {searchDesc}
     Group = {"Testing"} Location = { location } />
     </ScrollView>
