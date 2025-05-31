@@ -8,8 +8,10 @@ export default function LoginPage() {
   const navigation = useNavigation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const setUser =  useUserStore((state) => state.setUser);
+  const clearToken = useUserStore.getState().clearUser
 
   const handleGoogleSignIn = async () => {
+      clearToken();
       await GoogleSignin.signOut();
       try {
           setIsSubmitting(true);
@@ -18,6 +20,7 @@ export default function LoginPage() {
           if (isSuccessResponse(response)) {
               const { idToken } = response.data;
               const passable = { idToken };
+              console.log(passable);
               const responseBack = await fetch('https://planit-40q0.onrender.com/auth/google', {
                   method: "POST",
                   headers: {
@@ -25,10 +28,9 @@ export default function LoginPage() {
                   },
                   body: JSON.stringify(passable),
               })
-
               if (responseBack.ok) {
                 const data = await responseBack.json();
-                console.log(data);
+                console.log("Data" + data);
                 setUser(data.user);
                 navigation.navigate('BottomTabs', { screen: 'Main-page' });
               } else {
