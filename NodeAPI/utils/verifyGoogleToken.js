@@ -3,6 +3,7 @@ const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client();
 
 async function verifyGoogleToken(idToken) {
+  console.log("Verifying token");
   const ticket = await client.verifyIdToken({
     idToken,
     // Accepted Client IDs, from the android client.

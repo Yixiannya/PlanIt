@@ -2,6 +2,7 @@
 const jwt = require('jsonwebtoken');
 
 function createJWT(user) {
+  console.log("Creating JWT");
   return jwt.sign(
     {
       id: user._id,

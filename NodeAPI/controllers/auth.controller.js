@@ -35,17 +35,22 @@ const initiatePasswordAuth = async (req, res) => {
 // Android Oauth method
 const initiateAndroidAuth = async (req, res) => {
   try {
+    console.log("Received token");
     const { idToken } = req.body;
 
     if (!idToken) {
+      console.log("No token received");
       return res.status(400).json({ error: 'ID token required' });
     }
 
+    console.log("Verify token function");
     const googleUser = await verifyGoogleToken(idToken);
 
+    console.log("Finding user");
     let user = await User.findOne({ googleId: googleUser.googleId });
 
     if (!user) {
+      console.log("No such user found");
       user = await User.create({
         googleId: googleUser.googleId,
         name: googleUser.name,
@@ -53,7 +58,10 @@ const initiateAndroidAuth = async (req, res) => {
       });
     }
 
+    console.log("User found, creating JWT");
     const token = createJWT(user);
+
+    console.log("Responding with JWT and user");
     res.json({ token, user });
   } catch (err) {
     console.error(err);
