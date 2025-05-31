@@ -1,3 +1,4 @@
+// Code to handle the creation of JWT.
 const jwt = require('jsonwebtoken');
 
 function createJWT(user) {

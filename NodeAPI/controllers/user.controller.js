@@ -1,3 +1,4 @@
+// Code containing all methods used in user routes
 const User = require('../models/user.model.js');
 
 // Controls to get all users
@@ -11,7 +12,7 @@ const getAllUsers = async (req, res) => {
 };
 
 // Controls to get a specific user by id
-const getSpecificUser = async (req, res) => {
+const getUserById = async (req, res) => {
     try {
         const {id} = req.params;
         const user = await User.findById(id);
@@ -29,9 +30,9 @@ const getSpecificUser = async (req, res) => {
 
 
 // Get all events a user has
-const getAllUserEvents = async (req, res) => {
+const getUserEvents = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const userEvents = await User.findById(id, '-_id events').populate('events');
 
         // If user doesn't exist
@@ -44,8 +45,6 @@ const getAllUserEvents = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
-
-
 
 
 // Controls to create a user
@@ -108,6 +107,11 @@ const deleteUser = async (req, res) => {
             return res.status(404).json({message: "User not found"});
         }
 
+        const events = await user.events;
+
+        // Loop through events array and delete every event.
+        // In the future we have to check if any other member is involved in the event as well.
+
         res.status(200).json({message: "User deleted successfully"});
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -116,8 +120,8 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
     getAllUsers, 
-    getSpecificUser,
-    getAllUserEvents,
+    getUserById,
+    getUserEvents,
     postUser,
     putUser,
     patchUser,

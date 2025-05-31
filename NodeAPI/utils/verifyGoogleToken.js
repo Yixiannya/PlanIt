@@ -5,12 +5,11 @@ const client = new OAuth2Client();
 async function verifyGoogleToken(idToken) {
   const ticket = await client.verifyIdToken({
     idToken,
-    // Accepted Client IDs, from the web test client in passport and the android client
+    // Accepted Client IDs, from the android client.
     audience: [
       process.env.SHANE_WEB_CLIENT_ID,
       process.env.SHANE_ANDROID_CLIENT_ID,
       process.env.SHANE_IOS_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_ID
     ]
   });
 
