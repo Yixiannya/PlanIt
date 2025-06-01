@@ -109,6 +109,19 @@ Version Control: Github
 Authentication: Google Cloud API
 Deployment: Render
 ### Working Concept:
-Please refer to the project video for our currently working features:
+Please refer to the project [video](https://youtu.be/iQ5stYlp2X4) for our currently working features in action.
+
+The current prototype of the app is also available to be used by downloading the source code from the Github repo, and downloading the APK.
+
+Android Studio is required for emulation of an Android phone to run the app on your computer.
+
+To try out the app:
+
+Download the source code from Github and the APK from the Google drive link.
+Place the APK file in the folder containing the source code.
+Run npm install in the terminal.
+If on Android Studio emulator, drag and drop the downloaded APK into your emulated device window to install the APK
+Run npx expo start in the terminal.
+The app should begin running in the Android Studio emulator.
 ### Project Log:
 Refer to the attached spreadsheet [here](https://docs.google.com/spreadsheets/d/10PFNlH9ZJCyJIUI4B1prtAhdHoA_GZrtEwoDidm1E9A/edit?usp=sharing).
