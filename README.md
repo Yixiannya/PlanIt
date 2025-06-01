@@ -103,7 +103,7 @@ Editing date, time, name and description is similar to that of adding an event.
 Upon successfully editing the event, the app will give a prompt indicating edit success. The user can close this prompt by selecting OK.
 
 ### Tech Stack:
-Frontend: React Native, Android Studio
+Frontend: React Native (Expo), Android Studio
 Backend: MongoDB, NodeJS, NoSQL
 Version Control: Github
 Authentication: Google Cloud API
