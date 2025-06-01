@@ -4,19 +4,31 @@ const UserSchema = mongoose.Schema(
     {
         name: {
             type: String,
-            required: [true, "Please enter username"]
+            required: [true, "Please enter username"],
+            default: "New User"
         },
 
-        // Use OAuth libraries, obtain access through email
+        // Use OAuth libraries, obtain access through Google
+        googleId: {
+            type: String,
+            required: true,
+            unique: true
+        },
+
         email: {
             type: String,
             required: true
         },
 
+        password: {
+            type: String,
+            required: false
+        },
+
         groups: [{
             type: mongoose.Schema.Types.ObjectId,
             required: false,
-            ref: "Group"
+            ref: "Group",
         }],
 
         events: [{
@@ -24,6 +36,12 @@ const UserSchema = mongoose.Schema(
             required: false,
             ref: "Event"
         }],
+
+        loggedIn: {
+            type: Boolean,
+            required: true,
+            default: false
+        }
     },
     {
         timestamps: true

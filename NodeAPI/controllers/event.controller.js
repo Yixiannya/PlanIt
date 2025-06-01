@@ -1,3 +1,4 @@
+// Code containing all methods used in event routes
 const Event = require('../models/event.model.js');
 const User = require('../models/user.model.js');
 
@@ -12,7 +13,7 @@ const getAllEvents = async (req, res) => {
 };
 
 // Controls to get a specific event by id
-const getSpecificEvent = async (req, res) => {
+const getEventById = async (req, res) => {
     try {
         const {id} = req.params;
         const event = await Event.findById(id);
@@ -29,7 +30,7 @@ const getSpecificEvent = async (req, res) => {
 };
 
 // Controls to get a specific event's owner by id
-const getSpecificEventOwner = async (req, res) => {
+const getEventOwner = async (req, res) => {
     try {
         const {id} = req.params;
         const eventOwner = await Event.findById(id, '-_id owner').populate('owner');
@@ -142,8 +143,8 @@ const deleteEvent = async (req, res) => {
 
 module.exports = {
     getAllEvents, 
-    getSpecificEvent,
-    getSpecificEventOwner,
+    getEventById,
+    getEventOwner,
     postEvent,
     putEvent,
     patchEvent,

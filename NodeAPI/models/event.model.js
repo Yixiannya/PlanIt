@@ -13,6 +13,12 @@ const EventSchema = mongoose.Schema(
             ref: "User"
         },
 
+        members: [{
+            type: mongoose.Schema.Types.ObjectId,
+            required: false,
+            ref: "User"
+        }],
+
         group: {
             // type: mongoose.Schema.Types.ObjectId,
             type: String,

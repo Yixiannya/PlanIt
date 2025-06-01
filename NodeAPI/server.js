@@ -12,35 +12,37 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const express = require('express');
+const session = require('express-session');
 const mongoose = require('mongoose');
 
-const User = require('./models/user.model.js');
-const Event = require('./models/event.model.js');
 const userRoute = require('./routes/user.route.js');
 const eventRoute = require('./routes/event.route.js');
-const app = express();
+const authRoute = require('./routes/auth.route.js');
 
+const app = express();
 
 const PORT = process.env.PORT;
 const mongoUri = process.env.MONGODB_URI;
-
+const sessionSecret = process.env.SESSION_SECRET;
 
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
 
 // Routes
 app.use("/api/users", userRoute);
 app.use("/api/events", eventRoute);
+app.use('/', authRoute);
 
-
-// Testing commands
+// Initialise server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 
+app.get('/', async (req, res) => {
+  res.send('<a href="/auth/google">Sign in with Google</a>');
+});
 
-// Connection
+// Connection to MongoDB
 mongoose.connect(mongoUri)
 .then(() => {
     console.log("Connected to database!");
