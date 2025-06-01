@@ -1,3 +1,5 @@
+### Link to Expo Developer Version for this app: https://drive.google.com/file/d/1-AR0UFPnlFlEJOD31nwO6XVUbGX7v3p_/view?usp=drive_link
+
 # PlanIt
 ## NUS Orbital 2025 - Milestone 1 Report
 Team 7418, PlanIt
