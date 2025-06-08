@@ -46,6 +46,23 @@ const getUserEvents = async (req, res) => {
     }
 };
 
+// Get all events a user has
+const getUserGroups = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userGroups = await User.findById(id, '-_id groups').populate('groups');
+
+        // If user doesn't exist
+        if (!userGroups) {
+            return res.status(404).json({message: "User not found"});
+        }
+        
+        res.status(200).json(userGroups);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
 
 // Controls to create a user
 const postUser = async (req, res) => {
