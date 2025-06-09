@@ -20,10 +20,10 @@ const EventSchema = mongoose.Schema(
         }],
 
         group: {
-            // type: mongoose.Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             type: String,
             required: false,
-            // ref: "Group"
+            ref: "Group"
         },
 
         description: {

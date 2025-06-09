@@ -1,5 +1,6 @@
 // Code containing all methods used in event routes
 const Event = require('../models/event.model.js');
+const Group = require('../models/group.model.js');
 const User = require('../models/user.model.js');
 
 // Controls to get all events
@@ -70,6 +71,33 @@ const postEvent = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+const postGroupEvent = async (req, res) => {
+    try {
+        const event = await Event.create(req.body);
+
+        const owner = event.owner;
+        
+        const group = await Group.findByIdAndUpdate(
+
+        );
+
+        const user = await User.findByIdAndUpdate(
+            owner,
+            { $push: { events: event } }
+        );
+        
+        // If user doesn't exist
+        if (!user) {
+            return res.status(404).json({message: "User not found"});
+        }
+
+        res.status(200).json(event);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
 
 // Controls to update an event
 const putEvent = async (req, res) => {

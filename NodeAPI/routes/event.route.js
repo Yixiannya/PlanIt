@@ -4,6 +4,7 @@ const router = express.Router();
 const {getAllEvents, getEventById, getEventOwner, postEvent, putEvent, patchEvent, deleteEvent} = require('../controllers/event.controller.js');
 
 router.get('/', getAllEvents);
+
 // Get event by id
 router.get('/:id', getEventById);
 

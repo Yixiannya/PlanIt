@@ -139,6 +139,7 @@ module.exports = {
     getAllUsers, 
     getUserById,
     getUserEvents,
+    getUserGroups,
     postUser,
     putUser,
     patchUser,
