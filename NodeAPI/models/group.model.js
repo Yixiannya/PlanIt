@@ -19,6 +19,11 @@ const GroupSchema = mongoose.Schema(
             ref: "User"
         }],
 
+        image: {
+            type: String,
+            required: false
+        },
+
         events: [{
             type: mongoose.Schema.Types.ObjectId,
             required: false,

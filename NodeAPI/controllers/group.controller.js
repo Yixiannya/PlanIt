@@ -58,7 +58,8 @@ const getGroupMembers = async (req, res) => {
             return res.status(404).json({message: "Group not found"});
         }
         
-        res.status(200).json(groupOwner);
+        console.log(groupMembers.members[0]._id);
+        res.status(200).json(groupMembers);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -72,15 +73,20 @@ const postGroup = async (req, res) => {
         const group = await Group.create(req.body);
 
         const owner = group.owner;
-        
-        const user = await User.findByIdAndUpdate(
-            owner,
-            { $push: { groups: group } }
-        );
-        
-        // If user doesn't exist
-        if (!user) {
-            return res.status(404).json({message: "User not found"});
+
+        const members = group.members;
+
+        // Goes through array and assigns every user in members array to the group
+        for (let i = 0; i < members.length; i++) {
+            const user = await User.findByIdAndUpdate(
+                members[i],
+                { $push: { groups: group } }
+            );
+
+            // If user doesn't exist
+            if (!user) {
+                return res.status(404).json({message: "User not found"});
+            }
         }
 
         res.status(200).json(group);
@@ -158,16 +164,19 @@ const deleteGroup = async (req, res) => {
             return res.status(404).json({message: "Group not found"});
         }
         
-        const owner = group.owner;
+        const members = group.members;
 
-        const user = await User.findByIdAndUpdate(
-            owner,
-            { $pull: { groups: id } }
-        );
+        // Goes through array and removes group from every user that is a member
+        for (let i = 0; i < members.length; i++) {
+            const user = await User.findByIdAndUpdate(
+                members[i],
+                { $pull: { groups: id } }
+            );
 
-        // If user doesn't exist
-        if (!user) {
-            return res.status(404).json({message: "User not found"});
+            // If user doesn't exist
+            if (!user) {
+                return res.status(404).json({message: "User not found"});
+            }
         }
 
         res.status(200).json({message: "Group deleted successfully"});
