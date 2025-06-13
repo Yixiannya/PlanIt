@@ -55,15 +55,41 @@ const postEvent = async (req, res) => {
         const event = await Event.create(req.body);
 
         const owner = event.owner;
+
+        const group = event.group;
         
-        const user = await User.findByIdAndUpdate(
-            owner,
+        const targetGroup = await Group.findByIdAndUpdate(
+            group,
             { $push: { events: event } }
         );
-        
-        // If user doesn't exist
-        if (!user) {
-            return res.status(404).json({message: "User not found"});
+
+        // If a group is specified for the event
+        if (targetGroup) {
+            const members = targetGroup.members;
+
+            for (let i = 0; i < members.length; i++) {
+                const member = await User.findByIdAndUpdate(
+                    members[i],
+                    { $push: { events: event } }
+                );
+
+                event.members.push(member._id);
+            
+                // If user doesn't exist
+                if (!member) {
+                    return res.status(404).json({message: "User not found"});
+                }
+            }
+        } else {
+            const user = await User.findByIdAndUpdate(
+                owner,
+                { $push: { events: event } }
+            );
+            
+            // If user doesn't exist
+            if (!user) {
+                return res.status(404).json({message: "User not found"});
+            }
         }
 
         res.status(200).json(event);
@@ -72,15 +98,14 @@ const postEvent = async (req, res) => {
     }
 };
 
-const postGroupEvent = async (req, res) => {
+// Create event for a group.
+/* const postGroupEvent = async (req, res) => {
     try {
         const event = await Event.create(req.body);
 
         const owner = event.owner;
         
-        const group = await Group.findByIdAndUpdate(
-
-        );
+        const group = event.group;
 
         const user = await User.findByIdAndUpdate(
             owner,
@@ -92,11 +117,16 @@ const postGroupEvent = async (req, res) => {
             return res.status(404).json({message: "User not found"});
         }
 
+        const members = await Group.findById(group, 'members')
+            .populate('members');
+
+        
+
         res.status(200).json(event);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
-};
+}; */
 
 
 // Controls to update an event
@@ -151,16 +181,42 @@ const deleteEvent = async (req, res) => {
             return res.status(404).json({message: "Event not found"});
         }
         
-        const owner = event.owner;
+        const ownerId = event.owner;
 
-        const user = await User.findByIdAndUpdate(
-            owner,
+        const groupId = event.group;
+
+        const members = event.members;
+
+        const owner = await User.findByIdAndUpdate(
+            ownerId,
             { $pull: { events: id } }
         );
 
-        // If user doesn't exist
-        if (!user) {
+        const group = await Group.findByIdAndUpdate(
+            groupId,
+            { $pull: { events: id } }
+        );
+
+        for (let i = 0; i < members.length; i++) {
+                const member = await User.findByIdAndUpdate(
+                    members[i],
+                    { $pull: { events: id } }
+                );
+            
+                // If member doesn't exist
+                if (!member) {
+                    return res.status(404).json({message: "User not found"});
+                }
+            }
+
+        // If owner doesn't exist
+        if (!owner) {
             return res.status(404).json({message: "User not found"});
+        }
+
+        // If group doesn't exist
+        if (!group) {
+            return res.status(404).json({message: "Group not found"});
         }
 
         res.status(200).json({message: "Event deleted successfully"});

@@ -7,11 +7,11 @@ const GroupSchema = mongoose.Schema(
             required: [true, "Please enter group name"]
         },
 
-        owner: {
+        admin: [{
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: "User"
-        },
+        }],
 
         members: [{
             type: mongoose.Schema.Types.ObjectId,
@@ -19,6 +19,11 @@ const GroupSchema = mongoose.Schema(
             ref: "User"
         }],
 
+        description: {
+            type: String,
+            required: false
+        },
+        
         image: {
             type: String,
             required: false

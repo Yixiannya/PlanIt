@@ -72,7 +72,7 @@ const postGroup = async (req, res) => {
     try {
         const group = await Group.create(req.body);
 
-        const owner = group.owner;
+        const admins = group.admins;
 
         const members = group.members;
 
@@ -134,7 +134,8 @@ const getGroupEvents = async (req, res) => {
 // Controls to patch an group
 const patchGroup = async (req, res) => {
     try {
-        const updateObject = req.body; // e.g. {name: "dog", dueDate: 2025-10-10T01:00:00.000+00:00}
+        // have it check requester's id and see if they're an admin
+        const updateObject = req.body; // e.g. {name: "dog", members: ["id1", "id2"]}
         const {id} = req.params;
         const group = await Group.findByIdAndUpdate(id, {$set: updateObject});
         
@@ -156,7 +157,9 @@ const patchGroup = async (req, res) => {
 // Also deletes it from owner of this group
 const deleteGroup = async (req, res) => {
     try {
+        // have it check requester's id and see if they're an admin
         const {id} = req.params;
+        // const {userId} = req.params;
         const group = await Group.findByIdAndDelete(id, req.body);
 
         // If group doesn't exist

@@ -21,7 +21,6 @@ const EventSchema = mongoose.Schema(
 
         group: {
             type: mongoose.Schema.Types.ObjectId,
-            type: String,
             required: false,
             ref: "Group"
         },
@@ -34,6 +33,11 @@ const EventSchema = mongoose.Schema(
         dueDate: {
             type: Date,
             required: [true, "Select a due date"]
+        },
+
+        endDate: {
+            type: Date,
+            required: [true, "Select an end date"]
         },
 
         description: {
