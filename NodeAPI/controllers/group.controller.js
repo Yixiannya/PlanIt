@@ -30,18 +30,18 @@ const getGroupById = async (req, res) => {
     }
 };
 
-// Controls to get a specific group's owner by id
-const getGroupOwner = async (req, res) => {
+// Controls to get a specific group's admins by id
+const getGroupAdmins = async (req, res) => {
     try {
         const {id} = req.params;
-        const groupOwner = await Group.findById(id, '-_id owner').populate('owner');
+        const groupAdmins = await Group.findById(id, '-_id admins').populate('admins');
 
         // If group doesn't exist
-        if (!groupOwner) {
+        if (!groupAdmins) {
             return res.status(404).json({message: "Group not found"});
         }
         
-        res.status(200).json(groupOwner);
+        res.status(200).json(groupAdmins);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -67,7 +67,7 @@ const getGroupMembers = async (req, res) => {
 
 
 // Controls to create a group
-// Updates owner to contain new group when group is created
+// Updates admins to contain new group when group is created
 const postGroup = async (req, res) => {
     try {
         const group = await Group.create(req.body);
@@ -154,7 +154,7 @@ const patchGroup = async (req, res) => {
 
 
 // Controls to delete a group
-// Also deletes it from owner of this group
+// Also deletes it from admins of this group
 const deleteGroup = async (req, res) => {
     try {
         // have it check requester's id and see if they're an admin
@@ -191,7 +191,7 @@ const deleteGroup = async (req, res) => {
 module.exports = {
     getAllGroups, 
     getGroupById,
-    getGroupOwner,
+    getGroupAdmins,
     getGroupMembers,
     getGroupEvents,
     postGroup,

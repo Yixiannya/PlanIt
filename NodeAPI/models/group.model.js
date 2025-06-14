@@ -7,7 +7,7 @@ const GroupSchema = mongoose.Schema(
             required: [true, "Please enter group name"]
         },
 
-        admin: [{
+        admins: [{
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: "User"
