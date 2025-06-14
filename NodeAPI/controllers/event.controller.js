@@ -65,8 +65,10 @@ const postEvent = async (req, res) => {
 
         // If a group is specified for the event
         if (targetGroup) {
+            const admins = targetGroup.admins;
             const members = targetGroup.members;
 
+            // Members array
             for (let i = 0; i < members.length; i++) {
                 const member = await User.findByIdAndUpdate(
                     members[i],
@@ -77,6 +79,21 @@ const postEvent = async (req, res) => {
             
                 // If user doesn't exist
                 if (!member) {
+                    return res.status(404).json({message: "User not found"});
+                }
+            }
+
+            // Admins array
+            for (let i = 0; i < admins.length; i++) {
+                const admin = await User.findByIdAndUpdate(
+                    admins[i],
+                    { $push: { events: event } }
+                );
+
+                event.members.push(admin._id);
+            
+                // If user doesn't exist
+                if (!admin) {
                     return res.status(404).json({message: "User not found"});
                 }
             }

@@ -89,6 +89,19 @@ const postGroup = async (req, res) => {
             }
         }
 
+        // Goes through array and assigns every user in admins array to the group
+        for (let i = 0; i < admins.length; i++) {
+            const user = await User.findByIdAndUpdate(
+                admins[i],
+                { $push: { groups: group } }
+            );
+
+            // If user doesn't exist
+            if (!user) {
+                return res.status(404).json({message: "User not found"});
+            }
+        }
+
         res.status(200).json(group);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -157,7 +170,7 @@ const patchGroup = async (req, res) => {
 // Also deletes it from admins of this group
 const deleteGroup = async (req, res) => {
     try {
-        // have it check requester's id and see if they're an admin
+        // TODO: have it check requester's id and see if they're an admin
         const {id} = req.params;
         // const {userId} = req.params;
         const group = await Group.findByIdAndDelete(id, req.body);
@@ -167,12 +180,26 @@ const deleteGroup = async (req, res) => {
             return res.status(404).json({message: "Group not found"});
         }
         
+        const admins = group.admins;
         const members = group.members;
 
         // Goes through array and removes group from every user that is a member
         for (let i = 0; i < members.length; i++) {
             const user = await User.findByIdAndUpdate(
                 members[i],
+                { $pull: { groups: id } }
+            );
+
+            // If user doesn't exist
+            if (!user) {
+                return res.status(404).json({message: "User not found"});
+            }
+        }
+
+        // Goes through array and removes group from every user that is an admin
+        for (let i = 0; i < admins.length; i++) {
+            const user = await User.findByIdAndUpdate(
+                admins[i],
                 { $pull: { groups: id } }
             );
 
