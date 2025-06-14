@@ -147,11 +147,38 @@ const getGroupEvents = async (req, res) => {
 // Controls to patch an group
 const patchGroup = async (req, res) => {
     try {
-        // have it check requester's id and see if they're an admin
+        // TODO: have it check requester's id and see if they're an admin
         const updateObject = req.body; // e.g. {name: "dog", members: ["id1", "id2"]}
         const {id} = req.params;
         const group = await Group.findByIdAndUpdate(id, {$set: updateObject});
         
+        // If group doesn't exist
+        if (!group) {
+            return res.status(404).json({message: "Group not found"});
+        }
+
+        // Check group again
+        const updatedGroup = await Group.findById(id);
+        res.status(200).json(updatedGroup);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+// Change member roles
+const changeGroupMemRole = async (req, res) => {
+    try {
+        // TODO: have it check requester's id and see if they're an admin
+        const {id} = req.params;
+        const {userId} = req.params;
+        const group = await Group.findById(id);
+        const admins = group.admins;
+        const members = group.members;
+
+        for (let i = 0; i < admins.length; i++) {
+            
+        }
+
         // If group doesn't exist
         if (!group) {
             return res.status(404).json({message: "Group not found"});
