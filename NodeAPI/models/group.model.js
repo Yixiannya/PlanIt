@@ -24,10 +24,10 @@ const GroupSchema = mongoose.Schema(
             required: false
         },
         
-        image: {
+        /* image: {
             type: String,
             required: false
-        },
+        }, */
 
         events: [{
             type: mongoose.Schema.Types.ObjectId,

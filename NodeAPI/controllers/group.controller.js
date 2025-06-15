@@ -67,7 +67,7 @@ const getGroupMembers = async (req, res) => {
 
 
 // Controls to create a group
-// Updates admins to contain new group when group is created
+// Updates admins and members to contain new group when group is created
 const postGroup = async (req, res) => {
     try {
         const group = await Group.create(req.body);
@@ -184,7 +184,7 @@ const promoteGroupMember = async (req, res) => {
         }
 
         if (i >= admins.length) {
-            return res.status(403).json({message: "Requesting User is not admin"});
+            return res.status(403).json({message: "Requesting User is not an admin"});
         }
 
         // If group doesn't exist
@@ -226,7 +226,7 @@ const addGroupMember = async (req, res) => {
         }
 
         if (i >= admins.length) {
-            return res.status(403).json({message: "Requesting User is not admin"});
+            return res.status(403).json({message: "Requesting User is not an admin"});
         }
 
         // If group doesn't exist
@@ -240,6 +240,18 @@ const addGroupMember = async (req, res) => {
                 console.log("Skipping duplicate member");
                 continue;
             }
+
+            // Updates the user's info so they have this group
+            const user = await User.findByIdAndUpdate(
+                memberId,
+                { $push: { groups: group } }
+            );
+
+            // If user doesn't exist
+            if (!user) {
+                return res.status(404).json({message: "User not found"});
+            }
+
             group.members.push(memberId);
             await group.save();
         }
@@ -272,7 +284,7 @@ const deleteGroupMember = async (req, res) => {
         }
 
         if (i >= admins.length) {
-            return res.status(403).json({message: "Requesting User is not admin"});
+            return res.status(403).json({message: "Requesting User is not an admin"});
         }
 
         // If group doesn't exist
@@ -313,7 +325,7 @@ const demoteGroupAdmin = async (req, res) => {
         }
 
         if (i >= admins.length) {
-            return res.status(403).json({message: "Requesting User is not admin"});
+            return res.status(403).json({message: "Requesting User is not an admin"});
         }
 
         // If group doesn't exist
@@ -355,7 +367,7 @@ const addGroupAdmin = async (req, res) => {
         }
 
         if (i >= admins.length) {
-            return res.status(403).json({message: "Requesting User is not admin"});
+            return res.status(403).json({message: "Requesting User is not an admin"});
         }
 
         // If group doesn't exist
@@ -363,12 +375,25 @@ const addGroupAdmin = async (req, res) => {
             return res.status(404).json({message: "Group not found"});
         }
 
+        // TODO: Add a check so there is always at least 1 admin in a group
         for (let j = 0; j < addedAdmins.length; j++) {
             const adminId = addedAdmins[j];
             if (group.admins.includes(adminId)) {
                 console.log("Skipping duplicate admin");
                 continue;
             }
+
+            // Updates the user's info so they have this group
+            const user = await User.findByIdAndUpdate(
+                adminId,
+                { $push: { groups: group } }
+            );
+
+            // If user doesn't exist
+            if (!user) {
+                return res.status(404).json({message: "User not found"});
+            }
+
             group.admins.push(adminId);
         }
 
@@ -401,7 +426,7 @@ const deleteGroupAdmin = async (req, res) => {
         }
 
         if (i >= admins.length) {
-            return res.status(403).json({message: "Requesting User is not admin"});
+            return res.status(403).json({message: "Requesting User is not an admin"});
         }
 
         // If group doesn't exist
@@ -438,6 +463,19 @@ const deleteGroup = async (req, res) => {
             return res.status(404).json({message: "Group not found"});
         }
         
+        // Check requester's id and see if they're an admin
+        let i = 0;
+        while (i < admins.length) {
+            if (admins[i] == userId) {
+                break;
+            }
+            i++;
+        }
+
+        if (i >= admins.length) {
+            return res.status(403).json({message: "Requesting User is not an admin"});
+        }
+
         const admins = group.admins;
         const members = group.members;
 

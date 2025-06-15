@@ -68,6 +68,19 @@ const postEvent = async (req, res) => {
             const admins = targetGroup.admins;
             const members = targetGroup.members;
 
+            // Check requester's id and see if they're an admin
+            let i = 0;
+            while (i < admins.length) {
+                if (admins[i] == owner) {
+                    break;
+                }
+                i++;
+            }
+
+            if (i >= admins.length) {
+                return res.status(403).json({message: "Requesting User is not an admin of the given group"});
+            }
+
             // Members array
             for (let i = 0; i < members.length; i++) {
                 const member = await User.findByIdAndUpdate(
@@ -98,6 +111,7 @@ const postEvent = async (req, res) => {
                 }
             }
         } else {
+            // No group specificed, so event is a personal event.
             const user = await User.findByIdAndUpdate(
                 owner,
                 { $push: { events: event } }
