@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { getAllGroups, getGroupById, getGroupAdmins, getGroupMembers, promoteGroupMember,
-    addGroupMember, deleteGroupMember, getGroupEvents, postGroup, putGroup, 
+    addGroupMember, deleteGroupMember, demoteGroupAdmin, deleteGroupAdmin, getGroupEvents, postGroup, putGroup, 
     patchGroup, deleteGroup } = require('../controllers/group.controller.js');
 
 router.get('/', getAllGroups);
@@ -29,8 +29,8 @@ router.patch('/:id/members/delete', deleteGroupMember);
 
 // Admins related routes
 router.get('/:id/admins', getGroupAdmins);
-// router.patch('/:id/admins/demote', demoteGroupAdmin);
-// router.patch('/:id/admins/delete', removeGroupAdmin);
+router.patch('/:id/admins/demote', demoteGroupAdmin);
+router.patch('/:id/admins/delete', deleteGroupAdmin);
 
 // Delete event by id
 router.delete('/:id', deleteGroup);

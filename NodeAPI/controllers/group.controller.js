@@ -431,6 +431,8 @@ module.exports = {
     promoteGroupMember,
     addGroupMember,
     deleteGroupMember,
+    demoteGroupAdmin,
+    deleteGroupAdmin,
     getGroupEvents,
     postGroup,
     putGroup,
