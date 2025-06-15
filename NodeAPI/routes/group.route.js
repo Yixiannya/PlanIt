@@ -23,14 +23,14 @@ router.patch('/:id', patchGroup);
 
 // Members related routes
 router.get('/:id/members', getGroupMembers);
-router.patch('/:id/members/promote', promoteGroupMember);
-router.patch('/:id/members/add', addGroupMember);
-router.patch('/:id/members/delete', deleteGroupMember);
+router.post('/:id/members/promote', promoteGroupMember);
+router.post('/:id/members/add', addGroupMember);
+router.post('/:id/members/delete', deleteGroupMember);
 
 // Admins related routes
 router.get('/:id/admins', getGroupAdmins);
-router.patch('/:id/admins/demote', demoteGroupAdmin);
-router.patch('/:id/admins/delete', deleteGroupAdmin);
+router.post('/:id/admins/demote', demoteGroupAdmin);
+router.post('/:id/admins/delete', deleteGroupAdmin);
 
 // Delete event by id
 router.delete('/:id', deleteGroup);
