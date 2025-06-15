@@ -193,7 +193,7 @@ const promoteGroupMember = async (req, res) => {
         }
 
         for (let j = 0; j < promotedMembers.length; j++) {
-            const memberId = promotedMembers[i];
+            const memberId = promotedMembers[j];
             group.members.pull(memberId);
             group.admins.push(memberId);
         }
@@ -235,11 +235,10 @@ const addGroupMember = async (req, res) => {
         }
 
         for (let j = 0; j < addedMembers.length; j++) {
-            const memberId = addedMembers[i];
-            group.members.push(memberId);
+            group.members.push(addedMembers[j]);
+            await group.save();
         }
 
-        await group.save();
         // Check group again
         const updatedGroup = await Group.findById(id);
         res.status(200).json(updatedGroup);
@@ -277,11 +276,11 @@ const deleteGroupMember = async (req, res) => {
         }
 
         for (let j = 0; j < deletedMembers.length; j++) {
-            const memberId = deletedMembers[i];
-            group.members.pull(memberId);
+            group.members.pull(deletedMembers[j]);
+            await group.save();
         }
 
-        await group.save();
+        
         // Check group again
         const updatedGroup = await Group.findById(id);
         res.status(200).json(updatedGroup);
@@ -318,7 +317,7 @@ const demoteGroupAdmin = async (req, res) => {
         }
 
         for (let j = 0; j < demotedAdmins.length; j++) {
-            const adminId = demotedAdmins[i];
+            const adminId = demotedAdmins[j];
             group.admins.pull(adminId);
             group.members.push(adminId);
         }
@@ -360,7 +359,7 @@ const addGroupAdmin = async (req, res) => {
         }
 
         for (let j = 0; j < addedAdmins.length; j++) {
-            const adminId = addedAdmins[i];
+            const adminId = addedAdmins[j];
             group.admins.push(adminId);
         }
 
@@ -402,7 +401,7 @@ const deleteGroupAdmin = async (req, res) => {
         }
 
         for (let j = 0; j < deletedAdmins.length; j++) {
-            const adminId = deletedAdmins[i];
+            const adminId = deletedAdmins[j];
             group.admins.pull(adminId);
         }
 
