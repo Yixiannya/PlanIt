@@ -235,7 +235,12 @@ const addGroupMember = async (req, res) => {
         }
 
         for (let j = 0; j < addedMembers.length; j++) {
-            group.members.push(addedMembers[j]);
+            const memberId = addedMembers[j];
+            if (group.members.includes(memberId)) {
+                console.log("Skipping duplicate member");
+                continue;
+            }
+            group.members.push(memberId);
             await group.save();
         }
 
@@ -360,6 +365,10 @@ const addGroupAdmin = async (req, res) => {
 
         for (let j = 0; j < addedAdmins.length; j++) {
             const adminId = addedAdmins[j];
+            if (group.admins.includes(adminId)) {
+                console.log("Skipping duplicate admin");
+                continue;
+            }
             group.admins.push(adminId);
         }
 
