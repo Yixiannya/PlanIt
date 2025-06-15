@@ -165,7 +165,7 @@ const patchGroup = async (req, res) => {
     }
 };
 
-// Change member roles
+// Promote member to admin
 const promoteGroupMember = async (req, res) => {
     try {
         const {id} = req.params;
@@ -289,6 +289,90 @@ const deleteGroupMember = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+const demoteGroupAdmin = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const userId = req.body.userId;
+        const group = await Group.findById(id);
+        const admins = group.admins;
+        // Must be array of admins to demote
+        const demotedAdmins = req.body.demotedAdmins; 
+
+        // Check requester's id and see if they're an admin
+        let i = 0;
+        while (i < admins.length) {
+            if (admins[i] == userId) {
+                break;
+            }
+            i++;
+        }
+
+        if (i >= admins.length) {
+            return res.status(403).json({message: "Requesting User is not admin"});
+        }
+
+        // If group doesn't exist
+        if (!group) {
+            return res.status(404).json({message: "Group not found"});
+        }
+
+        for (let j = 0; j < demotedAdmins.length; j++) {
+            const adminId = demotedAdmins[i];
+            group.admins.pull(adminId);
+            group.members.push(adminId);
+        }
+
+        await group.save();
+        // Check group again
+        const updatedGroup = await Group.findById(id);
+        res.status(200).json(updatedGroup);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+const deleteGroupAdmin = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const userId = req.body.userId;
+        const group = await Group.findById(id);
+        const admins = group.admins;
+        // Must be array of admins to delete
+        const deletedAdmins = req.body.deletedAdmins; 
+
+        // Check requester's id and see if they're an admin
+        let i = 0;
+        while (i < admins.length) {
+            if (admins[i] == userId) {
+                break;
+            }
+            i++;
+        }
+
+        if (i >= admins.length) {
+            return res.status(403).json({message: "Requesting User is not admin"});
+        }
+
+        // If group doesn't exist
+        if (!group) {
+            return res.status(404).json({message: "Group not found"});
+        }
+
+        for (let j = 0; j < deletedAdmins.length; j++) {
+            const adminId = deletedAdmins[i];
+            group.admins.pull(adminId);
+        }
+
+        await group.save();
+        // Check group again
+        const updatedGroup = await Group.findById(id);
+        res.status(200).json(updatedGroup);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
 
 // Controls to delete a group
 // Also deletes it from admins of this group
