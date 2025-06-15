@@ -332,6 +332,48 @@ const demoteGroupAdmin = async (req, res) => {
     }
 };
 
+const addGroupAdmin = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const userId = req.body.userId;
+        const group = await Group.findById(id);
+        const admins = group.admins;
+        const addedAdmins = req.body.addedAdmins; // Must be array of members id to add
+
+        // Check requester's id and see if they're an admin
+        let i = 0;
+        while (i < admins.length) {
+            console.log(userId);
+            if (admins[i] == userId) {
+                break;
+            }
+            i++;
+        }
+
+        if (i >= admins.length) {
+            return res.status(403).json({message: "Requesting User is not admin"});
+        }
+
+        // If group doesn't exist
+        if (!group) {
+            return res.status(404).json({message: "Group not found"});
+        }
+
+        for (let j = 0; j < addedAdmins.length; j++) {
+            const adminId = addedAdmins[i];
+            group.admins.push(adminId);
+        }
+
+        await group.save();
+        // Check group again
+        const updatedGroup = await Group.findById(id);
+        res.status(200).json(updatedGroup);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+
 const deleteGroupAdmin = async (req, res) => {
     try {
         const {id} = req.params;
@@ -432,6 +474,7 @@ module.exports = {
     addGroupMember,
     deleteGroupMember,
     demoteGroupAdmin,
+    addGroupAdmin,
     deleteGroupAdmin,
     getGroupEvents,
     postGroup,
