@@ -293,8 +293,23 @@ const deleteGroupMember = async (req, res) => {
         }
 
         for (let j = 0; j < deletedMembers.length; j++) {
-            group.members.pull(deletedMembers[j]);
+            const memberId = deletedMembers[j];
+            console.log(memberId);
+            group.members.pull(memberId);
             await group.save();
+
+            // Updates the user's info so they don't have this group
+            const user = await User.findByIdAndUpdate(
+                memberId,
+                { $pull: { groups: group._id } }
+            );
+
+            
+            // If user doesn't exist
+            if (!user) {
+                return res.status(404).json({message: "User not found"});
+            }
+
         }
 
         
@@ -437,6 +452,17 @@ const deleteGroupAdmin = async (req, res) => {
         for (let j = 0; j < deletedAdmins.length; j++) {
             const adminId = deletedAdmins[j];
             group.admins.pull(adminId);
+
+            // Updates the user's info so they don't have this group
+            const user = await User.findByIdAndUpdate(
+                adminId,
+                { $pull: { groups: group._id } }
+            );
+
+            // If user doesn't exist
+            if (!user) {
+                return res.status(404).json({message: "User not found"});
+            }
         }
 
         await group.save();
