@@ -482,26 +482,30 @@ const deleteGroup = async (req, res) => {
         // TODO: have it check requester's id and see if they're an admin
         const {id} = req.params;
         const userId = req.body.userId;
-        const group = await Group.findByIdAndDelete(id, req.body);
+        const targetGroup = await Group.findById(id);
 
         // If group doesn't exist
-        if (!group) {
+        if (!targetGroup) {
             return res.status(404).json({message: "Group not found"});
         }
         
+        const tAdmins = targetGroup.admins;
+        
+
         // Check requester's id and see if they're an admin
         let i = 0;
-        while (i < admins.length) {
-            if (admins[i] == userId) {
+        while (i < tAdmins.length) {
+            if (tAdmins[i] == userId) {
                 break;
             }
             i++;
         }
 
-        if (i >= admins.length) {
+        if (i >= tAdmins.length) {
             return res.status(403).json({message: "Requesting User is not an admin"});
         }
 
+        const group = await Group.findByIdAndDelete(id, req.body);
         const admins = group.admins;
         const members = group.members;
 
