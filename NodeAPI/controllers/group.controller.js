@@ -455,7 +455,7 @@ const deleteGroup = async (req, res) => {
     try {
         // TODO: have it check requester's id and see if they're an admin
         const {id} = req.params;
-        // const {userId} = req.params;
+        const userId = req.body.userId;
         const group = await Group.findByIdAndDelete(id, req.body);
 
         // If group doesn't exist
