@@ -54,7 +54,7 @@ const postEvent = async (req, res) => {
     try {
         const event = await Event.create(req.body);
 
-        const owner = event.owner;
+        const owner = req.body.owner;
 
         const group = event.group;
         
@@ -71,11 +71,13 @@ const postEvent = async (req, res) => {
             // Check requester's id and see if they're an admin
             let i = 0;
             while (i < admins.length) {
+                console.log(admins[i] == owner);
                 if (admins[i] == owner) {
                     break;
                 }
                 i++;
             }
+            
 
             if (i >= admins.length) {
                 return res.status(403).json({message: "Requesting User is not an admin of the given group"});
