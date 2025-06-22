@@ -354,6 +354,11 @@ const demoteGroupAdmin = async (req, res) => {
             group.members.push(adminId);
         }
 
+        // Check to make sure there is an admin in the group.
+        if (group.admins.length <= 0) {
+            return res.status(403).json({message: "Must have at least one admin in the group."});
+        }
+
         await group.save();
         // Check group again
         const updatedGroup = await Group.findById(id);
@@ -390,7 +395,6 @@ const addGroupAdmin = async (req, res) => {
             return res.status(404).json({message: "Group not found"});
         }
 
-        // TODO: Add a check so there is always at least 1 admin in a group
         for (let j = 0; j < addedAdmins.length; j++) {
             const adminId = addedAdmins[j];
             if (group.admins.includes(adminId)) {
@@ -465,6 +469,11 @@ const deleteGroupAdmin = async (req, res) => {
             }
         }
 
+        // Check to make sure there is an admin in the group.
+        if (group.admins.length <= 0) {
+            return res.status(403).json({message: "Must have at least one admin in the group."});
+        }
+
         await group.save();
         // Check group again
         const updatedGroup = await Group.findById(id);
@@ -479,7 +488,6 @@ const deleteGroupAdmin = async (req, res) => {
 // Also deletes it from admins of this group
 const deleteGroup = async (req, res) => {
     try {
-        // TODO: have it check requester's id and see if they're an admin
         const {id} = req.params;
         const userId = req.body.userId;
         const targetGroup = await Group.findById(id);
