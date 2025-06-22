@@ -70,6 +70,12 @@ const getGroupMembers = async (req, res) => {
 // Updates admins and members to contain new group when group is created
 const postGroup = async (req, res) => {
     try {
+        
+        // Check to make sure there is an admin in the group.
+        if (req.body.admins.length <= 0) {
+            return res.status(403).json({message: "Must have at least one admin in the group."});
+        }
+
         const group = await Group.create(req.body);
 
         const admins = group.admins;
@@ -101,6 +107,7 @@ const postGroup = async (req, res) => {
                 return res.status(404).json({message: "User not found"});
             }
         }
+        
 
         res.status(200).json(group);
     } catch (error) {
