@@ -207,7 +207,7 @@ const patchEvent = async (req, res) => {
 const deleteEvent = async (req, res) => {
     try {
         const {id} = req.params;
-        const event = await Event.findByIdAndDelete(id, req.body);
+        const event = await Event.findById(id, req.body);
 
         // If event doesn't exist
         if (!event) {
@@ -252,6 +252,7 @@ const deleteEvent = async (req, res) => {
             return res.status(404).json({message: "Group not found"});
         }
 
+        await Event.findById(id, req.body);
         res.status(200).json({message: "Event deleted successfully"});
     } catch (error) {
         res.status(500).json({message: error.message});
