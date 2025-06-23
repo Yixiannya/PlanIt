@@ -7,7 +7,7 @@ export async function getGroups(userId) {
         throw new Error(`Response Error status: ${eventfetch.status}`);
         }
         const data = await eventfetch.json();
-        console.log(data.groups)
+        console.log("My groups", data.groups)
         return data.groups;
       } catch (error) {
          console.error('Fetch error:', error);

@@ -4,10 +4,6 @@ export async function deleteEvent(information) {
         method: "DELETE",
      });
 
-     if (!response.ok) {
-        throw new Error(`Cannot delete: ${deletefetch.status}`);
-     }
-
      } catch (error) {
          console.error('Delete error:', error);
      } finally {

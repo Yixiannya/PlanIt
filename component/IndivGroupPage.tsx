@@ -9,15 +9,15 @@ import { useUserStore } from '../Data/userStore';
 import { sendUser } from '../Data/sendUser';
 import { deleteGroup } from '../Data/deleteGroup';
 
-export default function IndivGroupPage({ route }) {
+export default function IndivGroupPage() {
   const navigation = useNavigation();
-  const { Group } = route.params;
   const [GroupMembers, setGroupMembers] = useState([]);
   const [Admins, setAdmins] = useState([]);
   const [actualEvents, setActualEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const setGroup = useGroupStore((state) => state.setGroup);
+  const Group = useGroupStore((state) => state.group);
   const clearGroup = useGroupStore.getState().clearGroup;
   const myuser = useUserStore((state) => state.user);
   const isAdmin = Admins.some((admin => admin._id == myuser._id));

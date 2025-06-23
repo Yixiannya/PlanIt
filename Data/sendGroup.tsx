@@ -19,6 +19,6 @@ export async function sendGroup(information) {
      } catch (error) {
          console.error('Fetch error:', error);
      } finally {
-        console.log('Event created:', information);
+        console.log('Group created:', information);
      }
 };

@@ -8,7 +8,6 @@ export async function getGroupEvents(groupId, purpose) {
       throw new Error(`Fetch failed with status ${response.status}`);
     }
     const data = await response.json();
-    console.log(data);
     return data;
 
   } catch (error) {

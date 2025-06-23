@@ -2,23 +2,24 @@ import { Text, View, TouchableOpacity, FlatList } from 'react-native';
 import Header from '../REUSABLES/HeaderBanner';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
+import { useGroupStore } from '../Data/groupStore';
 
 export default function Groups({route}) {
   const navigation = useNavigation();
   const {loading, Groups} = route.params;
+  const setGroup = useGroupStore((state) => state.setGroup);
 
   const Item = ({ item }) => (
-    <View className="flex-1 items-center justify-center m-2 p-5 bg-orange-400 rounded-2xl">
       <TouchableOpacity
-      onPress = { () =>
+      className = "flex-1 m-2 p-5 bg-orange-400 rounded-2xl items-center justify-center"
+      onPress = { () => {
+          setGroup(item);
         navigation.navigate('GroupTabs', {
           screen: 'Group Info',
-          params: { Group: item },
-        })
-      }>
+        });
+      }}>
         <Text className="text-xl font-bold">{item.name}</Text>
       </TouchableOpacity>
-    </View>
   );
 
   return (

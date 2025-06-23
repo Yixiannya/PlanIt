@@ -42,16 +42,10 @@ export default function GroupUser({route}) {
       const id_array_add = {
           id: gp,
           userId: user._id,
-          addedAdmins:  [id._id],
-      }
-      const id_array_delete = {
-          id: gp,
-          userId: user._id,
-          deletedMembers: [id._id],
+          promotedMembers:  [id._id],
       }
       try {
-         await sendUser("admins", gp, id_array_add, "add");
-         await sendUser("members", gp, id_array_delete, "delete");
+         await sendUser("members", gp, id_array_add, "promote");
          Alert.alert('Promoted successfully');
          navigation.pop();
          navigation.replace('GroupTabs', {
@@ -67,17 +61,11 @@ export default function GroupUser({route}) {
         const id_array = {
             id: gp,
             userId: user._id,
-            deletedAdmins:  [id._id],
-        }
-        const id_array_2 = {
-                id: gp,
-                userId: user._id,
-                addedMembers:  [id._id],
+            demotedAdmins: [id._id],
         }
         try {
-            await sendUser("members", gp, id_array_2, "add")
-            await sendUser("admins", gp, id_array, "delete");
-            Alert.alert('Deleted successfully');
+            await sendUser("admins", gp, id_array, "demote")
+            Alert.alert('Demoted successfully');
             navigation.pop();
             navigation.replace('GroupTabs', {
                 screen: 'Group Info',

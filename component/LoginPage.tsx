@@ -32,7 +32,7 @@ export default function LoginPage() {
                 const data = await responseBack.json();
                 console.log("Data" + data);
                 setUser(data.user);
-                navigation.navigate('BottomTabs', { screen: 'Main-page' });
+                navigation.replace('BottomTabs', { screen: 'Main-page' });
               } else {
                 const errorData = await responseBack.json();
                 console.error('Error:', responseBack.status, errorData);
@@ -64,13 +64,13 @@ export default function LoginPage() {
   return (
     <View className="flex-col flex-1 items-center justify-center bg-orange-500">
       <Image className="w-[300px] h-[300px]" source={require('../assets/PlanIt.png')} />
-      <Text className="text-center text-[100px] text-white font-bold pr-10">Plan It</Text>
-      <Text className="text-center text-[30px] text-white pr-5 pt-1 py-1">
+      <Text className="text-center text-[100px] text-white font-bold pr-2">Plan It</Text>
+      <Text className="text-center text-[30px] text-white pr-2 pt-1 py-1">
         A smart scheduling app made just for students
       </Text>
       <View className="py-5">
         <TouchableOpacity onPress={handleGoogleSignIn}>
-          <Text className="pl-1 px-3 py-3 text-3xl font-bold border border-black rounded border-2 bg-orange-400">
+          <Text className="px-4 py-4 text-2xl font-bold border border-black rounded-2xl border-2 bg-orange-400">
             Login with Google
           </Text>
         </TouchableOpacity>
