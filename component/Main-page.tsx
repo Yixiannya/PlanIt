@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Alert, StyleSheet, Text, View, Button, Image, TouchableOpacity, ImageSourcePropType, ScrollView } from 'react-native';
 import Header from '../REUSABLES/HeaderBanner';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { getEvent } from '../Data/getEvent';
 import {getUser} from '../Data/getUser';
 import {getGroups} from '../Data/getGroups';
 import { useUserStore } from '../Data/userStore';
 import {useGroupStore} from '../Data/groupStore'
 
-export function sorting (loading, actualEvents) {
+export function sorting (today, loading, actualEvents) {
     return !loading
-    ? actualEvents.sort( (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+    ? actualEvents.filter(event => new Date(event.dueDate) >= today || new Date(event.endDate) >= today)
+    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
     : [];
 }
 
@@ -21,7 +22,10 @@ export default function MainPage() {
     const [loading, setLoading] = useState(true);
     const user = useUserStore((state) => state.user);
     const setUser =  useUserStore((state) => state.setUser);
-    const clearToken = useUserStore.getState().clearUser
+    const clearToken = useUserStore.getState().clearUser;
+    const isFocused = useIsFocused();
+    const today = new Date();
+    console.log(today);
 
 useEffect(() => {
   async function fetchEvents() {
@@ -34,10 +38,12 @@ useEffect(() => {
     setActualEvents(Array.isArray(events) ? events : []);
     setLoading(false);
   }
-  fetchEvents();
-}, []);
-
-    const sortedEvents = sorting (loading, actualEvents);
+  if (isFocused) {
+      fetchEvents();
+  }
+}, [isFocused]);
+console.log(actualEvents);
+    const sortedEvents = sorting (today, loading, actualEvents);
 
     return (
     <View className="bg-gray-200 flex-1 flex-col items-center">
@@ -82,13 +88,25 @@ const Carousel = ({ loading, events}) => {
                    <View className="py-3 justify-center items-center">
                      <Image source = {require('../assets/ICON.png')} />
                    </View>
-                     <Text className="py-1 justify-center text-center font-bold text-4xl">{event.name}</Text>
-                     <Text className="py-2 justify-center text-center">
+                     <Text className="justify-center text-center font-bold text-4xl">{event.name}</Text>
+                     <Text className="justify-center text-center">
+                     <Text className = "font-bold">
+                       Start Date:{" "}
+                     </Text>
                      {event.dueDate.split('T')[0].split('-')[2]}/
                      {event.dueDate.split('T')[0].split('-')[1]}/
                      {event.dueDate.split('T')[0].split('-')[0]},{" "}
                      {event.dueDate.split('T')[1].split('.')[0]}
                      </Text>
+                     <Text className="justify-center text-center">
+                     <Text className = "font-bold">
+                      End Date:{" "}
+                     </Text>
+                      {event.endDate.split('T')[0].split('-')[2]}/
+                      {event.endDate.split('T')[0].split('-')[1]}/
+                      {event.endDate.split('T')[0].split('-')[0]},{" "}
+                      {event.endDate.split('T')[1].split('.')[0]}
+                      </Text>
                    </View>
                    </TouchableOpacity>
                ))}
