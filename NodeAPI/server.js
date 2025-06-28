@@ -17,6 +17,7 @@ const mongoose = require('mongoose');
 
 const userRoute = require('./routes/user.route.js');
 const eventRoute = require('./routes/event.route.js');
+const groupRoute = require('./routes/group.route.js');
 const authRoute = require('./routes/auth.route.js');
 
 const app = express();
@@ -31,15 +32,12 @@ app.use(express.json());
 // Routes
 app.use("/api/users", userRoute);
 app.use("/api/events", eventRoute);
+app.use("/api/groups", groupRoute);
 app.use('/', authRoute);
 
 // Initialise server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-});
-
-app.get('/', async (req, res) => {
-  res.send('<a href="/auth/google">Sign in with Google</a>');
 });
 
 // Connection to MongoDB
