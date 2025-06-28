@@ -7,9 +7,10 @@ const { getAllGroups, getGroupById, getGroupAdmins, getGroupMembers, promoteGrou
 
 router.get('/', getAllGroups);
 
-// Get event by id
+// Get group by id
 router.get('/:id', getGroupById);
 
+// Get events in the group
 router.get('/:id/events', getGroupEvents);
 
 // Create event
