@@ -1,0 +1,17 @@
+import {sorting} from "../component/Main-page"
+
+const loading = false;
+const actualEvents = [
+{dueDate: '2025-06-28T14:30:00', endDate: '2025-06-29T14:30:00'},
+{dueDate: '2025-06-25T14:30:00', endDate: '2025-06-26T14:30:00'},
+{dueDate: '2025-06-27T14:30:00', endDate: '2025-06-28T14:30:00'},
+]
+test('sorter working correctly', () => {
+    const result = sorting(loading, actualEvents);
+
+      expect(result).toEqual([
+         {dueDate: '2025-06-25T14:30:00', endDate: '2025-06-26T14:30:00'},
+        { dueDate: '2025-06-27T14:30:00', endDate: '2025-06-28T14:30:00'},
+        { dueDate: '2025-06-28T14:30:00', endDate: '2025-06-29T14:30:00' },
+      ]);
+});
