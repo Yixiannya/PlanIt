@@ -63,7 +63,7 @@ export default function GroupUser({route}) {
   const user = useUserStore((state) => state.user);
   const isAdmin = admins.some((admin => admin._id == user._id));
 
-  console.log(isAdmin);
+  console.log(admins.length);
 
   const Item = ({ item }) => (
     <View className="flex-1 flex-row items-center justify-center m-2 p-5 bg-orange-400 rounded-2xl">
@@ -118,11 +118,15 @@ export default function GroupUser({route}) {
                "What would you like to do?",
                [
                  { text: "Remove admins", onPress:
-                     () => { isAdmin
-                         ? admins.length !== 0
-                         ? setAdminDeleting(true)
-                         : Alert.alert("Error", "There must be at least one admin")
-                         : Alert.alert("Error", "You are not an admin", [{ text: "Ok" }])}},
+                    () => {if (isAdmin) {
+                         if (admins.length !== 1) {
+                           setAdminDeleting(true);
+                         } else {
+                           Alert.alert("Error", "There must be at least one admin");
+                         }
+                       } else {
+                         Alert.alert("Error", "You are not an admin", [{ text: "Ok" }]);
+                   }}},
                  { text: "Add admins", onPress:
                      () => { isAdmin
                       ? setAdminAdding(true)
