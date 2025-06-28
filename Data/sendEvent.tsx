@@ -1,5 +1,6 @@
 export async function sendEvent(information) {
   try {
+      console.log(information);
      const sendfetch = await fetch('https://planit-40q0.onrender.com/api/events', {
         method: "POST",
         headers: {
