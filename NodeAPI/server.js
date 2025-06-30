@@ -18,6 +18,7 @@ const mongoose = require('mongoose');
 const userRoute = require('./routes/user.route.js');
 const eventRoute = require('./routes/event.route.js');
 const groupRoute = require('./routes/group.route.js');
+const modRoute = require('./routes/mod.route.js');
 const authRoute = require('./routes/auth.route.js');
 
 const app = express();
@@ -33,6 +34,7 @@ app.use(express.json());
 app.use("/api/users", userRoute);
 app.use("/api/events", eventRoute);
 app.use("/api/groups", groupRoute);
+app.use("/api/mods", modRoute);
 app.use('/', authRoute);
 
 // Initialise server

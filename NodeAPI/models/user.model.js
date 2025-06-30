@@ -37,6 +37,12 @@ const UserSchema = mongoose.Schema(
             ref: "Event"
         }],
 
+        mods: [{
+            type: mongoose.Schema.Types.ObjectId,
+            required: false,
+            ref: "Mod"
+        }],
+
         loggedIn: {
             type: Boolean,
             required: true,
