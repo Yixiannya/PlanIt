@@ -1,4 +1,5 @@
 // Code containing the routes used for mods
+// Base route is /api/mods
 const express = require('express');
 const router = express.Router();
 const {getAllMods, getModById, postMod, putMod, patchMod, deleteMod} = require('../controllers/mod.controller.js');
@@ -19,6 +20,8 @@ router.patch('/:id', patchMod);
 
 // Delete mod by id
 router.delete('/:id', deleteMod);
+
+router.post('/:id', createEvents);
 
 
 module.exports = router;

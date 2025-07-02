@@ -2,6 +2,11 @@ const Mod = require('../models/mod.model.js');
 const Event = require('../models/event.model.js');
 const User = require('../models/user.model.js');
 
+// Find a way to track first monday of every August, that's when Sem 1 starts
+// Keep track of users?
+
+const SEM_START = "2026-08-04";
+
 const getAllMods = async (req, res) => {
     try {
         const mods = await Mod.find({});
@@ -28,8 +33,31 @@ const getModById = async (req, res) => {
 
 const postMod = async (req, res) => {
     try {
-        const mod = await Mod.create(req.body);
+        const userId = req.body.userId;
 
+        // Check for duplicates and add user into it
+        let mod = await findOneAndUpdate({ 
+                moduleCode: req.body.moduleCode, 
+                year: req.body.year, 
+                semester: req.body.semester
+            }, 
+            { $push: { userId: userId } }
+        );
+
+        if (!mod) {
+            mod = await Mod.create(req.body);
+        }
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { $push: { mods: mod } }
+        );
+                    
+        // If user doesn't exist
+        if (!user) {
+            return res.status(404).json({message: "User not found"});
+        }
+        
         res.status(200).json(mod);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -85,12 +113,23 @@ const deleteMod = async (req, res) => {
             return res.status(404).json({message: "Mod not found"});
         }
 
-        const events = await mod.events;
-
-        // Loop through events array and delete every event.
-        // In the future we have to check if any other member is involved in the event as well.
-
         res.status(200).json({message: "Mod deleted successfully"});
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+const updateStatus = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const mod = await Mod.findByIdAndUpdate(id, { isComplete: true })
+
+        // If mod doesn't exist
+        if (!mod) {
+            return res.status(404).json({message: "Mod not found"});
+        }
+
+        res.status(200).json();
     } catch (error) {
         res.status(500).json({message: error.message});
     }

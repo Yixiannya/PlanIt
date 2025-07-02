@@ -43,6 +43,12 @@ const ModSchema = mongoose.Schema(
             default: false
         },
 
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: false,
+            ref: "User"
+        },
+
         events: [{
             type: mongoose.Schema.Types.ObjectId,
             required: false,
