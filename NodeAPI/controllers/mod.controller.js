@@ -33,29 +33,36 @@ const getModById = async (req, res) => {
 
 const postMod = async (req, res) => {
     try {
-        const userId = req.body.userId;
+        const user = req.body.userId;
 
         // Check for duplicates and add user into it
-        let mod = await findOneAndUpdate({ 
+        let mod = await Mod.findOne({ 
                 moduleCode: req.body.moduleCode, 
                 year: req.body.year, 
                 semester: req.body.semester
-            }, 
-            { $push: { userId: userId } }
+            }  
         );
 
         if (!mod) {
+            console.log("Creating new mod");
             mod = await Mod.create(req.body);
+            await mod.save();
+        } else if (!mod.userId.includes(user)) {
+            // User isn't in mod so update both user and mod to contain this user
+            console.log("Adding user %s into mod", user);
+            mod.userId.push(user);
+            await mod.save();
         }
 
-        const user = await User.findByIdAndUpdate(
-            userId,
+        // Update users' mods array
+        const userObject = await User.findByIdAndUpdate(
+            user,
             { $push: { mods: mod } }
         );
                     
         // If user doesn't exist
-        if (!user) {
-            return res.status(404).json({message: "User not found"});
+        if (!userObject) {
+            console.log("User not found or no user given");
         }
         
         res.status(200).json(mod);
@@ -113,6 +120,20 @@ const deleteMod = async (req, res) => {
             return res.status(404).json({message: "Mod not found"});
         }
 
+        const userIds = mod.userId;
+
+        for (let i = 0; i < userIds.length; i++) {
+            const user = await User.findByIdAndUpdate(
+                userIds[i],
+                { $pull: { mods: id } }
+            );
+            
+            // If member doesn't exist
+            if (!user) {
+                return res.status(404).json({message: "User not found"});
+            }
+        }
+
         res.status(200).json({message: "Mod deleted successfully"});
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -129,6 +150,8 @@ const updateStatus = async (req, res) => {
             return res.status(404).json({message: "Mod not found"});
         }
 
+        // Find a way to create events based on given class, year, sem
+
         res.status(200).json();
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -141,5 +164,6 @@ module.exports = {
     postMod,
     putMod,
     patchMod,
-    deleteMod
+    deleteMod,
+    updateStatus
 }

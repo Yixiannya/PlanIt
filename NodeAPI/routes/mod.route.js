@@ -21,7 +21,7 @@ router.patch('/:id', patchMod);
 // Delete mod by id
 router.delete('/:id', deleteMod);
 
-router.post('/:id', createEvents);
+// router.post('/:id', updateStatus);
 
 
 module.exports = router;
