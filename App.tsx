@@ -14,6 +14,13 @@ import GroupUsers from './component/GroupUsers'
 import IndivGroupPage from './component/IndivGroupPage'
 import LoginPage from './component/LoginPage';
 import NewGroup from './component/NewGroup'
+import ViewMods from './component/ViewMods';
+import SearchModToAdd from './component/SearchModToAdd';
+import ConfigureMods from './component/ConfigureMods';
+import SelectModAY from './component/SelectModAY'
+import ModClasses from './component/ModClasses'
+import Settings from './component/Settings'
+
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
@@ -59,6 +66,34 @@ function BottomTabs() {
                  color= {color} />
             ),
         }}
+    />
+    <Stack.Screen
+        name="View Mods"
+        component={ViewMods}
+        options = {{
+            tabBarLabelStyle: {
+                fontSize: 12,
+            },
+            tabBarIcon: ({ focused, color, size }) => (
+                 <Ionicons name={focused ? "book" : "book-outline"}
+                 size = {size}
+                 color= {color} />
+            ),
+        }}
+    />
+    <Stack.Screen
+            name="Settings"
+            component={Settings}
+            options = {{
+                tabBarLabelStyle: {
+                    fontSize: 12,
+                },
+                tabBarIcon: ({ focused, color, size }) => (
+                     <Ionicons name={focused ? "setting" : "setting-outline"}
+                     size = {size}
+                     color= {color} />
+                ),
+            }}
     />
     </Stack.Navigator>
     );
@@ -131,6 +166,10 @@ export default function App() {
             <Pages.Screen name="AddUsers" component={AddUsers} />
             <Pages.Screen name="NewGroup" component={NewGroup} />
             <Pages.Screen name="GroupUsers" component={GroupUsers} />
+            <Pages.Screen name="SearchModToAdd" component={SearchModToAdd} />
+            <Pages.Screen name="ConfigureMods" component={ConfigureMods} />
+            <Pages.Screen name="SelectModAY" component={SelectModAY} />
+            <Pages.Screen name="ModClasses" component={ModClasses} />
             </Pages.Navigator>
         </NavigationContainer>
   );

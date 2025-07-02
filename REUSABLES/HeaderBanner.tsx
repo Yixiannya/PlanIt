@@ -1,9 +1,6 @@
 import { Text, View, Button, Image, TouchableOpacity, ImageSourcePropType} from 'react-native';
 
 const Header = ({ word, image, onPress }) => {
-      const iconPressed = () => {
-          console.log('Icon button pressed');
-      };
 
   return (
       <View className = "py-4 h-[11%] w-full flex-row items-center justify-between bg-orange-500 px-3 pt-10">

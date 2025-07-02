@@ -14,9 +14,9 @@ export default function LoginPage() {
       clearToken();
       await GoogleSignin.signOut();
       try {
-          setIsSubmitting(true);
           await GoogleSignin.hasPlayServices();
           const response = await GoogleSignin.signIn();
+          setIsSubmitting(true);
           if (isSuccessResponse(response)) {
               const { idToken } = response.data;
               const passable = { idToken };
@@ -31,6 +31,7 @@ export default function LoginPage() {
               if (responseBack.ok) {
                 const data = await responseBack.json();
                 console.log("Data" + data);
+                setIsSubmitting(false);
                 setUser(data.user);
                 navigation.replace('BottomTabs', { screen: 'Main-page' });
               } else {
@@ -62,19 +63,30 @@ export default function LoginPage() {
   };
 
   return (
-    <View className="flex-col flex-1 items-center justify-center bg-orange-500">
-      <Image className="w-[300px] h-[300px]" source={require('../assets/PlanIt.png')} />
+      <View className="flex-1 items-center justify-center bg-orange-500 pb-15">
+      <View className = "pr-1">
+      <Image className="w-[300px] h-[300px] py-2" source={require('../assets/PlanIt.png')} />
+      </View>
+    {!isSubmitting ? (
+        <View>
       <Text className="text-center text-[100px] text-white font-bold pr-2">Plan It</Text>
-      <Text className="text-center text-[30px] text-white pr-2 pt-1 py-1">
+      <Text className="text-center text-[30px] text-white pr-1 pt-1 py-1">
         A smart scheduling app made just for students
       </Text>
-      <View className="py-5">
-        <TouchableOpacity onPress={handleGoogleSignIn}>
-          <Text className="px-4 py-4 text-2xl font-bold border border-black rounded-2xl border-2 bg-orange-400">
+      <View className="py-5 items-center justify-center">
+        <TouchableOpacity onPress={handleGoogleSignIn} className="w-[250px]">
+          <Text className="text-center px-4 py-4 text-2xl font-bold border border-black rounded-2xl border-2 bg-orange-400">
             Login with Google
           </Text>
         </TouchableOpacity>
       </View>
+      </View>
+     ):(
+         <View className="px-4 items-center justify-center py-4 text-2xl font-bold">
+         <Text className = "pr-2 text-white py-5 text-6xl font-bold text-center"> Loading your info... </Text>
+         <Text className = "text-white text-4xl text-center"> Please wait... </Text>
+         </View>
+        )}
     </View>
   );
 }

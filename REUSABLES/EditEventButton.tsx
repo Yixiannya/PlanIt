@@ -54,7 +54,7 @@ const EditEventButton = ({ ID, Name, Date, Hour, Minute, endDate, endHour, endMi
 
     return (
         <TouchableOpacity onPress = {iconPressed}>
-        <View className = "h-64 bg-orange-50 flex-col justify-center items-center">
+        <View className = "h-64 bg-orange-500 flex-col justify-center items-center">
             <Text className = "pb-5 text-4xl text-gray-800 font-bold"> Edit event </Text>
         </View>
          </TouchableOpacity>
