@@ -34,7 +34,7 @@ const getModById = async (req, res) => {
 const getModUsers = async (req, res) => {
     try {
         const {id} = req.params;
-        const users = await Group.findById(id, '-_id userId').populate('userId');
+        const users = await Mod.findById(id, '-_id userId').populate('userId');
 
         // If group doesn't exist
         if (!users) {
