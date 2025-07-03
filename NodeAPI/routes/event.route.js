@@ -1,7 +1,10 @@
 // Code containing the routes used for events
 const express = require('express');
 const router = express.Router();
-const {getAllEvents, getEventById, getEventOwner, postEvent, putEvent, patchEvent, deleteEvent} = require('../controllers/event.controller.js');
+const {
+    getAllEvents, getEventById, getEventOwner, getEventDates, 
+    postEvent, putEvent, patchEvent, deleteEvent
+} = require('../controllers/event.controller.js');
 
 router.get('/', getAllEvents);
 
@@ -10,6 +13,8 @@ router.get('/:id', getEventById);
 
 // Get specific event owner by event id
 router.get('/:id/owner', getEventOwner);
+
+router.get('/:id/dates', getEventDates);
 
 // Create event
 router.post('/', postEvent);

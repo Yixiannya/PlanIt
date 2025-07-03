@@ -46,7 +46,7 @@ const EventSchema = mongoose.Schema(
             default: false
         },
 
-        recurrencePattern: {
+        rRule: {
             type: String,
             required: false
         },

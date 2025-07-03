@@ -151,6 +151,8 @@ const updateStatus = async (req, res) => {
         }
 
         // Find a way to create events based on given class, year, sem
+        // Use a temp event/mod for start of Sem 1, and refer to that mod for creation of future mods/events
+        const ayStart = await Event.findById();
 
         res.status(200).json();
     } catch (error) {

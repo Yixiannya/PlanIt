@@ -1,4 +1,6 @@
 // Code containing all methods used in event routes
+// Imports
+const { RRule, rrulestr } = require('rrule');
 const Event = require('../models/event.model.js');
 const Group = require('../models/group.model.js');
 const User = require('../models/user.model.js');
@@ -42,6 +44,28 @@ const getEventOwner = async (req, res) => {
         }
         
         res.status(200).json(eventOwner);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+const getEventDates = async (req, res) => {
+    try {
+        const {id} = req.params;
+
+        const startRange = new Date(req.body.startRange);
+        const endRange = new Date(req.body.endRange);
+        
+        const event = await Event.findById(id);
+
+        // If event doesn't exist
+        if (!event) {
+            return res.status(404).json({message: "Event not found"});
+        }
+        
+        const rRule = rrulestr(event.rRule);
+        const dates = rRule.between(startRange, endRange);
+        res.status(200).json(dates);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -240,7 +264,7 @@ const deleteEvent = async (req, res) => {
                 if (!member) {
                     return res.status(404).json({message: "User not found"});
                 }
-            }
+        }
 
         // If owner doesn't exist
         if (!owner) {
@@ -263,6 +287,7 @@ module.exports = {
     getAllEvents, 
     getEventById,
     getEventOwner,
+    getEventDates,
     postEvent,
     putEvent,
     patchEvent,

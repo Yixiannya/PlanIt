@@ -18,7 +18,8 @@
     "google-auth-library": "^9.15.1",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "6.16",
-    "mongoose": "^8.15.0"
+    "mongoose": "^8.15.0",
+    "rrule": "^2.8.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
