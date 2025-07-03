@@ -10,7 +10,7 @@ router.get('/', getAllMods);
 // Get mod by id
 router.get('/:id', getModById);
 
-router.get('/:id', getModUsers);
+router.get('/:id/users', getModUsers);
 
 // Create mod
 router.post('/', postMod);
