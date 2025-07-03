@@ -2,12 +2,15 @@
 // Base route is /api/mods
 const express = require('express');
 const router = express.Router();
-const {getAllMods, getModById, postMod, putMod, patchMod, deleteMod} = require('../controllers/mod.controller.js');
+const {getAllMods, getModById, getModUsers,
+    postMod, putMod, patchMod, deleteMod} = require('../controllers/mod.controller.js');
 
 router.get('/', getAllMods);
 
 // Get mod by id
 router.get('/:id', getModById);
+
+router.get('/:id', getModUsers);
 
 // Create mod
 router.post('/', postMod);

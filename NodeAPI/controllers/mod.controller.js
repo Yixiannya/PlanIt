@@ -31,6 +31,22 @@ const getModById = async (req, res) => {
     }
 };
 
+const getModUsers = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const users = await Group.findById(id, '-_id userId').populate('userId');
+
+        // If group doesn't exist
+        if (!users) {
+            return res.status(404).json({message: "Mod not found"});
+        }
+        
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
 const postMod = async (req, res) => {
     try {
         const user = req.body.userId;
@@ -152,7 +168,30 @@ const updateStatus = async (req, res) => {
 
         // Find a way to create events based on given class, year, sem
         // Use a temp event/mod for start of Sem 1, and refer to that mod for creation of future mods/events
-        const ayStart = await Event.findById();
+        const yearStart = new Date(mod.year, 0, 1);
+        const yearEnd = new Date(mod.year, 11, 31, 23, 59, 59);
+        
+        const ayStartRRule = await Event.findById("68667030a93852c53e910021").rRule;
+        const ayStart = rrulestr(ayStartRRule.rRule).between(yearStart, yearEnd);
+
+        console.log(ayStart);
+
+        var semStart = ayStart;
+
+        switch (mod.semester) {
+            case 1:
+                console.log(semStart);
+                break;
+            case 2:
+                semStart.setDate(semStart.getDate() + (23 * 7)); 
+                console.log(semStart);
+                break;
+            default:
+                console.log(semStart);
+                break;
+        }
+
+
 
         res.status(200).json();
     } catch (error) {
@@ -163,6 +202,7 @@ const updateStatus = async (req, res) => {
 module.exports = {
     getAllMods, 
     getModById,
+    getModUsers,
     postMod,
     putMod,
     patchMod,
