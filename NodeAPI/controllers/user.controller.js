@@ -63,6 +63,22 @@ const getUserGroups = async (req, res) => {
     }
 };
 
+const getUserMods = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userMods = await User.findById(id, '-_id mods').populate('mods');
+
+        // If user doesn't exist
+        if (!userMods) {
+            return res.status(404).json({message: "User not found"});
+        }
+        
+        res.status(200).json(userMods);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
 
 // Controls to create a user
 const postUser = async (req, res) => {
@@ -140,6 +156,7 @@ module.exports = {
     getUserById,
     getUserEvents,
     getUserGroups,
+    getUserMods,
     postUser,
     putUser,
     patchUser,

@@ -1,3 +1,4 @@
+const { RRule, rrulestr } = require('rrule');
 const Mod = require('../models/mod.model.js');
 const Event = require('../models/event.model.js');
 const User = require('../models/user.model.js');
@@ -36,7 +37,7 @@ const getModUsers = async (req, res) => {
         const {id} = req.params;
         const users = await Mod.findById(id, '-_id userId').populate('userId');
 
-        // If group doesn't exist
+        // If mod doesn't exist
         if (!users) {
             return res.status(404).json({message: "Mod not found"});
         }
