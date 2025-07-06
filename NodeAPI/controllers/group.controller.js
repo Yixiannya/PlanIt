@@ -2,6 +2,7 @@
 const Group = require('../models/group.model.js');
 const Event = require('../models/event.model.js');
 const User = require('../models/user.model.js');
+const { deleteEvent } = require('./event.controller.js');
 
 // Controls to get all groups
 const getAllGroups = async (req, res) => {
@@ -493,6 +494,7 @@ const deleteGroupAdmin = async (req, res) => {
 
 // Controls to delete a group
 // Also deletes it from admins of this group
+// TODO: Delete events
 const deleteGroup = async (req, res) => {
     try {
         const {id} = req.params;
@@ -523,6 +525,41 @@ const deleteGroup = async (req, res) => {
         const group = await Group.findByIdAndDelete(id, req.body);
         const admins = group.admins;
         const members = group.members;
+        const events = group.events;
+
+        // Goes through array and deletes each event
+        for (let i = 0; i < events.length; i++) {
+            const event = await Event.findByIdAndDelete(events[i]);
+            
+            if (!event) {
+                return res.status(404).json({message: "Event in group not found"});
+            }
+
+            const ownerId = event.owner;
+            const eventMembers = event.members;
+
+            const owner = await User.findByIdAndUpdate(
+                ownerId,
+                { $pull: { events: id } }
+            );
+
+            for (let i = 0; i < eventMembers.length; i++) {
+                    const eventMember = await User.findByIdAndUpdate(
+                        eventMembers[i],
+                        { $pull: { events: id } }
+                    );
+                        
+                    // If member doesn't exist
+                    if (!eventMember) {
+                        return res.status(404).json({message: "User in event not found"});
+                    }
+                }
+            
+            // If owner doesn't exist
+            if (!owner) {
+                return res.status(404).json({message: "User in group not found"});
+            };
+        }
 
         // Goes through array and removes group from every user that is a member
         for (let i = 0; i < members.length; i++) {
