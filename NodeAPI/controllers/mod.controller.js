@@ -3,6 +3,8 @@ const Mod = require('../models/mod.model.js');
 const Event = require('../models/event.model.js');
 const User = require('../models/user.model.js');
 
+// const { postEvent } = require('./event.controller.js');
+
 // Find a way to track first monday of every August, that's when Sem 1 starts
 // Keep track of users?
 
@@ -167,20 +169,50 @@ const updateStatus = async (req, res) => {
             return res.status(404).json({message: "Mod not found"});
         }
 
-        // Find a way to create events based on given class, year, sem
+        // TODO: Find a way to create events based on given class, year, sem
         // Use a temp event/mod for start of Sem 1, and refer to that mod for creation of future mods/events
-        const yearStart = new Date(mod.year, 0, 1);
-        const yearEnd = new Date(mod.year, 11, 31, 23, 59, 59);
+        const user = await User.findById(req.body.userId);
+
+        if (!userId) {
+            return res.status(404).json({message: "User not found"});
+        }
+
+        const events = mod.events;
+        const weeks = mod.weeks;
+
+        const yearSplit = "-";
+        let splitPosition = 0;
+
+        // Find position of the 2 years in year string
+        while (splitPosition < mod.year.length) {
+            if (mod.year.charAt(splitPosition) == yearSplit) {
+                break;
+            }
+            splitPosition++;
+        }
+
+        const yearSem1 = mod.year.slice(0, splitPosition - 1);
+        const yearSem2 = mod.year.slice(splitPosition + 1);
+
+        // Sem 1 year dates
+        const aySem1Start = new Date(yearSem1, 0, 1);
+        const aySem1End = new Date(yearSem1, 11, 31, 23, 59, 59);
+
+        // Sem 2 year dates
+        const aySem2Start = new Date(yearSem2, 0, 1);
+        const aySem2End = new Date(yearSem2, 11, 31, 23, 59, 59);
         
         const ayStartRRule = await Event.findById("68667030a93852c53e910021").rRule;
-        const ayStart = rrulestr(ayStartRRule.rRule).between(yearStart, yearEnd);
+        const ayStartDate = rrulestr(ayStartRRule.rRule).between(aySem1Start, aySem1End);
 
-        console.log(ayStart);
+        console.log(ayStartDate);
 
-        var semStart = ayStart;
+        var semStart = ayStartDate;
 
+        // Sets semStart to respective dates for sem 1/2
         switch (mod.semester) {
             case 1:
+                semStart.setDate(semStart.getDate() + 7); 
                 console.log(semStart);
                 break;
             case 2:
@@ -192,9 +224,81 @@ const updateStatus = async (req, res) => {
                 break;
         }
 
+        var classDay = 0;
 
+        switch (mod.day) {
+            case "Monday":
+                classDay = 0; 
+                console.log(semStart);
+                break;
+            case "Tuesday":
+                classDay = 1;
+                console.log(semStart);
+                break;
+            case "Wednesday":
+                classDay = 2;
+                console.log(semStart);
+                break;
+            case "Thursday":
+                classDay = 3;
+                console.log(semStart);
+                break;
+            case "Friday":
+                classDay = 4;
+                console.log(semStart);
+                break;
+            case "Saturday":
+                classDay = 5;
+                console.log(semStart);
+                break;
+            case "Sunday":
+                classDay = 6;
+                console.log(semStart);
+                break;
+            default:
+                classDay = 0;
+                break;
+        }
 
-        res.status(200).json();
+        await weeks;
+
+        let eventName = mod.name;
+        if (mod.lessonType) {
+            eventName = eventName + " " + mod.lessonType;
+        }
+        if (mod.classNo) {
+            eventName = eventName + " " + mod.classNo;
+        }
+
+        function convertHoursToMs(time) {
+            const hours = time.slice(0, 2);
+            const mins = time.slice(2);
+            return (hours * 3600 * 1000) + (mins * 60 * 1000);
+        }
+
+        // Creates an event at the given date for each week, counting from start of sem
+        // Add them into given user's events array
+        for (let i = 0; i < weeks.length; i++) {
+            const eventStart = new Date(semStart.getDate() + classDay + (i * 7));
+            eventStart.setTime(eventStart.getTime() + convertHoursToMs(mod.startTime));
+            const eventEnd = new Date(semStart.getDate() + classDay + (i * 7));
+            eventEnd.setTime(eventEnd.getTime() + convertHoursToMs(mod.endTime));
+
+            const event = await Event.create( { 
+                "name": eventName,
+                "description": mod.description,
+                "owner": user,
+                "dueDate": eventStart,
+                "endDate": eventEnd
+             } );
+
+            user.events.push(event);
+            mod.events.push(event);
+
+            console.log("Event for week %d created", i);
+        }        
+
+        res.status(200).json(mod.events);
     } catch (error) {
         res.status(500).json({message: error.message});
     }

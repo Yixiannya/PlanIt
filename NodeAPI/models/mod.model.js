@@ -32,10 +32,30 @@ const ModSchema = mongoose.Schema(
             required: true
         },
 
+        day: {
+            type: String,
+            required: true
+        },
+
         startDate: {
             type: Date,
             required: true
         },
+
+        startTime: {
+            type: String,
+            required: true
+        },
+
+        endTime: {
+            type: String,
+            required: true
+        },
+
+        weeks: [{
+            type: String,
+            required: true
+        }],
 
         isComplete: {
             type: Boolean,
