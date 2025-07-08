@@ -84,6 +84,7 @@ const postMod = async (req, res) => {
             console.log("User not found or no user given");
         }
         
+        console.log("Mod %s created successfully", mod.moduleCode);
         res.status(200).json(mod);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -133,26 +134,46 @@ const deleteMod = async (req, res) => {
     try {
         const {id} = req.params;
         const mod = await Mod.findByIdAndDelete(id, req.body);
+
+        console.log(id);
         
         // If mod doesn't exist
         if (!mod) {
             return res.status(404).json({message: "Mod not found"});
         }
 
+        const events = mod.events;
         const userIds = mod.userId;
 
         for (let i = 0; i < userIds.length; i++) {
-            const user = await User.findByIdAndUpdate(
-                userIds[i],
-                { $pull: { mods: id } }
-            );
+            const userId = userIds[i];
+            const user = await User.findById(userId);
+
+            console.log("Modifying %s", user.name);
             
             // If member doesn't exist
             if (!user) {
                 return res.status(404).json({message: "User not found"});
             }
-        }
 
+            // Remove every event within the mod from the user
+            for (let j = 0; j < events.length; j++) {
+                const eventId = events[j];
+                user.events.pull(eventId);
+                const deletedEvent = await Event.findByIdAndDelete(eventId);
+
+                if (!deletedEvent) {
+                    return res.status(404).json({message: "Event not found for deletion"});
+                } 
+                console.log("Event %s on %s deleted", deletedEvent.name, deletedEvent.dueDate.toDateString());
+            }
+
+            // Remove the mod from the user
+            user.mods.pull(id);
+            await user.save();
+        }
+        
+        console.log("Mod %s deleted successfully", mod.moduleCode);
         res.status(200).json({message: "Mod deleted successfully"});
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -162,23 +183,29 @@ const deleteMod = async (req, res) => {
 const updateStatus = async (req, res) => {
     try {
         const {id} = req.params;
-        const mod = await Mod.findByIdAndUpdate(id, { isComplete: true })
+        const mod = await Mod.findById(id);
 
         // If mod doesn't exist
         if (!mod) {
             return res.status(404).json({message: "Mod not found"});
         }
 
+        console.log("Mod found");
+
         // TODO: Find a way to create events based on given class, year, sem
         // Use a temp event/mod for start of Sem 1, and refer to that mod for creation of future mods/events
-        const user = await User.findById(req.body.userId);
+        const userId = req.body.userId;
+        const user = await User.findById(userId);
 
-        if (!userId) {
+        if (!user) {
             return res.status(404).json({message: "User not found"});
         }
+        console.log("User found");
 
         const events = mod.events;
         const weeks = mod.weeks;
+
+        console.log("weeks found");
 
         const yearSplit = "-";
         let splitPosition = 0;
@@ -191,8 +218,11 @@ const updateStatus = async (req, res) => {
             splitPosition++;
         }
 
-        const yearSem1 = mod.year.slice(0, splitPosition - 1);
+        const yearSem1 = mod.year.slice(0, splitPosition);
         const yearSem2 = mod.year.slice(splitPosition + 1);
+
+        console.log("Year 1 is %d", yearSem1);
+        console.log("Year 2 is %d", yearSem2);
 
         // Sem 1 year dates
         const aySem1Start = new Date(yearSem1, 0, 1);
@@ -202,58 +232,55 @@ const updateStatus = async (req, res) => {
         const aySem2Start = new Date(yearSem2, 0, 1);
         const aySem2End = new Date(yearSem2, 11, 31, 23, 59, 59);
         
-        const ayStartRRule = await Event.findById("68667030a93852c53e910021").rRule;
-        const ayStartDate = rrulestr(ayStartRRule.rRule).between(aySem1Start, aySem1End);
+        const ayStartEvent = await Event.findById("68667030a93852c53e910021");
+
+        console.log("Event %s found", ayStartEvent.name);
+
+        const ayStartRRule = await ayStartEvent.rRule;
+        const ayStartDate = rrulestr(ayStartRRule).between(aySem1Start, aySem1End);
 
         console.log(ayStartDate);
 
-        var semStart = ayStartDate;
+        var semStart = ayStartDate[0];
 
         // Sets semStart to respective dates for sem 1/2
-        switch (mod.semester) {
-            case 1:
+        const sem = mod.semester;
+        console.log("Semester %s", sem);
+        switch (sem) {
+            case "1":
                 semStart.setDate(semStart.getDate() + 7); 
-                console.log(semStart);
                 break;
-            case 2:
-                semStart.setDate(semStart.getDate() + (23 * 7)); 
-                console.log(semStart);
+            case "2":
+                semStart.setDate(semStart.getDate() + (22 * 7)); 
                 break;
             default:
-                console.log(semStart);
+                console.log("Sem starts at %s", semStart);
                 break;
         }
-
+        
         var classDay = 0;
 
         switch (mod.day) {
             case "Monday":
                 classDay = 0; 
-                console.log(semStart);
                 break;
             case "Tuesday":
                 classDay = 1;
-                console.log(semStart);
                 break;
             case "Wednesday":
                 classDay = 2;
-                console.log(semStart);
                 break;
             case "Thursday":
                 classDay = 3;
-                console.log(semStart);
                 break;
             case "Friday":
                 classDay = 4;
-                console.log(semStart);
                 break;
             case "Saturday":
                 classDay = 5;
-                console.log(semStart);
                 break;
             case "Sunday":
                 classDay = 6;
-                console.log(semStart);
                 break;
             default:
                 classDay = 0;
@@ -262,7 +289,7 @@ const updateStatus = async (req, res) => {
 
         await weeks;
 
-        let eventName = mod.name;
+        let eventName = mod.moduleCode;
         if (mod.lessonType) {
             eventName = eventName + " " + mod.lessonType;
         }
@@ -279,10 +306,27 @@ const updateStatus = async (req, res) => {
         // Creates an event at the given date for each week, counting from start of sem
         // Add them into given user's events array
         for (let i = 0; i < weeks.length; i++) {
-            const eventStart = new Date(semStart.getDate() + classDay + (i * 7));
+            var week = weeks[i];
+            const eventStart = new Date(semStart);
+
+            // Account for midterm reading week (between week 6 and 7)
+            if (week >= 7) {
+                week++;
+            }
+
+            // Account for no orientation week (week 0) in Sem 2
+            if (mod.semester == 2) {
+                week--;
+            }
+
+            eventStart.setDate(eventStart.getDate() + classDay + (week * 7));
             eventStart.setTime(eventStart.getTime() + convertHoursToMs(mod.startTime));
-            const eventEnd = new Date(semStart.getDate() + classDay + (i * 7));
+            console.log("Lesson starts on %s", eventStart);
+
+            const eventEnd = new Date(semStart);
+            eventEnd.setDate(eventEnd.getDate() + classDay + (week * 7));
             eventEnd.setTime(eventEnd.getTime() + convertHoursToMs(mod.endTime));
+            console.log("Lesson ends on %s", eventEnd);
 
             const event = await Event.create( { 
                 "name": eventName,
@@ -293,12 +337,18 @@ const updateStatus = async (req, res) => {
              } );
 
             user.events.push(event);
-            mod.events.push(event);
+            events.push(event);
 
-            console.log("Event for week %d created", i);
+            console.log("Event for week %d created", week);
         }        
 
-        res.status(200).json(mod.events);
+        user.save();
+        await mod.set({ isComplete: true });
+        await mod.save();
+
+        console.log("Status updated");
+
+        res.status(200).json(events);
     } catch (error) {
         res.status(500).json({message: error.message});
     }

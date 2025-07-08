@@ -53,7 +53,7 @@ const ModSchema = mongoose.Schema(
         },
 
         weeks: [{
-            type: String,
+            type: Number,
             required: true
         }],
 

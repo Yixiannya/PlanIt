@@ -273,10 +273,11 @@ const deleteEvent = async (req, res) => {
 
         // If group doesn't exist
         if (!group) {
-            return res.status(404).json({message: "Group not found"});
+            console.log("Group not found");
         }
 
         await Event.findById(id, req.body);
+        console.log("Event %s deleted successfully", event.name);
         res.status(200).json({message: "Event deleted successfully"});
     } catch (error) {
         res.status(500).json({message: error.message});
