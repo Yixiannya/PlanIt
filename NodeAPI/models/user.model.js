@@ -43,6 +43,22 @@ const UserSchema = mongoose.Schema(
             ref: "Mod"
         }],
 
+        notificationsEnabled: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+
+        notificationToken: {
+            type: String,
+            required: false
+        },
+
+        image: {
+            type: String,
+            required: false
+        },
+
         loggedIn: {
             type: Boolean,
             required: true,
