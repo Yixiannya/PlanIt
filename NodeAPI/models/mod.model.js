@@ -1,12 +1,7 @@
 const mongoose = require('mongoose');
 
-const ModSchema = mongoose.Schema(
+const ClassSchema = mongoose.Schema(
     {
-        moduleCode: {
-            type: String,
-            required: [true, "Please enter module code"],
-        },
-
         lessonType: {
             type: String,
             required: false
@@ -56,6 +51,38 @@ const ModSchema = mongoose.Schema(
             type: Number,
             required: true
         }],
+
+        userId: [{
+            type: mongoose.Schema.Types.ObjectId,
+            required: false,
+            ref: "User"
+        }]
+    }
+)
+
+const ModSchema = mongoose.Schema(
+    {
+        moduleCode: {
+            type: String,
+            required: [true, "Please enter module code"],
+        },
+
+        classes: [ClassSchema],
+
+        description: {
+            type: String,
+            required: false
+        },
+
+        year: {
+            type: String,
+            required: true
+        },
+
+        semester: {
+            type: String,
+            required: true
+        },
 
         isComplete: {
             type: Boolean,
