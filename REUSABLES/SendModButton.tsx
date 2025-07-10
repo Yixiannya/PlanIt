@@ -22,14 +22,15 @@ export const SendModButton = ({mods, year, semester, startDate}) => {
                 semester: semester,
                 startDate: startDate,
                 isComplete: false,
-            })), user._id);
+                userId: user._id,
+            })));
         }
     };
 
-    const sendAllMods = async (mods, id) => {
+    const sendAllMods = async (mods) => {
         try {
             await Promise.all(
-                mods.map(mod => sendUserMod(mod, id))
+                mods.map(mod => sendUserMod(mod))
             );
             Alert.alert("Mods have been added!")
             navigation.pop();

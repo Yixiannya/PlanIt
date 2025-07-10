@@ -6,7 +6,7 @@ import { useNavigation, useIsFocused } from '@react-navigation/native';
 import {getUserMod} from "../Data/getUserMod"
 
 export default function ViewMods() {
-const [loading, setLoading] = useState(false);
+const [loading, setLoading] = useState(true);
 const [yourMods, setYourMods] = useState([]);
 const navigation = useNavigation();
 const isFocused = useIsFocused();

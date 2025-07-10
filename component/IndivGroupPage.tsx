@@ -82,6 +82,7 @@ export default function IndivGroupPage() {
         setGroup(replace);
         const users = await fetchUser(replace.members);
         const admins = await fetchUser(replace.admins);
+        console.log(admins[0].image)
         setGroupMembers(users);
         setAdmins(admins);
         setLoading(false);
@@ -146,7 +147,7 @@ export default function IndivGroupPage() {
                 {Admins.map((member) => (
                     <View key={member._id} className="flex-col px-4 py-2">
                         <View className="py-2 justify-center items-center">
-                        <Image source = {require('../assets/ICON.png')} />
+                        <Image source = {{uri: member.image}} className = "rounded-3xl w-20 h-20"/>
                         </View>
                         <Text className="pt-2 justify-center text-center font-bold text-2xl">
                             {member.name}
@@ -159,7 +160,7 @@ export default function IndivGroupPage() {
                 GroupMembers.map((member) => (
                     <View key={member._id} className="flex-col px-4 py-2">
                          <View className="py-2 justify-center items-center">
-                           <Image source = {require('../assets/ICON.png')} />
+                          <Image source = {{uri: member.image}} className = "rounded-3xl w-20 h-20"/>
                          </View>
                          <Text className="py-2 justify-center text-center font-bold text-2xl">
                          {member.name}

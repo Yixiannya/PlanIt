@@ -1,4 +1,4 @@
-import { Alert, Image, Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { Alert, Image, Text, View, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import Header from '../REUSABLES/HeaderBanner';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
@@ -66,8 +66,9 @@ export default function GroupUser({route}) {
   console.log(admins.length);
 
   const Item = ({ item }) => (
-    <View className="flex-1 flex-row items-center justify-center m-2 p-5 bg-orange-400 rounded-2xl">
-        <Text className=" text-xl font-bold">{item.name}</Text>
+    <View className="flex-1 flex-col items-center justify-center m-2 p-5 pb-3 bg-orange-400 rounded-2xl">
+        <Image source = {{uri: item.image}} className = "rounded-3xl w-20 h-20"/>
+        <Text className="text-center pt-3 text-xl font-bold">{item.name}</Text>
         {deleting && (
             <TouchableOpacity onPress = {() => handleDelete(navigation, user, Group._id, item)}>
                 <Image source={require('../assets/delete.png')} className="w-12 h-12" />
@@ -82,8 +83,9 @@ export default function GroupUser({route}) {
   );
 
   const ItemAdmin = ({ item }) => (
-      <View className="flex-1 flex-row items-center justify-center m-2 p-5 bg-orange-400 rounded-2xl">
-          <Text className="text-xl font-bold">{item.name}</Text>
+      <View className="flex-1 flex-col items-center justify-center m-2 p-5 pb-3 bg-orange-400 rounded-2xl">
+              <Image source = {{uri: item.image}} className = "rounded-3xl w-20 h-20"/>
+              <Text className="text-center pt-3 text-2xl font-bold">{item.name}</Text>
           {adminDeleting && (
               <TouchableOpacity onPress = {() => handleAdminDeleting(navigation, user, Group._id, item)}>
                   <Image source={require('../assets/delete.png')} className="w-12 h-12" />
@@ -93,11 +95,12 @@ export default function GroupUser({route}) {
     );
 
   return (
-    <View className="flex-1 bg-orange-300">
+      <View className="flex-1 bg-orange-300">
       <Header word="Group Members"
-            image={require('../assets/Close.png')}
-            onPress={() => navigation.pop()}
-      />
+                  image={require('../assets/Close.png')}
+                  onPress={() => navigation.pop()}
+            />
+    <ScrollView>
       <View className="flex-row rounded-3xl border-8 border-orange-300 bg-orange-500 py-5 px-4 items-center">
          <View className = "w-4/5 flex-1 items-center">
             <Text className="ml-12 text-4xl font-bold">Admins</Text>
@@ -177,7 +180,7 @@ export default function GroupUser({route}) {
         </TouchableOpacity>
         )}
       </View>
-          <View className="pt-2 px-4">
+          <View className="pt-2 px-4 pb-20">
              <FlatList
                 data={members}
                 numColumns={2}
@@ -185,6 +188,7 @@ export default function GroupUser({route}) {
                 keyExtractor={(item) => item._id}
              />
           </View>
+      </ScrollView>
       </View>
     );
     }

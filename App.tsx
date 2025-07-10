@@ -21,13 +21,26 @@ import SelectModAY from './component/SelectModAY'
 import ModClasses from './component/ModClasses'
 import Settings from './component/Settings'
 
+
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import Toast from 'react-native-toast-message';
 
 const Stack = createBottomTabNavigator();
 const Group = createBottomTabNavigator();
+
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldPlaySound: false,
+    shouldShowBanner: true,
+    shouldSetBadge: false,
+  }),
+});
+
 function BottomTabs() {
     return (
     <Stack.Navigator screenOptions={{
@@ -89,7 +102,7 @@ function BottomTabs() {
                     fontSize: 12,
                 },
                 tabBarIcon: ({ focused, color, size }) => (
-                     <Ionicons name={focused ? "setting" : "setting-outline"}
+                     <Ionicons name={focused ? "settings" : "settings-outline"}
                      size = {size}
                      color= {color} />
                 ),
@@ -154,6 +167,7 @@ export default function App() {
     });
     const Pages = createStackNavigator();
     return (
+        <>
         <NavigationContainer>
             <Pages.Navigator screenOptions={{ headerShown: false }}>
             <Pages.Screen name="LoginPage" component={LoginPage} />
@@ -172,6 +186,8 @@ export default function App() {
             <Pages.Screen name="ModClasses" component={ModClasses} />
             </Pages.Navigator>
         </NavigationContainer>
+        <Toast />
+        </>
   );
   }
 

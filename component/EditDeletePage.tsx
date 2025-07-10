@@ -3,7 +3,6 @@ import { useNavigation } from '@react-navigation/native';
 import { deleteEvent } from '../Data/deleteEvent';
 import Header from '../REUSABLES/HeaderBanner';
 import { useEffect, useState } from 'react';
-import { getGroupEvents } from '../Data/getGroupEvents';
 import { useUserStore } from '../Data/userStore';
 
 export default function EditDeletePage({ route }) {
@@ -18,7 +17,7 @@ export default function EditDeletePage({ route }) {
    if (event.group !== undefined) {
      async function fetchEvents() {
        setLoading(true);
-       const replace = await getGroupEvents(event.group, "");
+       const replace = event.groupName;
        setGroup(replace);
        setAdmins(replace.admins.length === 0 || replace.admins.some(admin => admin === myuser._id));
        setLoading(false);

@@ -7,6 +7,8 @@ import {getUser} from '../Data/getUser';
 import {getGroups} from '../Data/getGroups';
 import { useUserStore } from '../Data/userStore';
 import {useGroupStore} from '../Data/groupStore'
+import {getGroup} from '../Data/getGroup';
+import {useNotificationStore} from  '../Data/notificationStore'
 
 export function sorting (today, loading, actualEvents) {
     return !loading
@@ -35,7 +37,20 @@ useEffect(() => {
     const mygroups = await getGroups(user._id);
     setGroups(mygroups);
     const events = await getEvent(user._id);
-    setActualEvents(Array.isArray(events) ? events : []);
+    const updatedEvents = await Promise.all(
+      events.map(async (event) => {
+        if (event.group != null) {
+          const groupName = await getGroup(event.group);
+          return {
+            ...event,
+            groupName: groupName,
+          };
+        } else {
+          return event;
+        }
+      })
+    );
+    setActualEvents(Array.isArray(events) ? updatedEvents : []);
     setLoading(false);
   }
   if (isFocused) {
@@ -55,6 +70,9 @@ console.log(actualEvents);
                     { text: "Yes", onPress:
                         () => {
                          clearToken();
+                         if (useNotificationStore.getState().listener) {
+                             useNotificationStore.getState().clearListener();
+                         }
                          navigation.replace("LoginPage");
                          } },
                  ]
@@ -84,11 +102,19 @@ const Carousel = ({ loading, events}) => {
                            location: () => navigation.replace('BottomTabs', { screen: 'Main-Page' }),
                             allEvents: events,
                        } )}>
-                   <View key={event._id} className="py-2 border-4 bg-gray-300 border-gray-300 rounded-2xl flex-col px-5 ml-3 mr-3">
-                   <View className="py-3 justify-center items-center">
-                     <Image source = {require('../assets/ICON.png')} />
-                   </View>
-                     <Text className="justify-center text-center font-bold text-4xl">{event.name}</Text>
+                   <View key={event._id} className="py-7 border-4 bg-gray-300 border-gray-300 rounded-2xl flex-col px-5 ml-3 mr-3">
+                     <Text className="pb-2 justify-center text-center font-bold text-5xl">{event.name}</Text>
+                     {event.group != null ? (
+                         <View className = "pt-1 pb-2 flex-row justify-center ">
+                         <Text className="text-center font-bold text-2xl">Group: </Text>
+                         <Text className="text-center text-2xl">{event.groupName.name}</Text>
+                         </View>
+                     ) : (
+                         <View className = "pt-1 pb-2 flex-row justify-center ">
+                         <Text className="font-bold text-center text-2xl">Personal event</Text>
+                         </View>
+                         )
+                     }
                      <Text className="justify-center text-center">
                      <Text className = "font-bold">
                        Start Date:{" "}
@@ -173,7 +199,7 @@ const GroupComponent = ({ indivEvent }) => {
             navigation.navigate('GroupTabs', {
                       screen: 'Group Info',
                     });
-            } }className="w-full flex-row items-center justify-between
+            }} className="w-full flex-row items-center justify-between
                          bg-gray-300 rounded-2xl border-2 border-gray-200">
             <View className="h-20 w-20 items-center mt-2">
                 <Image source={require('../assets/ICON.png')}/>

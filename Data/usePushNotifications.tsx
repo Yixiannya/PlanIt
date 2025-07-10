@@ -1,75 +1,71 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+import appConfig from '../app.json';
 
 import { Alert, Platform } from "react-native";
 import { useUserStore } from '../Data/userStore';
+import {editUser} from '../Data/editUser'
+import {useNotificationStore} from  '../Data/notificationStore'
 
-export const usePushNotifications = (setUp) => {
-    Notifications.setNotificationHandler({
-        handleNotification: async () => ({
-            shouldPlaySound: false,
-            shouldShowAlert: true,
-            shouldSetBadge: false,
-        }),
-    });
-    const myuser = useUserStore((state) => state.user);
-    const [expoPushToken, setExpoPushToken] = useState();
-    const [responseListener, setResponseListener] = useRef();
+export const setUpNotifications = async () => {
+   if (Device.isDevice) {
 
-    const setUpNotifications = async () => {
-        const token = null;
+       const existingStatus = await Notifications.getPermissionsAsync();
 
-        if (Device.isDevice) {
-            const existingStatus = await Notifications.getPermissionsAsync();
+       const finalStatus = existingStatus.status;
+       console.log(existingStatus);
+       if (existingStatus.status !== "granted") {
+           const request = await Notifications.requestPermissionsAsync();
+           finalStatus = request.status;
+       }
+       if (finalStatus !== "granted") {
+           Alert.alert("Failed to activate notifications, try again")
+       }
 
-            const finalStatus = existingStatus.status;
+       const projectId =
+         appConfig.expo.extra.eas.projectId;
 
-            if (existingStatus.status !== "granted") {
-                const request = await Notifications.requestPermissionsAsync();
-                finalStatus = request.status;
-            }
-            if (finalStatus !== "granted") {
-                Alert.alert("Failed to activate notifications, try again")
-            }
+       try {
+         const pushTokenString = (
+           await Notifications.getExpoPushTokenAsync({
+             projectId,
+           })
+         ).data;
+         return pushTokenString;
+       } catch (error) {
+         console.log(error)
+       }
 
-            token = await Notifications.getExpoPushTokenAsync({
-                projectId: "6ac8d5db-e62d-4daf-98e1-85516c76e31a",
-            })
+       if (Platform.OS === "android") {
+           Notifications.setNotificationsChannelAsync("notifications", {
+               name: "Notifications",
+               importance: Notifications.AndroidImportance.MAX,
+           })
+       }
+   } else {
+       console.log("Error: Use a physical device")
+   }
+}
 
-            if (Platform.OS === "android") {
-                Notifications.setNotificationsChannelAsync("notifications", {
-                    name: "Notifications",
-                    importance: Notifications.AndroidImportance.MAX,
-                })
-            }
-
-            return token;
-
-        } else {
-            console.log("Error: Use a physical device")
-        }
-    }
-        useEffect(() => {
-            if (!setUp) {
-                setUpNotifications().then((token) => {
-                setExpoPushToken(token);})
-            } else {
-                 responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-                    console.log("User interacted with notification:", response);
-                  });
-            }
-        return () => {
-            if (responseListener.current) {
-              responseListener.current.remove()
-            }
-          };
-        }, []);
-
-        return !setUp
-          ? { expoPushToken }
-          : {};
+export const usePushNotifications = async (setUp) => {
+    const userID = useUserStore.getState().user._id;
+        if (setUp === true) {
+            try {
+             const token = await setUpNotifications();
+             console.log(token);
+             await editUser({notificationsEnabled: true, notificationToken: token}
+                                  , userID);
+             useNotificationStore.getState().setListener();
+             } catch (error) {
+                 Alert.alert("Error", "Something went wrong");
+                 console.log(error);
+             }
+       } else {
+           await editUser({notificationsEnabled: false}
+                                , userID);
+       }
 };
 
 

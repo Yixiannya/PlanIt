@@ -1,4 +1,4 @@
-export async function sendUserMod(information, id) {
+export async function sendUserMod(information) {
   try {
       console.log(information);
      const sendfetch = await fetch('https://planit-40q0.onrender.com/api/mods', {

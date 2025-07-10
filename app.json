@@ -16,6 +16,9 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.raylong268.planit",
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -24,6 +27,8 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.raylong268.planit",
+      "googleServicesFile": "./google-services.json",
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -34,14 +39,17 @@
         "projectId": "6ac8d5db-e62d-4daf-98e1-85516c76e31a"
       }
     },
-    "plugins" : [
+    "plugins": [
       [
         "@react-native-google-signin/google-signin",
         {
           "iosUrlScheme": "com.googleusercontent.apps.1058453984266-39br9cbp3sc3k8r7a0ukdm06v5735i9m"
         }
-      ]
-    ]
+      ],
+      "expo-notifications"
+    ],
+    "updates": {
+      "url": "https://u.expo.dev/6ac8d5db-e62d-4daf-98e1-85516c76e31a"
+    }
   }
-
 }

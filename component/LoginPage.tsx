@@ -3,6 +3,9 @@ import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { GoogleSignin, isSuccessResponse, isErrorwithCode, statusCodes } from "@react-native-google-signin/google-signin";
 import { useUserStore } from '../Data/userStore';
+import {editUser} from '../Data/editUser'
+import {usePushNotifications} from  '../Data/usePushNotifications'
+import {useNotificationStore} from  '../Data/notificationStore'
 
 export default function LoginPage() {
   const navigation = useNavigation();
@@ -10,6 +13,15 @@ export default function LoginPage() {
   const setUser =  useUserStore((state) => state.setUser);
   const clearToken = useUserStore.getState().clearUser
 
+  const toggleNotifications = async () => {
+      try {
+        await usePushNotifications(true);
+        Alert.alert('Notification enabled', "You can now receive notifications");
+      } catch (e) {
+        Alert.alert('Failed to activate notifications', "Please try again in settings");
+        console.log(e)
+      }
+    };
   const handleGoogleSignIn = async () => {
       clearToken();
       await GoogleSignin.signOut();
@@ -17,10 +29,14 @@ export default function LoginPage() {
           await GoogleSignin.hasPlayServices();
           const response = await GoogleSignin.signIn();
           setIsSubmitting(true);
+          if (!isSuccessResponse(response)) {
+              setIsSubmitting(false);
+          }
           if (isSuccessResponse(response)) {
+              const photoUrl = response.data.user.photo;
               const { idToken } = response.data;
               const passable = { idToken };
-              console.log(passable);
+
               const responseBack = await fetch('https://planit-40q0.onrender.com/auth/google', {
                   method: "POST",
                   headers: {
@@ -30,10 +46,24 @@ export default function LoginPage() {
               })
               if (responseBack.ok) {
                 const data = await responseBack.json();
-                console.log("Data" + data);
+
+                await editUser({ image: photoUrl }, data.user._id)
+
                 setIsSubmitting(false);
                 setUser(data.user);
                 navigation.replace('BottomTabs', { screen: 'Main-page' });
+
+                if (!data.user.notificationsEnabled) {
+                    Alert.alert("Do you want to enable notifications?",
+                        "This will allow you to receive alerts on your phone",
+                        [{text: "No", onPress: () => Alert.alert("Notifications not enabled", "If you wish to enable notifications, toggle it in settings"),},
+                         { text: "Yes", onPress: () => {
+                             toggleNotifications();
+                         },}]
+                    );
+                } else {
+                    useNotificationStore.getState().setListener();
+                }
               } else {
                 const errorData = await responseBack.json();
                 console.error('Error:', responseBack.status, errorData);
