@@ -383,9 +383,18 @@ const deleteMod = async (req, res) => {
 
 const deleteClass = async (res, req) => {
     try {
+        const { id } = req.params;
+        const mod = findById(id);
+        const modClass = mod.classes.find(c =>
+            c.lessonType == req.body.lessonType
+            && c.classNo == req.body.classNo
+        );
+        const modClassId = modClass._id;
 
+        await mod.classes.pull(modClassId).then(mod.save());
+        res.status(200).json(mod.events);
     } catch (error) {
-
+        res.status(500).json({ message: error.message });
     }
 }
 
@@ -441,5 +450,6 @@ module.exports = {
     putMod,
     patchMod,
     deleteMod,
+    deleteClass,
     updateStatus
 }
