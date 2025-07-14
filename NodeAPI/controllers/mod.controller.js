@@ -381,6 +381,14 @@ const deleteMod = async (req, res) => {
     }
 };
 
+const deleteClass = async (res, req) => {
+    try {
+
+    } catch (error) {
+
+    }
+}
+
 const updateStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -401,23 +409,23 @@ const updateStatus = async (req, res) => {
         console.log("User found");
 
         // Use a temp event/mod for start of Sem 1, and refer to that mod for creation of future mods/events
-        if (!mod.isComplete) {
-            const userClasses = await mod.classes.filter(c => c.userId.includes(userId));
-            console.log(userClasses);
+        
+        const userClasses = await mod.classes.filter(c => c.userId.includes(userId));
+        console.log(userClasses);
 
-            const promises = [];
-            for (let i = 0; i < userClasses.length; i++) {
-                const modClass = userClasses[i];
-                promises.push(createEventsForClass(mod, modClass, user));
-            }
-
-            await Promise.all(promises)
-                .then(promise => mod.set({ isComplete: true }))
-                .then(promise => mod.save())
-                .then(promise => user.save());
-
-            console.log("Status updated");
+        const promises = [];
+        for (let i = 0; i < userClasses.length; i++) {
+            const modClass = userClasses[i];
+            promises.push(createEventsForClass(mod, modClass, user));
         }
+
+        await Promise.all(promises)
+            .then(promise => mod.set({ isComplete: true }))
+            .then(promise => mod.save())
+            .then(promise => user.save());
+
+        console.log("Status updated");
+        
         res.status(200).json(mod.events);
     } catch (error) {
         res.status(500).json({ message: error.message });

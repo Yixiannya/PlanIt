@@ -543,6 +543,7 @@ const deleteGroup = async (req, res) => {
                 { $pull: { events: id } }
             );
 
+            // Removes group event from every user and owner
             for (let i = 0; i < eventMembers.length; i++) {
                     const eventMember = await User.findByIdAndUpdate(
                         eventMembers[i],
