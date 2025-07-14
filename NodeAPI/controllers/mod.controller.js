@@ -25,7 +25,7 @@ function createClass(mod, req) {
 };
 
 async function createEventsForClass(mod, modClass, user) {
-    const events = mod.events;
+    const events = modClass.events;
     const weeks = modClass.weeks;
 
     console.log("weeks found");
@@ -34,15 +34,15 @@ async function createEventsForClass(mod, modClass, user) {
     let splitPosition = 0;
 
     // Find position of the 2 years in year string
-    while (splitPosition < mod.year.length) {
-        if (mod.year.charAt(splitPosition) == yearSplit) {
+    while (splitPosition < modClass.year.length) {
+        if (modClass.year.charAt(splitPosition) == yearSplit) {
             break;
         }
         splitPosition++;
     }
 
-    const yearSem1 = mod.year.slice(0, splitPosition);
-    const yearSem2 = mod.year.slice(splitPosition + 1);
+    const yearSem1 = modClass.year.slice(0, splitPosition);
+    const yearSem2 = modClass.year.slice(splitPosition + 1);
 
     console.log("Year 1 is %d", yearSem1);
     console.log("Year 2 is %d", yearSem2);
@@ -63,7 +63,7 @@ async function createEventsForClass(mod, modClass, user) {
     var semStart = ayStartDate[0];
 
     // Sets semStart to respective dates for sem 1/2
-    const sem = mod.semester;
+    const sem = modClass.semester;
     console.log("Semester %s", sem);
     switch (sem) {
         case "1":
@@ -75,12 +75,13 @@ async function createEventsForClass(mod, modClass, user) {
         default:
             break;
     }
+    semStart.setHours(0, 0, 0);
 
     console.log("Sem starts at %s", semStart);
 
     var classDay = 0;
 
-    switch (mod.day) {
+    switch (modClass.day) {
         case "Monday":
             classDay = 0;
             break;
@@ -136,7 +137,7 @@ async function createEventsForClass(mod, modClass, user) {
         }
 
         // Account for no orientation week (week 0) in Sem 2
-        if (mod.semester == 2) {
+        if (modClass.semester == 2) {
             week--;
         }
 
@@ -174,6 +175,26 @@ async function deleteEvent(eventId, user) {
     }
     console.log("Event %s on %s deleted", deletedEvent.name, deletedEvent.dueDate.toDateString());
 };
+
+async function deleteClassEvents(modClass) {
+    const users = modClass.userId;
+    const events = modClass.events;
+    const promises = [];
+    for (let i = 0; i < users.length; i++) {
+        const userId = users[i];
+
+        const user = await User.findById(userId);
+        console.log("Modifying %s in class", user.name);
+
+        for (let j = 0; j < events.length; j++) {
+            const eventId = events[j]._id;
+            promises.push(deleteEvent(eventId, user));
+        }
+        promises.push(user.save());
+    }
+
+    await Promise.all(promises);
+}
 
 const getAllMods = async (req, res) => {
     try {
@@ -347,7 +368,7 @@ const deleteMod = async (req, res) => {
             return res.status(404).json({ message: "Mod not found" });
         }
 
-        const events = mod.events;
+        const modClasses = mod.classes;
         const userIds = mod.userId;
 
         for (let i = 0; i < userIds.length; i++) {
@@ -363,9 +384,10 @@ const deleteMod = async (req, res) => {
 
             // Remove every event within the mod from the user
             const promises = [];
-            for (let j = 0; j < events.length; j++) {
-                const eventId = events[j];
-                promises.push(deleteEvent(eventId, user));
+            for (let j = 0; j < modClasses.length; j++) {
+                // delete class events
+                const modClass = modClasses[j];
+                promises.push(deleteClassEvents(modClass));
             }
 
             // Remove the mod from the user
@@ -381,18 +403,24 @@ const deleteMod = async (req, res) => {
     }
 };
 
-const deleteClass = async (res, req) => {
+const deleteClass = async (req, res) => {
     try {
         const { id } = req.params;
-        const mod = findById(id);
+        const mod = await Mod.findById(id);
         const modClass = mod.classes.find(c =>
             c.lessonType == req.body.lessonType
             && c.classNo == req.body.classNo
         );
         const modClassId = modClass._id;
 
-        await mod.classes.pull(modClassId).then(mod.save());
-        res.status(200).json(mod.events);
+        // delete class events
+        console.log("Deleting class events");
+        await deleteClassEvents(modClass);
+        console.log("Class Events deleted");
+
+        await mod.classes.pull(modClassId);
+        mod.save();
+        res.status(200).json({ message: "Class deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -435,7 +463,7 @@ const updateStatus = async (req, res) => {
 
         console.log("Status updated");
         
-        res.status(200).json(mod.events);
+        res.status(200).json(user.events);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

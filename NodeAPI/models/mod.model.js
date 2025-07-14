@@ -56,6 +56,12 @@ const ClassSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: false,
             ref: "User"
+        }],
+
+        events: [{
+            type: mongoose.Schema.Types.ObjectId,
+            required: false,
+            ref: "Event"
         }]
     }
 )
@@ -94,14 +100,7 @@ const ModSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: false,
             ref: "User"
-        }],
-
-        events: [{
-            type: mongoose.Schema.Types.ObjectId,
-            required: false,
-            ref: "Event"
-        }],
-
+        }]
     },
     {
         timestamps: true
