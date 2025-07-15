@@ -20,6 +20,7 @@ const eventRoute = require('./routes/event.route.js');
 const groupRoute = require('./routes/group.route.js');
 const modRoute = require('./routes/mod.route.js');
 const authRoute = require('./routes/auth.route.js');
+const googleRoute = require("./routes/google.route.js");
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use("/api/events", eventRoute);
 app.use("/api/groups", groupRoute);
 app.use("/api/mods", modRoute);
 app.use('/', authRoute);
+app.use('/google', googleRoute);
 
 // Initialise server
 app.listen(PORT, () => {

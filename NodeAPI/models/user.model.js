@@ -1,5 +1,31 @@
 const mongoose = require('mongoose');
 
+const GoogleSchema = mongoose.Schema(
+    {
+        // Use OAuth libraries, obtain access through Google
+        googleId: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        
+        accessToken: {
+            type: String,
+            required: true
+        },
+
+        refreshToken: {
+            type: String,
+            required: true
+        },
+
+        expiryDate: {
+            type: Date,
+            required: true
+        }
+    }
+);
+
 const UserSchema = mongoose.Schema(
     {
         name: {
@@ -8,12 +34,7 @@ const UserSchema = mongoose.Schema(
             default: "New User"
         },
 
-        // Use OAuth libraries, obtain access through Google
-        googleId: {
-            type: String,
-            required: true,
-            unique: true
-        },
+        google: GoogleSchema,
 
         email: {
             type: String,

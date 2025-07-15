@@ -5,6 +5,8 @@ const Event = require('../models/event.model.js');
 const Group = require('../models/group.model.js');
 const User = require('../models/user.model.js');
 
+const { syncEventToCalendar } = require('./google.controller.js');
+
 // Controls to get all events
 const getAllEvents = async (req, res) => {
     try {
@@ -147,6 +149,8 @@ const postEvent = async (req, res) => {
             if (!user) {
                 return res.status(404).json({message: "User not found"});
             }
+
+            await syncEventToCalendar(user, event);
         }
 
         res.status(200).json(event);

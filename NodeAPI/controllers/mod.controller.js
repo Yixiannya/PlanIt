@@ -7,19 +7,21 @@ const User = require('../models/user.model.js');
 
 // Some functions for usage
 function createClass(mod, req) {
-    mod.classes.push({
-        lessonType: req.body.lessonType,
-        classNo: req.body.classNo,
-        description: req.body.description,
-        year: req.body.year,
-        semester: req.body.semester,
-        day: req.body.day,
-        startDate: req.body.startDate,
-        startTime: req.body.startTime,
-        endTime: req.body.endTime,
-        weeks: req.body.weeks,
-        userId: req.body.userId
-    });
+    mod.classes.push(
+        {
+            lessonType: req.body.lessonType,
+            classNo: req.body.classNo,
+            description: req.body.description,
+            year: req.body.year,
+            semester: req.body.semester,
+            day: req.body.day,
+            startDate: req.body.startDate,
+            startTime: req.body.startTime,
+            endTime: req.body.endTime,
+            weeks: req.body.weeks,
+            userId: req.body.userId
+        }
+    );
 
     console.log("%s %s created", req.body.lessonType, req.body.classNo);
 };

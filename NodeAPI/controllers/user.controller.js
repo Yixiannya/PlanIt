@@ -84,6 +84,17 @@ const getUserMods = async (req, res) => {
 const postUser = async (req, res) => {
     try {
         const user = await User.create(req.body);
+        const expiryMs = new Date(req.body.expiryDate).getTime();
+        await user.google.push(
+            {
+                googleId: req.body.googleId,
+                accessToken: req.body.accessToken,
+                refreshToken: req.body.refreshToken,
+                expiryDate: expiryMs
+            }
+        );
+
+        console.log("User %s created", user.name);
         res.status(200).json(user);
     } catch (error) {
         res.status(500).json({message: error.message});
