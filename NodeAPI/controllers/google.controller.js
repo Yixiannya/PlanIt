@@ -44,11 +44,11 @@ async function syncEventToCalendar(user, event) {
     const googleEvent = {
         summary: event.name,
         description: event.description,
-        start: { dateTime: event.dueDate, timeZone: "Asia/Singapore" },
-        end: { dateTime: event.endDate, timeZone: "Asia/Singapore" },
+        start: { dateTime: event.dueDate },
+        end: { dateTime: event.endDate },
         attendees: googleEventMembers
     };
-    console.log("Google Calendar event created");
+    console.log("Google Calendar event created on %s", event.dueDate);
 
     if (!user || !user.google) {
         return res.status(404).json({ message: "User not connected to Google" });
