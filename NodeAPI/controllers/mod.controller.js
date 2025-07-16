@@ -169,17 +169,6 @@ async function createEventsForClass(mod, modClass, user) {
     }
 };
 
-async function deleteEvent(eventId, user) {
-    console.log("Deleting event");
-    user.events.pull(eventId);
-    const deletedEvent = await Event.findByIdAndDelete(eventId);
-
-    if (!deletedEvent) {
-        return res.status(404).json({ message: "Event not found for deletion" });
-    }
-    console.log("Event %s on %s deleted", deletedEvent.name, deletedEvent.dueDate.toDateString());
-};
-
 async function deleteClassEvents(modClass) {
     const users = modClass.userId;
     const events = modClass.events;
@@ -192,7 +181,7 @@ async function deleteClassEvents(modClass) {
 
         for (let j = 0; j < events.length; j++) {
             const eventId = events[j]._id;
-            promises.push(deleteEvent(eventId, user));
+            promises.push(deleteEventFunc(eventId));
         }
         promises.push(user.save());
     }

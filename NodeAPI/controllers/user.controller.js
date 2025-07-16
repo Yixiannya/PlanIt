@@ -147,7 +147,8 @@ const deleteUser = async (req, res) => {
         const promises = [];
         const ownedEvents = await user.events.filter(e => e.owner.toString() == id.toString());
         for (let i = 0; i < ownedEvents.length; i++) {
-            promises.push(deleteEventFunc(ownedEvents[i]));
+            const eventId = ownedEvents[i]._id;
+            promises.push(deleteEventFunc(eventId));
         }
         await Promise.all(promises);
 

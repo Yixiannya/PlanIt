@@ -224,11 +224,13 @@ async function deleteEventFunc(eventId) {
 
     const members = event.members;
 
+    console.log("Removing event from owner");
     const owner = await User.findByIdAndUpdate(
         ownerId,
         { $pull: { events: id } }
     );
 
+    console.log("Removing event from group");
     const group = await Group.findByIdAndUpdate(
         groupId,
         { $pull: { events: id } }
@@ -270,6 +272,7 @@ const deleteEvent = async (req, res) => {
     try {
         const {id} = req.params;
 
+        console.log("Deleting event");
         await deleteEventFunc(id);
 
         console.log("Event %s deleted successfully", event.name);
