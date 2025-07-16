@@ -1,5 +1,5 @@
 const { google } = require('googleapis');
-const { oAuth2Client } = require('../utils/googleapi.js');
+const { createOAuth2Client } = require('../utils/googleapi.js');
 
 const SCOPES = [
     'https://www.googleapis.com/auth/calendar',
@@ -33,6 +33,7 @@ async function syncEventToCalendar(user, event) {
     const members = event.members;
     const googleEventMembers = [];
     
+    
     for (let i = 0; i < members.length; i++) {
         const member = await User.findById(members[i]);
         const eventMember = { displayName: member.name, email: member.email };
@@ -54,7 +55,8 @@ async function syncEventToCalendar(user, event) {
     }
 
     console.log("Initialising oAuth2Client for query");
-    const oAuth2Client = oAuth2Client.setCredentials({
+    const oAuth2Client = createOAuth2Client();
+    oAuth2Client.setCredentials({
         access_token: user.google.accessToken,
         refresh_token: user.google.refreshToken,
         expiry_date: user.google.expiryDate

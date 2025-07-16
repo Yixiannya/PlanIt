@@ -3,7 +3,7 @@ const User = require('../models/user.model.js');
 
 const {verifyGoogleToken} = require('../utils/verifyGoogleToken.js');
 const {createJWT} = require('../utils/createJWT.js');
-const { oAuth2Client } = require('../utils/googleapi.js');
+const { createOAuth2Client } = require('../utils/googleapi.js');
 
 // Login screen
 const login = async (req, res, next) => {
@@ -38,7 +38,7 @@ const initiateAndroidAuth = async (req, res) => {
   try {
     console.log("Received token");
     const { idToken, accessToken, serverAuth } = req.body;
-
+    const oAuth2Client = createOAuth2Client();
     
     if (!idToken) {
       console.log("No idToken received");
