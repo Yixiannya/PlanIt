@@ -78,6 +78,7 @@ async function syncEventToCalendar(user, event) {
     });
 
     event.googleId = result.data.id;
+    await event.save();
     console.log("Event synced at %s", result.data.htmlLink);
 };
 
@@ -98,6 +99,7 @@ async function deleteEventFromCalendar(user, event) {
         calendarId: "primary",
         eventId: event.googleId
     });
+
     console.log("Event '%s' removed from %s's Google Calendar", event.name, user.name);
 };
 
