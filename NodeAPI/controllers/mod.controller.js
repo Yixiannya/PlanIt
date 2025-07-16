@@ -179,6 +179,7 @@ async function deleteClassEvents(modClass) {
         const user = await User.findById(userId);
         console.log("Modifying %s in class", user.name);
 
+        console.log("Deleting class events");
         for (let j = 0; j < events.length; j++) {
             const eventId = events[i]._id;
             const event = await Event.findById(eventId);
@@ -187,13 +188,14 @@ async function deleteClassEvents(modClass) {
             if (!event) {
                 return res.status(404).json({ message: "Event not found" });
             }
-            
+
             promises.push(deleteEventFunc(event));
         }
         promises.push(user.save());
     }
 
     await Promise.all(promises);
+    console.log("class events deleted");
 }
 
 const getAllMods = async (req, res) => {

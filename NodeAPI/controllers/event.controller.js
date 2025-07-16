@@ -264,7 +264,8 @@ async function deleteEventFunc(event) {
     promises.push(deleteEventFromCalendar(owner, event));
 
     await Promise.all(promises);
-    await Event.findByIdAndDelete(id, req.body);
+    await Event.findByIdAndDelete(eventId)
+        .then(promise => console.log("Event deleted"));
 };
 
 const deleteEvent = async (req, res) => {

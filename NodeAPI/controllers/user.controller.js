@@ -136,8 +136,10 @@ const patchUser = async (req, res) => {
 // Controls to delete a user
 const deleteUser = async (req, res) => {
     try {
+        console.log(req.params);
         const {id} = req.params;
-        const user = await User.findById(id, req.body);
+        const userId = id;
+        const user = await User.findById(id, req.body).populate('events');
 
         console.log("Initiating deletion of user %s", user.name);
         
@@ -150,7 +152,9 @@ const deleteUser = async (req, res) => {
         const promises = [];
 
         console.log("Deleting user's events");
-        const ownedEvents = await user.events.filter(e => e.owner.toString() == id.toString());
+        
+        const ownedEvents = user.events.filter(e => e.owner.toString() === userId.toString());
+
         for (let i = 0; i < ownedEvents.length; i++) {
             const eventId = ownedEvents[i]._id;
             const event = await Event.findById(eventId);
@@ -163,6 +167,9 @@ const deleteUser = async (req, res) => {
             promises.push(deleteEventFunc(event));
         }
         await Promise.all(promises);
+
+        console.log("User Events all deleted");
+
         await User.findByIdAndDelete(id, req.body);
 
         res.status(200).json({message: "User deleted successfully"});
