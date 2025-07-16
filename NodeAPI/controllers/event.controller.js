@@ -94,6 +94,8 @@ const postEvent = async (req, res) => {
             const admins = targetGroup.admins;
             const members = targetGroup.members;
 
+            const promises = [];
+
             // Check requester's id and see if they're an admin
             let i = 0;
             while (i < admins.length) {
@@ -103,7 +105,6 @@ const postEvent = async (req, res) => {
                 }
                 i++;
             }
-            
 
             if (i >= admins.length) {
                 return res.status(403).json({message: "Requesting User is not an admin of the given group"});
@@ -122,6 +123,8 @@ const postEvent = async (req, res) => {
                 if (!member) {
                     return res.status(404).json({message: "User not found"});
                 }
+
+                promises.push(syncEventToCalendar(member, event));
             }
 
             // Admins array
@@ -137,7 +140,11 @@ const postEvent = async (req, res) => {
                 if (!admin) {
                     return res.status(404).json({message: "User not found"});
                 }
+
+                promises.push(syncEventToCalendar(admin, event));
             }
+
+            await Promise.all(promises);
         } else {
             // No group specificed, so event is a personal event.
             const user = await User.findByIdAndUpdate(
