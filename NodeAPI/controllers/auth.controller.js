@@ -76,7 +76,7 @@ const initiateAndroidAuth = async (req, res) => {
       });
 
       console.log("Creating Google info");
-      const expiryMs = new Date(tokens.expiry_Date).getTime();
+      const expiryMs = new Date(tokens.expiry_date).getTime();
       user.google = {
           googleId: googleUser.googleId,
           accessToken: tokens.access_token,
