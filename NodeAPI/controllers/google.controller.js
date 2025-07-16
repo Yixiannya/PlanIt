@@ -1,7 +1,12 @@
 const { google } = require('googleapis');
-const { getOAuthClient } = require('../utils/googleapi.js');
+const { oAuth2Client } = require('../utils/googleapi.js');
 
-const SCOPES = ['https://www.googleapis.com/auth/calendar'];
+const SCOPES = [
+    'https://www.googleapis.com/auth/calendar',
+    'openid',
+    'email',
+    'profile'
+];
 
 /*
 const consent = (req, res) => {
@@ -45,7 +50,7 @@ async function syncEventToCalendar(user, event) {
         return res.status(404).json({ message: "User not connected to Google" });
     }
 
-    const oAuth2Client = getOAuthClient({
+    const oAuth2Client = oAuth2Client({
         access_token: user.google.accessToken,
         refresh_token: user.google.refreshToken,
         expiry_date: user.google.expiryDate

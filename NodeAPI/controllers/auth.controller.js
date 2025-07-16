@@ -3,6 +3,7 @@ const User = require('../models/user.model.js');
 
 const {verifyGoogleToken} = require('../utils/verifyGoogleToken.js');
 const {createJWT} = require('../utils/createJWT.js');
+const { oAuth2Client } = require('../utils/googleapi.js');
 
 // Login screen
 const login = async (req, res, next) => {
@@ -36,26 +37,53 @@ const initiatePasswordAuth = async (req, res) => {
 const initiateAndroidAuth = async (req, res) => {
   try {
     console.log("Received token");
-    const { idToken } = req.body;
+    const { idToken, accessToken, serverAuth } = req.body;
 
+    
     if (!idToken) {
-      console.log("No token received");
+      console.log("No idToken received");
       return res.status(400).json({ error: 'ID token required' });
     }
+    if (!accessToken) {
+      console.log("No accessToken received");
+      return res.status(400).json({ error: 'Access token required' });
+    }
+    if (!serverAuth) {
+      console.log("No serverAuth received");
+      return res.status(400).json({ error: 'Server Auth Code required' });
+    }
+
+    console.log("idToken: %s", idToken);
+    console.log("accessToken: %s", accessToken);
+    console.log("serverAuth: %s", serverAuth);
 
     console.log("Verify token function");
     const googleUser = await verifyGoogleToken(idToken);
 
+    console.log("Creating access and refresh tokens");
+    const { tokens } = await oAuth2Client.getToken(serverAuth);
+    console.log("Access token: %s", tokens.access_Token);
+    console.log("Refresh token: %s", tokens.refresh_Token);
+
     console.log("Finding user");
-    let user = await User.findOne({ googleId: googleUser.googleId });
+    let user = await User.findOne({ 'google.googleId': googleUser.googleId });
 
     if (!user) {
-      console.log("No such user found");
+      console.log("No such user found, creating new user");
       user = await User.create({
-        googleId: googleUser.googleId,
         name: googleUser.name,
         email: googleUser.email,
       });
+
+      const expiryMs = new Date(tokens.expiry_Date).getTime();
+      await user.google.push(
+        {
+          googleId: googleUser.googleId,
+          accessToken: tokens.access_Token,
+          refreshToken: tokens.refresh_Token,
+          expiryDate: expiryMs
+        }
+      );
     }
 
     console.log("User found, creating JWT");
