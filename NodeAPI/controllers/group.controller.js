@@ -2,7 +2,8 @@
 const Group = require('../models/group.model.js');
 const Event = require('../models/event.model.js');
 const User = require('../models/user.model.js');
-const { deleteEvent } = require('./event.controller.js');
+
+const { deleteEventFunc } = require('./event.controller.js');
 
 // Controls to get all groups
 const getAllGroups = async (req, res) => {
@@ -527,39 +528,11 @@ const deleteGroup = async (req, res) => {
         const members = group.members;
         const events = group.events;
 
+        const promises = [];
+
         // Goes through array and deletes each event
         for (let i = 0; i < events.length; i++) {
-            const event = await Event.findByIdAndDelete(events[i]);
-            
-            if (!event) {
-                return res.status(404).json({message: "Event in group not found"});
-            }
-
-            const ownerId = event.owner;
-            const eventMembers = event.members;
-
-            const owner = await User.findByIdAndUpdate(
-                ownerId,
-                { $pull: { events: id } }
-            );
-
-            // Removes group event from every user and owner
-            for (let i = 0; i < eventMembers.length; i++) {
-                    const eventMember = await User.findByIdAndUpdate(
-                        eventMembers[i],
-                        { $pull: { events: id } }
-                    );
-                        
-                    // If member doesn't exist
-                    if (!eventMember) {
-                        return res.status(404).json({message: "User in event not found"});
-                    }
-                }
-            
-            // If owner doesn't exist
-            if (!owner) {
-                return res.status(404).json({message: "User in group not found"});
-            };
+            promises.push(deleteEventFunc(events[i]));
         }
 
         // Goes through array and removes group from every user that is a member
@@ -588,6 +561,7 @@ const deleteGroup = async (req, res) => {
             }
         }
 
+        await Promise.all(promises);
         res.status(200).json({message: "Group deleted successfully"});
     } catch (error) {
         res.status(500).json({message: error.message});

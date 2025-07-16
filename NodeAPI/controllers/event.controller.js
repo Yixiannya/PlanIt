@@ -5,7 +5,7 @@ const Event = require('../models/event.model.js');
 const Group = require('../models/group.model.js');
 const User = require('../models/user.model.js');
 
-const { syncEventToCalendar } = require('./google.controller.js');
+const { syncEventToCalendar, deleteEventFromCalendar } = require('./google.controller.js');
 
 // Controls to get all events
 const getAllEvents = async (req, res) => {
@@ -166,37 +166,6 @@ const postEvent = async (req, res) => {
     }
 };
 
-// Create event for a group.
-/* const postGroupEvent = async (req, res) => {
-    try {
-        const event = await Event.create(req.body);
-
-        const owner = event.owner;
-        
-        const group = event.group;
-
-        const user = await User.findByIdAndUpdate(
-            owner,
-            { $push: { events: event } }
-        );
-        
-        // If user doesn't exist
-        if (!user) {
-            return res.status(404).json({message: "User not found"});
-        }
-
-        const members = await Group.findById(group, 'members')
-            .populate('members');
-
-        
-
-        res.status(200).json(event);
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-}; */
-
-
 // Controls to update an event
 const putEvent = async (req, res) => {
     try {
@@ -239,55 +208,70 @@ const patchEvent = async (req, res) => {
 
 // Controls to delete a event
 // Also deletes it from owner of this event
+
+// Helper function
+async function deleteEventFunc(eventId) {
+    const event = await Event.findById(eventId, req.body);
+
+    // If event doesn't exist
+    if (!event) {
+        return res.status(404).json({ message: "Event not found" });
+    }
+
+    const ownerId = event.owner;
+
+    const groupId = event.group;
+
+    const members = event.members;
+
+    const owner = await User.findByIdAndUpdate(
+        ownerId,
+        { $pull: { events: id } }
+    );
+
+    const group = await Group.findByIdAndUpdate(
+        groupId,
+        { $pull: { events: id } }
+    );
+
+    const promises = [];
+
+    for (let i = 0; i < members.length; i++) {
+        const member = await User.findByIdAndUpdate(
+            members[i],
+            { $pull: { events: id } }
+        );
+
+        // If member doesn't exist
+        if (!member) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        promises.push(deleteEventFromCalendar(member, event));
+    }
+
+    // If owner doesn't exist
+    if (!owner) {
+        return res.status(404).json({ message: "User not found" });
+    }
+
+    // If group doesn't exist
+    if (!group) {
+        console.log("Group not found");
+    }
+
+    promises.push(deleteEventFromCalendar(owner, event));
+
+    await Promise.all(promises)
+        .then(promise => Event.findByIdAndDelete(id, req.body));
+};
+
 const deleteEvent = async (req, res) => {
     try {
         const {id} = req.params;
-        const event = await Event.findById(id, req.body);
 
-        // If event doesn't exist
-        if (!event) {
-            return res.status(404).json({message: "Event not found"});
-        }
-        
-        const ownerId = event.owner;
+        await deleteEventFunc(id);
 
-        const groupId = event.group;
-
-        const members = event.members;
-
-        const owner = await User.findByIdAndUpdate(
-            ownerId,
-            { $pull: { events: id } }
-        );
-
-        const group = await Group.findByIdAndUpdate(
-            groupId,
-            { $pull: { events: id } }
-        );
-
-        for (let i = 0; i < members.length; i++) {
-                const member = await User.findByIdAndUpdate(
-                    members[i],
-                    { $pull: { events: id } }
-                );
-            
-                // If member doesn't exist
-                if (!member) {
-                    return res.status(404).json({message: "User not found"});
-                }
-        }
-
-        // If owner doesn't exist
-        if (!owner) {
-            return res.status(404).json({message: "User not found"});
-        }
-
-        // If group doesn't exist
-        if (!group) {
-            console.log("Group not found");
-        }
-
-        await Event.findById(id, req.body);
         console.log("Event %s deleted successfully", event.name);
         res.status(200).json({message: "Event deleted successfully"});
     } catch (error) {
@@ -303,5 +287,6 @@ module.exports = {
     postEvent,
     putEvent,
     patchEvent,
-    deleteEvent
+    deleteEvent,
+    deleteEventFunc
 }

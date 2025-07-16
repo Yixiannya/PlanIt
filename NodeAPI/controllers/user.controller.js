@@ -1,6 +1,8 @@
 // Code containing all methods used in user routes
 const User = require('../models/user.model.js');
 
+const { deleteEventFunc } = require('./event.controller.js');
+
 // Controls to get all users
 const getAllUsers = async (req, res) => {
     try {
@@ -27,7 +29,6 @@ const getUserById = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
-
 
 // Get all events a user has
 const getUserEvents = async (req, res) => {
@@ -84,15 +85,6 @@ const getUserMods = async (req, res) => {
 const postUser = async (req, res) => {
     try {
         const user = await User.create(req.body);
-        const expiryMs = new Date(req.body.expiryDate).getTime();
-        await user.google.push(
-            {
-                googleId: req.body.googleId,
-                accessToken: req.body.accessToken,
-                refreshToken: req.body.refreshToken,
-                expiryDate: expiryMs
-            }
-        );
 
         console.log("User %s created", user.name);
         res.status(200).json(user);
@@ -151,10 +143,13 @@ const deleteUser = async (req, res) => {
             return res.status(404).json({message: "User not found"});
         }
 
-        const events = await user.events;
-
-        // Loop through events array and delete every event.
-        // In the future we have to check if any other member is involved in the event as well.
+        // Loops through events array and delete every event where user is owner.
+        const promises = [];
+        const ownedEvents = await user.events.filter(e => e.owner.toString() == id.toString());
+        for (let i = 0; i < ownedEvents.length; i++) {
+            promises.push(deleteEventFunc(ownedEvents[i]));
+        }
+        await Promise.all(promises);
 
         res.status(200).json({message: "User deleted successfully"});
     } catch (error) {

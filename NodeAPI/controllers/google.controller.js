@@ -45,7 +45,7 @@ async function syncEventToCalendar(user, event) {
     // Hardcoding timezone adjustment (Will need to do something else if we want to account for local time
     // all over the world)
     const adjustedDueDate = event.dueDate.toISOString().slice(0, 19) + "+08:00";
-    const adjustedEndDate = event.dueDate.toISOString().slice(0, 19) + "+08:00";
+    const adjustedEndDate = event.endDate.toISOString().slice(0, 19) + "+08:00";
     const googleEvent = {
         summary: event.name,
         description: event.description,
@@ -77,9 +77,31 @@ async function syncEventToCalendar(user, event) {
         resource: googleEvent
     });
 
+    event.googleId = result.data.id;
     console.log("Event synced at %s", result.data.htmlLink);
 };
 
+async function deleteEventFromCalendar(user, event) {
+    console.log("Initialising oAuth2Client for query");
+    const oAuth2Client = createOAuth2Client();
+
+    oAuth2Client.setCredentials({
+        access_token: user.google.accessToken,
+        refresh_token: user.google.refreshToken,
+        expiry_date: user.google.expiryDate
+    });
+    console.log("oAuth2Client initialised");
+
+    const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
+
+    await calendar.events.delete({
+        calendarId: "primary",
+        eventId: event.googleId
+    });
+    console.log("Event '%s' removed from %s's Google Calendar", event.name, user.name);
+};
+
 module.exports = {
-    syncEventToCalendar
+    syncEventToCalendar,
+    deleteEventFromCalendar
 }

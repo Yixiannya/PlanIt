@@ -3,7 +3,8 @@ const Mod = require('../models/mod.model.js');
 const Event = require('../models/event.model.js');
 const User = require('../models/user.model.js');
 
-// const { postEvent } = require('./event.controller.js');
+const { deleteEventFunc } = require('./event.controller.js');
+const { syncEventToCalendar, deleteEventFromCalendar } = require('./google.controller.js');
 
 // Some functions for usage
 function createClass(mod, req) {
@@ -160,6 +161,7 @@ async function createEventsForClass(mod, modClass, user) {
             "endDate": eventEnd
         });
 
+        await syncEventToCalendar(user, event);
         user.events.push(event);
         events.push(event);
 

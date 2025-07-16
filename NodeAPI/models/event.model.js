@@ -49,6 +49,10 @@ const EventSchema = mongoose.Schema(
         rRule: {
             type: String,
             required: false
+        },
+
+        googleId: {
+            type: String
         }
     },
     {
