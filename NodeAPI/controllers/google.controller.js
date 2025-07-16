@@ -47,14 +47,14 @@ async function syncEventToCalendar(user, event) {
         end: { dateTime: event.endDate, timeZone: "Asia/Singapore" },
         attendees: googleEventMembers
     };
-    console.log("Google Calendar created");
+    console.log("Google Calendar event created");
 
     if (!user || !user.google) {
         return res.status(404).json({ message: "User not connected to Google" });
     }
 
     console.log("Initialising oAuth2Client for query");
-    const oAuth2Client = await oAuth2Client({
+    const oAuth2Client = await oAuth2Client.setCredentials({
         access_token: user.google.accessToken,
         refresh_token: user.google.refreshToken,
         expiry_date: user.google.expiryDate
