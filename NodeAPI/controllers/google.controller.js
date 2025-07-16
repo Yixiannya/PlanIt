@@ -41,14 +41,19 @@ async function syncEventToCalendar(user, event) {
     }
 
     console.log("Creating Google Calendar event");
+
+    // Hardcoding timezone adjustment (Will need to do something else if we want to account for local time
+    // all over the world)
+    const adjustedDueDate = event.dueDate.toISOString().slice(0, 19) + "+08:00";
+    const adjustedEndDate = event.dueDate.toISOString().slice(0, 19) + "+08:00";
     const googleEvent = {
         summary: event.name,
         description: event.description,
-        start: { dateTime: event.dueDate },
-        end: { dateTime: event.endDate },
+        start: { dateTime: adjustedDueDate, timeZone: "Asia/Singapore" },
+        end: { dateTime: adjustedEndDate, timeZone: "Asia/Singapore" },
         attendees: googleEventMembers
     };
-    console.log("Google Calendar event created on %s", event.dueDate);
+    console.log("Google Calendar event created");
 
     if (!user || !user.google) {
         return res.status(404).json({ message: "User not connected to Google" });
@@ -56,6 +61,7 @@ async function syncEventToCalendar(user, event) {
 
     console.log("Initialising oAuth2Client for query");
     const oAuth2Client = createOAuth2Client();
+
     oAuth2Client.setCredentials({
         access_token: user.google.accessToken,
         refresh_token: user.google.refreshToken,
