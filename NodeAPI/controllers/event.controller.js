@@ -275,7 +275,7 @@ const deleteEvent = async (req, res) => {
         console.log("Deleting event");
         await deleteEventFunc(id);
 
-        console.log("Event %s deleted successfully", event.name);
+        console.log("Event %s deleted successfully");
         res.status(200).json({message: "Event deleted successfully"});
     } catch (error) {
         res.status(500).json({message: error.message});
