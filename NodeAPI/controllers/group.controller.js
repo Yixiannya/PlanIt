@@ -434,7 +434,6 @@ const addGroupAdmin = async (req, res) => {
     }
 };
 
-
 const deleteGroupAdmin = async (req, res) => {
     try {
         const {id} = req.params;
@@ -532,7 +531,15 @@ const deleteGroup = async (req, res) => {
 
         // Goes through array and deletes each event
         for (let i = 0; i < events.length; i++) {
-            promises.push(deleteEventFunc(events[i]));
+            const eventId = events[i]._id;
+            const event = await Event.findById(eventId);
+
+            // If event doesn't exist
+            if (!event) {
+                return res.status(404).json({ message: "Event not found" });
+            }
+            
+            promises.push(deleteEventFunc(event));
         }
 
         // Goes through array and removes group from every user that is a member

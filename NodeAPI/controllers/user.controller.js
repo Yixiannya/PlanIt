@@ -1,5 +1,6 @@
 // Code containing all methods used in user routes
 const User = require('../models/user.model.js');
+const Event = require('../models/event.model.js');
 
 const { deleteEventFunc } = require('./event.controller.js');
 
@@ -136,7 +137,9 @@ const patchUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         const {id} = req.params;
-        const user = await User.findByIdAndDelete(id, req.body);
+        const user = await User.findById(id, req.body);
+
+        console.log("Initiating deletion of user %s", user.name);
         
         // If user doesn't exist
         if (!user) {
@@ -145,12 +148,22 @@ const deleteUser = async (req, res) => {
 
         // Loops through events array and delete every event where user is owner.
         const promises = [];
+
+        console.log("Deleting user's events");
         const ownedEvents = await user.events.filter(e => e.owner.toString() == id.toString());
         for (let i = 0; i < ownedEvents.length; i++) {
             const eventId = ownedEvents[i]._id;
-            promises.push(deleteEventFunc(eventId));
+            const event = await Event.findById(eventId);
+
+            // If event doesn't exist
+            if (!event) {
+                return res.status(404).json({ message: "Event not found" });
+            }
+
+            promises.push(deleteEventFunc(event));
         }
         await Promise.all(promises);
+        await User.findByIdAndDelete(id, req.body);
 
         res.status(200).json({message: "User deleted successfully"});
     } catch (error) {

@@ -210,13 +210,10 @@ const patchEvent = async (req, res) => {
 // Also deletes it from owner of this event
 
 // Helper function
-async function deleteEventFunc(eventId) {
-    const event = await Event.findById(eventId, req.body);
-
-    // If event doesn't exist
-    if (!event) {
-        return res.status(404).json({ message: "Event not found" });
-    }
+async function deleteEventFunc(event) {
+    console.log("Deleting Event '%s'", event.name);
+    
+    const eventId = event._id;
 
     const ownerId = event.owner;
 
@@ -227,13 +224,13 @@ async function deleteEventFunc(eventId) {
     console.log("Removing event from owner");
     const owner = await User.findByIdAndUpdate(
         ownerId,
-        { $pull: { events: id } }
+        { $pull: { events: eventId } }
     );
 
     console.log("Removing event from group");
     const group = await Group.findByIdAndUpdate(
         groupId,
-        { $pull: { events: id } }
+        { $pull: { events: eventId } }
     );
 
     const promises = [];
@@ -241,12 +238,13 @@ async function deleteEventFunc(eventId) {
     for (let i = 0; i < members.length; i++) {
         const member = await User.findByIdAndUpdate(
             members[i],
-            { $pull: { events: id } }
+            { $pull: { events: eventId } }
         );
 
         // If member doesn't exist
         if (!member) {
-            return res.status(404).json({ message: "User not found" });
+            console.log("Member not found");
+            return;
         }
 
         promises.push(deleteEventFromCalendar(member, event));
@@ -254,7 +252,8 @@ async function deleteEventFunc(eventId) {
 
     // If owner doesn't exist
     if (!owner) {
-        return res.status(404).json({ message: "User not found" });
+        console.log("User not found");
+        return;
     }
 
     // If group doesn't exist
@@ -270,10 +269,16 @@ async function deleteEventFunc(eventId) {
 
 const deleteEvent = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
+        const event = await Event.findById(id, req.body);
+
+        // If event doesn't exist
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
 
         console.log("Deleting event");
-        await deleteEventFunc(id);
+        await deleteEventFunc(event);
 
         console.log("Event %s deleted successfully");
         res.status(200).json({message: "Event deleted successfully"});

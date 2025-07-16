@@ -180,8 +180,15 @@ async function deleteClassEvents(modClass) {
         console.log("Modifying %s in class", user.name);
 
         for (let j = 0; j < events.length; j++) {
-            const eventId = events[j]._id;
-            promises.push(deleteEventFunc(eventId));
+            const eventId = events[i]._id;
+            const event = await Event.findById(eventId);
+
+            // If event doesn't exist
+            if (!event) {
+                return res.status(404).json({ message: "Event not found" });
+            }
+            
+            promises.push(deleteEventFunc(event));
         }
         promises.push(user.save());
     }
