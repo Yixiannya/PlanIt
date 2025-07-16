@@ -75,15 +75,15 @@ const initiateAndroidAuth = async (req, res) => {
         email: googleUser.email,
       });
 
+      console.log("Creating Google info");
       const expiryMs = new Date(tokens.expiry_Date).getTime();
-      await user.google.push(
-        {
+      user.google = {
           googleId: googleUser.googleId,
           accessToken: tokens.access_token,
           refreshToken: tokens.refresh_token,
           expiryDate: expiryMs
-        }
-      );
+      };
+      await user.save();
     }
 
     console.log("User found, creating JWT");
