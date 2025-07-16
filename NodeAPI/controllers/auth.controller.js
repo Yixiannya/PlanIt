@@ -62,8 +62,8 @@ const initiateAndroidAuth = async (req, res) => {
 
     console.log("Creating access and refresh tokens");
     const { tokens } = await oAuth2Client.getToken(serverAuth);
-    console.log("Access token: %s", tokens.access_Token);
-    console.log("Refresh token: %s", tokens.refresh_Token);
+    console.log("Access token: %s", tokens.access_token);
+    console.log("Refresh token: %s", tokens.refresh_token);
 
     console.log("Finding user");
     let user = await User.findOne({ 'google.googleId': googleUser.googleId });
@@ -79,8 +79,8 @@ const initiateAndroidAuth = async (req, res) => {
       await user.google.push(
         {
           googleId: googleUser.googleId,
-          accessToken: tokens.access_Token,
-          refreshToken: tokens.refresh_Token,
+          accessToken: tokens.access_token,
+          refreshToken: tokens.refresh_token,
           expiryDate: expiryMs
         }
       );
