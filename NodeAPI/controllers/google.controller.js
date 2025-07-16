@@ -54,7 +54,7 @@ async function syncEventToCalendar(user, event) {
     }
 
     console.log("Initialising oAuth2Client for query");
-    const oAuth2Client = await oAuth2Client.setCredentials({
+    const oAuth2Client = oAuth2Client.setCredentials({
         access_token: user.google.accessToken,
         refresh_token: user.google.refreshToken,
         expiry_date: user.google.expiryDate
@@ -65,7 +65,6 @@ async function syncEventToCalendar(user, event) {
 
     console.log("Inserting into Google Calendar");
     const result = await calendar.events.insert({
-        auth: auth,
         calendarId: "primary",
         resource: googleEvent
     });
