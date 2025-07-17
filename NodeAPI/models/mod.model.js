@@ -100,7 +100,13 @@ const ModSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: false,
             ref: "User"
-        }]
+        }],
+
+        startDate: {
+            type: Date,
+            require: true
+        }
+        
     },
     {
         timestamps: true
