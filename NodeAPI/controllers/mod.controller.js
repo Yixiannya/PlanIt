@@ -8,6 +8,8 @@ const { syncEventToCalendar, deleteEventFromCalendar } = require('./google.contr
 
 // Some functions for usage
 function createClass(mod, req) {
+    // TODO: Modify weeks so it encompasses both a date range and array of weeks
+    // Some mods apparently have it listed on NUSMODS as a date range
     mod.classes.push(
         {
             lessonType: req.body.lessonType,
@@ -20,6 +22,7 @@ function createClass(mod, req) {
             startTime: req.body.startTime,
             endTime: req.body.endTime,
             weeks: req.body.weeks,
+            venue: req.body.venue,
             userId: req.body.userId
         }
     );
@@ -283,6 +286,55 @@ const getModClasses = async (req, res) => {
         }
 
         res.status(200).json(classes);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const getAllUserClasses = async (req, res) => {
+    try {
+        // Finds user
+        const user = await User.findById(req.body.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        await user.populate('mods');
+        var allOwnedClasses = [];
+        const mods = user.mods;
+
+        // Searches every mod the user is in
+        for (let i = 0; i < mods.length; i++) {
+            const mod = mods[i];
+            const ownedClasses = mod.classes.filter(c => c.userId.includes(user._id));
+            allOwnedClasses = allOwnedClasses.concat(ownedClasses);
+        }
+
+        res.status(200).json(allOwnedClasses);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const getUserModClasses = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Finds user
+        const user = await User.findById(req.body.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Finds mod
+        const mod = await Mod.findById(id);
+        if (!mod) {
+            return res.status(404).json({ message: "Mod not found" });
+        }
+
+        const ownedClasses = mod.classes.filter(c => c.userId.includes(user._id));
+
+        res.status(200).json(ownedClasses);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -617,6 +669,8 @@ module.exports = {
     getModById,
     getModUsers,
     getModClasses,
+    getAllUserClasses,
+    getUserModClasses,
     postMod,
     putMod,
     patchMod,

@@ -52,6 +52,11 @@ const ClassSchema = mongoose.Schema(
             required: true
         }],
 
+        venue: {
+            type: String,
+            required: false
+        },
+
         userId: [{
             type: mongoose.Schema.Types.ObjectId,
             required: false,
