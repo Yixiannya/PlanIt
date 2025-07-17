@@ -214,7 +214,7 @@ async function deleteClassEvents(modClass) {
 
         console.log("Deleting class events");
         for (let j = 0; j < events.length; j++) {
-            const eventId = events[i]._id;
+            const eventId = events[j]._id;
             const event = await Event.findById(eventId);
 
             // If event doesn't exist
@@ -452,6 +452,7 @@ const deleteMod = async (req, res) => {
         console.log("Mod %s deleted successfully", mod.moduleCode);
         res.status(200).json({ message: "Mod deleted successfully" });
     } catch (error) {
+        console.error(error.response?.data || error.message);
         res.status(500).json({ message: error.message });
     }
 };
@@ -499,6 +500,7 @@ const leaveMod = async (req, res) => {
 
         res.status(200).json({ message: "Mod left successfully" });
     } catch (error) {
+        console.error(error.response?.data || error.message);
         res.status(500).json({ message: error.message });
     }
 }
@@ -558,6 +560,7 @@ const deleteClass = async (req, res) => {
         mod.save();
         res.status(200).json({ message: "Class deleted successfully" });
     } catch (error) {
+        console.error(error.response?.data || error.message);
         res.status(500).json({ message: error.message });
     }
 }
@@ -601,7 +604,7 @@ const updateStatus = async (req, res) => {
         
         res.status(200).json({ message: "Status updated"});
     } catch (error) {
-        console.error("Google Calendar API error", error.response?.data || error.message);
+        console.error(error.response?.data || error.message);
         res.status(500).json({ message: error.message });
     }
 };
