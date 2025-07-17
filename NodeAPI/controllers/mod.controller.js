@@ -345,6 +345,9 @@ const postMod = async (req, res) => {
             const modClass = mod.classes.find(c =>
                 c.lessonType == req.body.lessonType
                 && c.classNo == req.body.classNo
+                && c.day == req.body.day
+                && c.startTime == req.body.startTime
+                && c.endTime == req.body.endTime
             );
 
             // Creates class with classInfo as subdoc if class cannot be found
