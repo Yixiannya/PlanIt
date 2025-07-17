@@ -133,6 +133,7 @@ async function createEventsForClass(mod, modClass, user) {
     // Creates an event at the given date for each week, counting from start of sem
     // Add them into given user's events array
     for (let i = 0; i < weeks.length; i++) {
+        const originWeek = weeks[i];
         var week = weeks[i];
         const eventStart = new Date(semStart);
 
@@ -170,18 +171,18 @@ async function createEventsForClass(mod, modClass, user) {
         user.events.push(event);
         events.push(event);
 
-        console.log("Event for week %d created", week);
+        console.log("Event for week %d created", originWeek);
     }
 };
 
-async function leaveClassHelper(user, modClass) {
+async function leaveClassHelper(user, modClass, mod) {
     const allEvents = modClass.events;
     const promises = [];
     console.log("Modifying %s in class", user.name);
 
     console.log("Deleting class events");
-    const userClassEvents = allEvents.filter(e => e.owner.toString() === userId.toString());
-    for (let j = 0; j < userClassEvents.length; j++) {
+    const userClassEvents = allEvents.filter(e => e.owner.toString() === user._id.toString());
+    for (let i = 0; i < userClassEvents.length; i++) {
         const eventId = userClassEvents[i]._id;
         const event = await Event.findById(eventId);
 
@@ -198,7 +199,7 @@ async function leaveClassHelper(user, modClass) {
 
     console.log("Removing user %s from class %s", user.name, modClass.name);
     await modClass.userId.pull(user);
-    await modClass.save();
+    await mod.save();
 }
 
 async function deleteClassEvents(modClass) {
@@ -218,7 +219,8 @@ async function deleteClassEvents(modClass) {
 
             // If event doesn't exist
             if (!event) {
-                return res.status(404).json({ message: "Event not found" });
+                console.log("Event not found");
+                return; 
             }
 
             promises.push(deleteEventFunc(event));
@@ -302,13 +304,37 @@ const postMod = async (req, res) => {
             mod = await Mod.create(req.body);
 
             // Creates class with classInfo as subdoc
-            createClass(mod, req);
+            if (req.body.lessonType && req.body.classNo) {
+                createClass(mod, req);
+            }
+
+            // Update users' mods array
+            const userObject = await User.findByIdAndUpdate(
+                user,
+                { $push: { mods: mod } }
+            );
+
+            // If user doesn't exist
+            if (!userObject) {
+                return res.status(404).json({ message: "User not found" });
+            }
 
             await mod.save();
         } else if (!mod.userId.includes(user)) {
             // User isn't in mod so update both user and mod to contain this user
             console.log("Adding user %s into mod", user);
             mod.userId.push(user);
+
+            // Update users' mods array
+            const userObject = await User.findByIdAndUpdate(
+                user,
+                { $push: { mods: mod } }
+            );
+
+            // If user doesn't exist
+            if (!userObject) {
+                return res.status(404).json({ message: "User not found" });
+            }
 
             await mod.save();
         }
@@ -334,17 +360,6 @@ const postMod = async (req, res) => {
                 }
             }
             mod.save();
-        }
-
-        // Update users' mods array
-        const userObject = await User.findByIdAndUpdate(
-            user,
-            { $push: { mods: mod } }
-        );
-
-        // If user doesn't exist
-        if (!userObject) {
-            console.log("User not found or no user given");
         }
 
         console.log("Mod %s created successfully", mod.moduleCode);
@@ -428,7 +443,8 @@ const deleteMod = async (req, res) => {
             }
 
             // Remove the mod from the user
-            user.mods.pull(id);
+            promises.push(user.mods.pull(id));
+
             await Promise.all(promises)
                 .then(p => user.save());
         }
@@ -459,13 +475,14 @@ const leaveMod = async (req, res) => {
         }
         console.log("Mod found");        
         
-        const modClasses = mod.classes.filter(c => c.userId.includes(user._id));   
+        await mod.populate("classes.events");
 
+        const modClasses = mod.classes.filter(c => c.userId.includes(user._id));   
         const promises = [];
 
         for (let i = 0; i < modClasses.length; i++) {
-            const modClass = mod.classes[0].populate('events');
-            promises.push(leaveClassHelper(user, modClass));
+            const modClass = mod.classes[i];
+            promises.push(leaveClassHelper(user, modClass, mod));
         }
 
         await Promise.all(promises);
@@ -505,13 +522,15 @@ const leaveClass = async (req, res) => {
         }
         console.log("Mod found");
 
+        await mod.populate("classes.events");
+
         const modClass = mod.classes.find(c =>
             c.lessonType == req.body.lessonType
             && c.classNo == req.body.classNo
-        ).populate('events');
+        );
 
         console.log("Deleting class events owned by user %s", user.name);
-        await leaveClassHelper(user, modClass);
+        await leaveClassHelper(user, modClass, mod);
         console.log("Owned class events deleted");
 
         res.status(200).json({ message: "Class left successfully" });
@@ -580,8 +599,9 @@ const updateStatus = async (req, res) => {
 
         console.log("Status updated");
         
-        res.status(200).json(user.events);
+        res.status(200).json({ message: "Status updated"});
     } catch (error) {
+        console.error("Google Calendar API error", error.response?.data || error.message);
         res.status(500).json({ message: error.message });
     }
 };

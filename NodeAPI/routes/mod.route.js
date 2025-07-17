@@ -29,7 +29,7 @@ router.post('/:id/class/delete', deleteClass);
 
 // Leave routes
 router.post('/:id/leave', leaveMod);
-router.post('/:id/leave/class', leaveClass);
+router.post('/:id/class/leave', leaveClass);
 
 router.post('/:id/update', updateStatus);
 

@@ -76,6 +76,7 @@ async function syncEventToCalendar(user, event) {
         calendarId: "primary",
         resource: googleEvent
     });
+    console.log("Insertion successful");
 
     event.googleId = result.data.id;
     await event.save();
