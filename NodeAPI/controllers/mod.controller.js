@@ -71,14 +71,16 @@ async function createEventsForClass(mod, modClass, user) {
     switch (sem) {
         case "1":
             semStart.setDate(semStart.getDate() + 7);
+            semStart.setHours(0, 0, 0);
             break;
         case "2":
             semStart.setDate(semStart.getDate() + (22 * 7));
+            semStart.setHours(0, 0, 0);
             break;
         default:
+            semStart.setDate(mod.startDate);
             break;
     }
-    semStart.setHours(0, 0, 0);
 
     console.log("Sem starts at %s", semStart);
 
@@ -134,14 +136,17 @@ async function createEventsForClass(mod, modClass, user) {
         var week = weeks[i];
         const eventStart = new Date(semStart);
 
-        // Account for midterm reading week (between week 6 and 7)
-        if (week >= 7) {
-            week++;
-        }
+        // For regular sems (not special term)
+        if (modClass.semester == 1 || modClass.semester == 2) {
+            // Account for midterm reading week (between week 6 and 7)
+            if (week >= 7) {
+                week++;
+            }
 
-        // Account for no orientation week (week 0) in Sem 2
-        if (modClass.semester == 2) {
-            week--;
+            // Account for no orientation week (week 0) in Sem 2
+            if (modClass.semester == 2) {
+                week--;
+            }
         }
 
         eventStart.setDate(eventStart.getDate() + classDay + (week * 7))
@@ -168,6 +173,33 @@ async function createEventsForClass(mod, modClass, user) {
         console.log("Event for week %d created", week);
     }
 };
+
+async function leaveClassHelper(user, modClass) {
+    const allEvents = modClass.events;
+    const promises = [];
+    console.log("Modifying %s in class", user.name);
+
+    console.log("Deleting class events");
+    const userClassEvents = allEvents.filter(e => e.owner.toString() === userId.toString());
+    for (let j = 0; j < userClassEvents.length; j++) {
+        const eventId = userClassEvents[i]._id;
+        const event = await Event.findById(eventId);
+
+        // If event doesn't exist
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        promises.push(deleteEventFunc(event));
+    }
+    promises.push(user.save());
+
+    await Promise.all(promises);
+
+    console.log("Removing user %s from class %s", user.name, modClass.name);
+    await modClass.userId.pull(user);
+    await modClass.save();
+}
 
 async function deleteClassEvents(modClass) {
     const users = modClass.userId;
@@ -282,24 +314,27 @@ const postMod = async (req, res) => {
         }
 
         // Find the class with specified info
-        const modClass = mod.classes.find(c =>
-            c.lessonType == req.body.lessonType
-            && c.classNo == req.body.classNo
-        );
+        if (req.body.lessonType && req.body.classNo) {
+            console.log("lessonType and classNo specified");
+            const modClass = mod.classes.find(c =>
+                c.lessonType == req.body.lessonType
+                && c.classNo == req.body.classNo
+            );
 
-        // Creates class with classInfo as subdoc if class cannot be found
-        if (!modClass) {
-            createClass(mod, req);
-            mod.set({isComplete: false});
-        } else {
-            const ClassUserArray = modClass.userId;
-            if (!ClassUserArray.includes(user)) {
-                modClass.userId.push(user);
-                console.log("User %s added to %s %s", user, modClass.lessonType, modClass.classNo);
-                mod.set({isComplete: false});
+            // Creates class with classInfo as subdoc if class cannot be found
+            if (!modClass) {
+                createClass(mod, req);
+                mod.set({ isComplete: false });
+            } else {
+                const ClassUserArray = modClass.userId;
+                if (!ClassUserArray.includes(user)) {
+                    modClass.userId.push(user);
+                    console.log("User %s added to %s %s", user, modClass.lessonType, modClass.classNo);
+                    mod.set({ isComplete: false });
+                }
             }
+            mod.save();
         }
-        mod.save();
 
         // Update users' mods array
         const userObject = await User.findByIdAndUpdate(
@@ -405,6 +440,86 @@ const deleteMod = async (req, res) => {
     }
 };
 
+const leaveMod = async (req, res) => {
+    try {
+        console.log("Leaving mod");
+        const { id } = req.params;
+
+        // Find user
+        const user = await User.findById(req.body.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        console.log("User found");
+
+        // Find mod
+        const mod = await Mod.findById(id);
+        if (!mod) {
+            return res.status(404).json({ message: "Mod not found" });
+        }
+        console.log("Mod found");        
+        
+        const modClasses = mod.classes.filter(c => c.userId.includes(user._id));   
+
+        const promises = [];
+
+        for (let i = 0; i < modClasses.length; i++) {
+            const modClass = mod.classes[0].populate('events');
+            promises.push(leaveClassHelper(user, modClass));
+        }
+
+        await Promise.all(promises);
+
+        console.log("Removing user from mod");
+        mod.userId.pull(user);
+        await mod.save();
+        console.log("User removed from mod");
+
+        console.log("Removing mod from user");
+        user.mods.pull(mod);
+        await user.save();
+        console.log("Mod removed from user");
+
+        res.status(200).json({ message: "Mod left successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+const leaveClass = async (req, res) => {
+    try {
+        console.log("Leaving class");
+        const { id } = req.params;
+
+        // Find user
+        const user = await User.findById(req.body.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        console.log("User found");
+
+        // Find mod
+        const mod = await Mod.findById(id);
+        if (!mod) {
+            return res.status(404).json({ message: "Mod not found" });
+        }
+        console.log("Mod found");
+
+        const modClass = mod.classes.find(c =>
+            c.lessonType == req.body.lessonType
+            && c.classNo == req.body.classNo
+        ).populate('events');
+
+        console.log("Deleting class events owned by user %s", user.name);
+        await leaveClassHelper(user, modClass);
+        console.log("Owned class events deleted");
+
+        res.status(200).json({ message: "Class left successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 const deleteClass = async (req, res) => {
     try {
         const { id } = req.params;
@@ -481,5 +596,7 @@ module.exports = {
     patchMod,
     deleteMod,
     deleteClass,
+    leaveMod,
+    leaveClass,
     updateStatus
 }

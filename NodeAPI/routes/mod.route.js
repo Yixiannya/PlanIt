@@ -3,7 +3,8 @@
 const express = require('express');
 const router = express.Router();
 const {getAllMods, getModById, getModUsers, getModClasses, updateStatus,
-    postMod, putMod, patchMod, deleteMod, deleteClass} = require('../controllers/mod.controller.js');
+    postMod, putMod, patchMod, deleteMod, deleteClass, leaveMod, leaveClass
+} = require('../controllers/mod.controller.js');
 
 router.get('/', getAllMods);
 
@@ -25,6 +26,10 @@ router.patch('/:id', patchMod);
 // Delete mod by id
 router.delete('/:id', deleteMod);
 router.post('/:id/class/delete', deleteClass);
+
+// Leave routes
+router.post('/:id/leave', leaveMod);
+router.post('/:id/leave/class', leaveClass);
 
 router.post('/:id/update', updateStatus);
 
