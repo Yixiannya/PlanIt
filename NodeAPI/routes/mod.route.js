@@ -24,7 +24,7 @@ router.patch('/:id', patchMod);
 
 // Delete mod by id
 router.delete('/:id', deleteMod);
-router.post('/:id/class', deleteClass);
+router.post('/:id/class/delete', deleteClass);
 
 router.post('/:id/update', updateStatus);
 
