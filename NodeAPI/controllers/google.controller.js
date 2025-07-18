@@ -96,6 +96,11 @@ async function deleteEventFromCalendar(user, event) {
 
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
+    if (!event.googleId) {
+        console.warn("Event '%s' has no googleId, terminating sync", event.name);
+        return;
+    }
+
     await calendar.events.delete({
         calendarId: "primary",
         eventId: event.googleId
