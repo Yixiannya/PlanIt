@@ -101,10 +101,21 @@ async function deleteEventFromCalendar(user, event) {
         return;
     }
 
-    await calendar.events.delete({
-        calendarId: "primary",
-        eventId: event.googleId
-    });
+    try {
+        await calendar.events.delete({
+            calendarId: "primary",
+            eventId: event.googleId
+        });
+    } catch (error) {
+        if (error.code === 410) {
+            // Catches error if deleting an event that has already been deleted
+            console.warn("Event '%s' is already deleted from Google Calendar", event.name);
+        } else {
+            console.error("Failed to delete event:", error.response?.data || error.message);
+            // Rethrow other errors
+            throw error; 
+        }
+    }
 
     console.log("Event '%s' removed from %s's Google Calendar", event.name, user.name);
 };
