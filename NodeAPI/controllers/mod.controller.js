@@ -584,6 +584,9 @@ const leaveClass = async (req, res) => {
         const modClass = mod.classes.find(c =>
             c.lessonType == req.body.lessonType
             && c.classNo == req.body.classNo
+            && c.day == req.body.day
+            && c.startTime == req.body.startTime
+            && c.endTime == req.body.endTime
         );
 
         console.log("Deleting class events owned by user %s", user.name);
@@ -603,6 +606,9 @@ const deleteClass = async (req, res) => {
         const modClass = mod.classes.find(c =>
             c.lessonType == req.body.lessonType
             && c.classNo == req.body.classNo
+            && c.day == req.body.day
+            && c.startTime == req.body.startTime
+            && c.endTime == req.body.endTime
         );
         const modClassId = modClass._id;
 
