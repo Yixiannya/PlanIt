@@ -177,6 +177,10 @@ const putEvent = async (req, res) => {
             return res.status(404).json({message: "Event not found"});
         }
 
+        // Sync to Google Calendar
+        const owner = await User.findById(event.owner);
+        await syncEventToCalendar(owner, event);
+
         // Check event again
         const updatedEvent = await Event.findById(id);
         res.status(200).json(updatedEvent);
@@ -188,7 +192,7 @@ const putEvent = async (req, res) => {
 // Controls to patch an event
 const patchEvent = async (req, res) => {
     try {
-        const updateObject = req.body; // e.g. {name: "dog", dueDate: 2025-10-10T01:00:00.000+00:00}
+        const updateObject = req.body;
         const {id} = req.params;
         const event = await Event.findByIdAndUpdate(id, {$set: updateObject});
         
@@ -196,6 +200,10 @@ const patchEvent = async (req, res) => {
         if (!event) {
             return res.status(404).json({message: "Event not found"});
         }
+
+        // Sync to Google Calendar
+        const owner = await User.findById(event.owner);
+        await syncEventToCalendar(owner, event);
 
         // Check event again
         const updatedEvent = await Event.findById(id);
@@ -288,6 +296,27 @@ const deleteEvent = async (req, res) => {
     }
 };
 
+const deleteAllEvents = async (req, res) => {
+    try {
+        const events = await Event.find({ _id: { $ne: "68667030a93852c53e910021" } });
+        
+        console.log(events[0]);
+        console.log("Deleting events");
+
+        const promises = []
+        
+        for (let i = 0; i < events.length; i++) {
+            const event = events[i];
+            await deleteEventFunc(event);
+            console.log("Event %s deleted successfully", event.name);
+        }
+        
+        res.status(200).json({message: "Events deleted successfully"});
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
 module.exports = {
     getAllEvents, 
     getEventById,
@@ -297,5 +326,6 @@ module.exports = {
     putEvent,
     patchEvent,
     deleteEvent,
-    deleteEventFunc
+    deleteEventFunc,
+    deleteAllEvents
 }

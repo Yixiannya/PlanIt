@@ -1,4 +1,6 @@
 const { google } = require('googleapis');
+const Event = require('../models/event.model.js');
+const User = require('../models/user.model.js');
 const { createOAuth2Client } = require('../utils/googleapi.js');
 
 const SCOPES = [
@@ -71,16 +73,41 @@ async function syncEventToCalendar(user, event) {
 
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
-    console.log("Inserting into Google Calendar");
-    const result = await calendar.events.insert({
-        calendarId: "primary",
-        resource: googleEvent
-    });
-    console.log("Insertion successful");
+    
+    if (event.googleId) {
+        // Event is already on Google Calendar, update it instead
+        const existingEvent = await calendar.events.get({
+            calendarId: "primary",
+            eventId: event.googleId
+        });
 
-    event.googleId = result.data.id;
-    await event.save();
-    console.log("Event synced at %s", result.data.htmlLink);
+        const updatedEvent = {
+            ...existingEvent.data,
+            summary: googleEvent.summary,
+            description: googleEvent.description,
+            start: googleEvent.start,
+            end: googleEvent.end,
+            attendees: googleEvent.attendees
+        };
+        
+        await calendar.events.update({
+            calendarId: "primary",
+            eventId: event.googleId,
+            resource: updatedEvent
+        });
+        console.log("Google Calendar event updated");
+    } else {
+        // Event not on Google Calendar, insert it
+        const result = await calendar.events.insert({
+            calendarId: "primary",
+            resource: googleEvent
+        });
+        console.log("Insertion successful");
+
+        event.googleId = result.data.id;
+        await event.save();
+    }
+    console.log("Event synced");
 };
 
 async function deleteEventFromCalendar(user, event) {
@@ -120,7 +147,71 @@ async function deleteEventFromCalendar(user, event) {
     console.log("Event '%s' removed from %s's Google Calendar", event.name, user.name);
 };
 
+async function importEventToUser(user, googleEvent) {
+    await user.populate('events');
+
+    const eventExists = user.events.some(event => event.googleId === googleEvent.id);
+
+    if (eventExists) {
+        console.log("Skipping event '%s'", googleEvent.summary);
+        return;
+    }
+    
+    const startDate = googleEvent.start.dateTime || googleEvent.start.date;
+    const endDate = googleEvent.end.dateTime || googleEvent.end.date;
+
+    const event = await Event.create({
+        googleId: googleEvent.id,
+        name: googleEvent.summary,
+        description: googleEvent.description,
+        owner: user,
+        dueDate: new Date(startDate),
+        endDate: new Date(endDate)
+    });
+    console.log("Event '%s' created", googleEvent.summary)
+
+    await user.events.push(event);
+    console.log("Event '%s' imported", googleEvent.summary)
+}
+
+const importEvents = async (req, res) => {
+    try {
+        const user = await User.findById(req.body.userId);
+
+        // Initialising oAuth2Client for query
+        const oAuth2Client = createOAuth2Client();
+
+        oAuth2Client.setCredentials({
+            access_token: user.google.accessToken,
+            refresh_token: user.google.refreshToken,
+            expiry_date: user.google.expiryDate
+        });
+        console.log("oAuth2Client initialised");
+
+        const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
+
+        const response = await calendar.events.list({
+            calendarId: "primary",
+            singleEvents: true,
+            orderBy: "startTime",
+            maxResults: 100, // Limit in case we got a user with too many dates to handle at one time
+            timeMin: new Date().toISOString() // Only upcoming dates from current time
+        });
+        console.log("Google Calendar Events found");
+
+        const eventsList = response.data.items;
+        const promises = [];
+        eventsList.forEach(event => promises.push(importEventToUser(user, event)));
+
+        await Promise.all(promises).then((promise) => user.save());
+        res.status(200).json({ message: "First 100 upcoming events imported successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     syncEventToCalendar,
-    deleteEventFromCalendar
+    deleteEventFromCalendar,
+    importEvents
 }
