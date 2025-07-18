@@ -95,12 +95,6 @@ const ModSchema = mongoose.Schema(
             required: true
         },
 
-        isComplete: {
-            type: Boolean,
-            required: true,
-            default: false
-        },
-
         userId: [{
             type: mongoose.Schema.Types.ObjectId,
             required: false,

@@ -371,6 +371,9 @@ const postMod = async (req, res) => {
                 return res.status(404).json({ message: "User not found" });
             }
 
+            userObject.modCompleted.set(mod._id.toString(), false);
+
+            await userObject.save();
             await mod.save();
         } else if (!mod.userId.includes(user)) {
             // User isn't in mod so update both user and mod to contain this user
@@ -388,6 +391,9 @@ const postMod = async (req, res) => {
                 return res.status(404).json({ message: "User not found" });
             }
 
+            userObject.modCompleted.set(mod._id.toString(), false);
+
+            await userObject.save();
             await mod.save();
         }
 
@@ -405,13 +411,11 @@ const postMod = async (req, res) => {
             // Creates class with classInfo as subdoc if class cannot be found
             if (!modClass) {
                 createClass(mod, req);
-                mod.set({ isComplete: false });
             } else {
                 const ClassUserArray = modClass.userId;
                 if (!ClassUserArray.includes(user)) {
                     modClass.userId.push(user);
                     console.log("User %s added to %s %s", user, modClass.lessonType, modClass.classNo);
-                    mod.set({ isComplete: false });
                 }
             }
             mod.save();
@@ -499,6 +503,7 @@ const deleteMod = async (req, res) => {
 
             // Remove the mod from the user
             promises.push(user.mods.pull(id));
+            promises.push(user.modCompleted.delete(mod._id.toString()));
 
             await Promise.all(promises)
                 .then(p => user.save());
@@ -550,6 +555,7 @@ const leaveMod = async (req, res) => {
 
         console.log("Removing mod from user");
         user.mods.pull(mod);
+        user.modCompleted.delete(mod._id.toString());
         await user.save();
         console.log("Mod removed from user");
 
@@ -595,6 +601,7 @@ const leaveClass = async (req, res) => {
 
         res.status(200).json({ message: "Class left successfully" });
     } catch (error) {
+        console.error(error.response?.data || error.message);
         res.status(500).json({ message: error.message });
     }
 }
@@ -657,7 +664,7 @@ const updateStatus = async (req, res) => {
         }
 
         await Promise.all(promises)
-            .then(promise => mod.set({ isComplete: true }))
+            .then(promise => user.modCompleted.set(mod._id.toString(), true))
             .then(promise => mod.save())
             .then(promise => user.save());
 

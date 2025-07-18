@@ -64,6 +64,12 @@ const UserSchema = mongoose.Schema(
             ref: "Mod"
         }],
 
+        modCompleted: {
+            type: Map,
+            of: Boolean,
+            default: {}
+        },
+
         notificationsEnabled: {
             type: Boolean,
             required: true,
