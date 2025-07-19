@@ -56,6 +56,7 @@ async function scheduleJoinGroupNotification(user, group) {
 
 // Schedule an upcoming event notification
 async function scheduleEventNotification(user, event) {
+    console.log("Scheduling event notif");
     const { notificationToken } = user;
     const { _id, dueDate, offsetMs } = event;
     const notifTime = new Date(dueDate.getTime() - offsetMs);
@@ -67,6 +68,7 @@ async function scheduleEventNotification(user, event) {
         console.warn("Event has finished");
         return;
     }
+    console.log(delayMs);
 
     var screen = "Indiv Event";
 
@@ -85,6 +87,7 @@ async function scheduleEventNotification(user, event) {
         console.warn("Invalid fields");
         return;
     }
+    console.log("Notif created");
 
     const members = event.members.map(objectId => objectId.toString());
 
@@ -107,6 +110,7 @@ async function scheduleEventNotification(user, event) {
             }
         }
     }
+    console.log("jobData created");
 
     await notificationQueue.add('send-notification', jobData, {
         delay: delayMs,
