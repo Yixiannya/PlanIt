@@ -95,33 +95,35 @@ async function scheduleEventNotification(user, event) {
         const jobData = {
             expoToken: notif.expoToken,
             title: "Event Notification",
-            body: `${event.name} will be happening soon.`,
+            body: `${event.name || "An event"} will be happening soon.`,
             data: {
                 screen: notif.screen,
                 event: {
-                    _id: event._id,
-                    name: event.name,
+                    _id: event._id?.toString?.(),
+                    name: event.name || "",
                     description: event.description || "",
-                    owner: event.owner.toString(),
+                    owner: event.owner?.toString?.(),
                     members: members,
-                    group: event.group.toString() || "",
+                    group: event.group?.toString?.(),
                     dueDate: event.dueDate,
                     endDate: event.endDate,
-                    googleId: event.googleId
+                    googleId: event.googleId || ""
                 }
             }
-        }
+        };
         console.log("jobData created");
+
+        await notificationQueue.add('send-notification', jobData, {
+            delay: delayMs,
+            jobId: _id,
+        });
+
+        console.log("Notification added to queue");
     } catch (error) {
         console.error(error);
     }
 
-    await notificationQueue.add('send-notification', jobData, {
-        delay: delayMs,
-        jobId: _id,
-    });
-
-    console.log("Notification added to queue");
+    
 };
 
 // Cancel a scheduled event notification
