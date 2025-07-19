@@ -27,8 +27,12 @@ async function scheduleJoinGroupNotification(user, group) {
         return;
     }
 
-    const adminsString = admins.map(objectId => objectId.toString());
-    const membersString = members.map(objectId => objectId.toString());
+    const adminsString = Array.isArray(admins)
+        ? admins.map(id => id?.toString?.())
+        : [];
+    const membersString = Array.isArray(admins)
+        ? members.map(id => id?.toString?.())
+        : [];
 
     const jobData = {
         expoToken: notif.expoToken,
@@ -38,8 +42,8 @@ async function scheduleJoinGroupNotification(user, group) {
         data: {
             screen: notif.screen,
             group: {
-                _id: group._id,
-                name: group.name,
+                _id: group._id.toString(),
+                name: group.name || "",
                 description: group.description || "",
                 admins: adminsString,
                 members: membersString,
@@ -118,7 +122,7 @@ async function scheduleEventNotification(user, event) {
 
         await notificationQueue.add('send-notification', jobData, {
             delay: delayMs,
-            jobId: _id,
+            jobId: _id.toString(),
         });
 
         console.log("Notification added to queue");
@@ -132,7 +136,7 @@ async function scheduleEventNotification(user, event) {
 // Cancel a scheduled event notification
 async function cancelEventNotification(event) {
     const { _id } = event;
-    const job = await notificationQueue.getJob(_id);
+    const job = await notificationQueue.getJob(_id.toString());
     if (job) {
         await job.remove();
         await Notif.findOneAndDelete({
