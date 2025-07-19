@@ -64,7 +64,9 @@ async function scheduleEventNotification(user, event) {
     const { notificationToken } = user;
     const { _id, dueDate, offsetMs } = event;
     const notifTime = new Date(dueDate.getTime() - offsetMs);
+    console.log(notifTime);
     const now = new Date();
+    console.log(now);
 
     const delayMs = notifTime - now;
 
