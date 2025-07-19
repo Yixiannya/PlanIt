@@ -76,7 +76,7 @@ const UserSchema = mongoose.Schema(
             default: false
         },
 
-        notificationToken: {
+        expoPushToken: {
             type: String,
             required: false
         },

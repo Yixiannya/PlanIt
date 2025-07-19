@@ -40,6 +40,12 @@ const EventSchema = mongoose.Schema(
             required: [true, "Select an end date"]
         },
 
+        offsetMs: {
+            type: Number,
+            required: true,
+            default: 0
+        },
+
         isRecurring: {
             type: Boolean,
             required: true,

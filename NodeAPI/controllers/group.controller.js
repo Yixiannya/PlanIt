@@ -4,6 +4,7 @@ const Event = require('../models/event.model.js');
 const User = require('../models/user.model.js');
 
 const { deleteEventFunc } = require('./event.controller.js');
+const { scheduleJoinGroupNotification } = require('./notif.controller.js');
 
 // Controls to get all groups
 const getAllGroups = async (req, res) => {
@@ -223,6 +224,7 @@ const addGroupMember = async (req, res) => {
         const group = await Group.findById(id);
         const admins = group.admins;
         const addedMembers = req.body.addedMembers; // Must be array of members id to add
+        const promises = [];
 
         // Check requester's id and see if they're an admin
         let i = 0;
@@ -261,12 +263,14 @@ const addGroupMember = async (req, res) => {
                 return res.status(404).json({message: "User not found"});
             }
 
+            promises.push(scheduleJoinGroupNotification(user, group));
             group.members.push(memberId);
             await group.save();
         }
 
         // Check group again
         const updatedGroup = await Group.findById(id);
+        await Promise.all(promises);
         res.status(200).json(updatedGroup);
     } catch (error) {
         res.status(500).json({message: error.message});

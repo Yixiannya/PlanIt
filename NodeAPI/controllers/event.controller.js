@@ -6,6 +6,7 @@ const Group = require('../models/group.model.js');
 const User = require('../models/user.model.js');
 
 const { syncEventToCalendar, deleteEventFromCalendar } = require('./google.controller.js');
+const { scheduleEventNotification, cancelEventNotification } = require('./notif.controller.js');
 
 // Controls to get all events
 const getAllEvents = async (req, res) => {
@@ -124,6 +125,7 @@ const postEvent = async (req, res) => {
                     return res.status(404).json({message: "User not found"});
                 }
 
+                promises.push(scheduleEventNotification(member, event));
                 promises.push(syncEventToCalendar(member, event));
             }
 
@@ -141,6 +143,7 @@ const postEvent = async (req, res) => {
                     return res.status(404).json({message: "User not found"});
                 }
 
+                promises.push(scheduleEventNotification(admin, event));
                 promises.push(syncEventToCalendar(admin, event));
             }
 
@@ -157,6 +160,7 @@ const postEvent = async (req, res) => {
                 return res.status(404).json({message: "User not found"});
             }
 
+            await scheduleEventNotification(user, event);
             await syncEventToCalendar(user, event);
         }
 
@@ -272,6 +276,7 @@ async function deleteEventFunc(event) {
     promises.push(deleteEventFromCalendar(owner, event));
 
     await Promise.all(promises);
+    await cancelEventNotification(event);
     await Event.findByIdAndDelete(eventId)
         .then(promise => console.log("Event deleted"));
 };
