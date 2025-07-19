@@ -40,7 +40,7 @@ async function scheduleJoinGroupNotification(user, group) {
             group: {
                 _id: group._id,
                 name: group.name,
-                description: group.description,
+                description: group.description || "",
                 admins: adminsString,
                 members: membersString,
             }
@@ -100,7 +100,7 @@ async function scheduleEventNotification(user, event) {
             event: {
                 _id: event._id,
                 name: event.name,
-                description: event.description,
+                description: event.description || "",
                 owner: event.owner.toString(),
                 members: members,
                 group: event.group.toString() || "",
