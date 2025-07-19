@@ -89,7 +89,10 @@ async function scheduleEventNotification(user, event) {
     }
     console.log("Notif created");
 
-    const members = event.members.map(objectId => objectId.toString());
+    const members = Array.isArray(event.members)
+        ? event.members.map(id => id?.toString?.())
+        : [];
+    console.log(members);
 
     try {
         const jobData = {
@@ -103,7 +106,7 @@ async function scheduleEventNotification(user, event) {
                     name: event.name || "",
                     description: event.description || "",
                     owner: event.owner?.toString?.(),
-                    members: members,
+                    members,
                     group: event.group?.toString?.(),
                     dueDate: event.dueDate,
                     endDate: event.endDate,
