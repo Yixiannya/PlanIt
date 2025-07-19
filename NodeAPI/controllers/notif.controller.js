@@ -11,12 +11,12 @@ const notificationQueue = new Queue('notifications', { connection });
 
 // Schedule a group joining notification
 async function scheduleJoinGroupNotification(user, group) {
-    const { expoPushToken } = user;
+    const { notificationToken } = user;
     const { _id, admins, members } = group;
     const screen = "Group"
 
     const notif = await Notif.create({
-        expoToken: expoPushToken,
+        expoToken: notificationToken,
         type: "Group",
         screen: screen,
         group: group
@@ -56,7 +56,7 @@ async function scheduleJoinGroupNotification(user, group) {
 
 // Schedule an upcoming event notification
 async function scheduleEventNotification(user, event) {
-    const { expoPushToken } = user;
+    const { notificationToken } = user;
     const { _id, dueDate, offsetMs } = event;
     const notifTime = new Date(dueDate.getTime() - offsetMs);
     const now = new Date();
@@ -75,7 +75,7 @@ async function scheduleEventNotification(user, event) {
     }
 
     const notif = await Notif.create({
-        expoToken: expoPushToken,
+        expoToken: notificationToken,
         type: "Event",
         screen: screen,
         event: event
@@ -189,7 +189,7 @@ const worker = new Worker('notifications', async job => {
             return;
     }
 
-    const user = await User.findOne({ expoPushToken: expoToken });
+    const user = await User.findOne({ notificationToken: expoToken });
 
     if (user.notificationsEnabled) {
         console.log('Sending notification:', job.data);
