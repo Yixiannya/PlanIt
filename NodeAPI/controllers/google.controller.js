@@ -1,7 +1,9 @@
 const { google } = require('googleapis');
 const Event = require('../models/event.model.js');
 const User = require('../models/user.model.js');
+
 const { createOAuth2Client } = require('../utils/googleapi.js');
+const { scheduleEventNotification, cancelEventNotification } = require('./notif.controller.js');
 
 const SCOPES = [
     'https://www.googleapis.com/auth/calendar',
@@ -105,6 +107,7 @@ async function syncEventToCalendar(user, event) {
         await event.save();
     }
     console.log("Event synced");
+    await scheduleEventNotification(user, event);
 };
 
 async function deleteEventFromCalendar(user, event) {
@@ -129,6 +132,7 @@ async function deleteEventFromCalendar(user, event) {
             eventId: event.googleId
         });
         console.log("Event '%s' removed from %s's Google Calendar", event.name, user.name);
+        await cancelEventNotification(event);
     } catch (error) {
         if (error.code === 410) {
             // Catches error if deleting an event that has already been deleted
@@ -150,7 +154,7 @@ async function importEventToUser(user, googleEvent) {
     const endDate = googleEvent.end.dateTime || googleEvent.end.date;
 
     if (eventExists) {
-        await Event.findOneAndUpdate({ googleId: googleEvent.id },
+        const event = await Event.findOneAndUpdate({ googleId: googleEvent.id },
             {
                 name: googleEvent.summary,
                 description: googleEvent.description,
@@ -159,7 +163,9 @@ async function importEventToUser(user, googleEvent) {
                 endDate: new Date(endDate)
             }
         );
-        console.log("Event '%s' exists, overriding PlanIt event", googleEvent.summary)
+        console.log("Event '%s' exists, overriding PlanIt event", googleEvent.summary);
+        await cancelEventNotification(event);
+        await scheduleEventNotification(user, event);
         return;
     }
 
@@ -173,6 +179,7 @@ async function importEventToUser(user, googleEvent) {
     });
     console.log("Event '%s' created", googleEvent.summary);
 
+    await scheduleEventNotification(user, event);
     await user.events.push(event);
     console.log("Event '%s' imported", googleEvent.summary);
 }
