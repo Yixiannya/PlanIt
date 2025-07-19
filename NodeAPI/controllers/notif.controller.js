@@ -103,7 +103,7 @@ async function scheduleEventNotification(user, event) {
                 description: event.description,
                 owner: event.owner.toString(),
                 members: members,
-                group: event.group.toString(),
+                group: event.group.toString() || "",
                 dueDate: event.dueDate,
                 endDate: event.endDate,
                 googleId: event.googleId
