@@ -41,8 +41,7 @@ async function syncEventToCalendar(user, event) {
         const eventMember = { displayName: member.name, email: member.email };
         googleEventMembers.push(eventMember);
     }
-
-    console.log("Creating Google Calendar event");
+    console.log("Members added");
 
     // Hardcoding timezone adjustment (Will need to do something else if we want to account for local time
     // all over the world)
@@ -61,9 +60,7 @@ async function syncEventToCalendar(user, event) {
         return res.status(404).json({ message: "User not connected to Google" });
     }
 
-    console.log("Initialising oAuth2Client for query");
     const oAuth2Client = createOAuth2Client();
-
     oAuth2Client.setCredentials({
         access_token: user.google.accessToken,
         refresh_token: user.google.refreshToken,
@@ -73,7 +70,6 @@ async function syncEventToCalendar(user, event) {
 
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
-    
     if (event.googleId) {
         // Event is already on Google Calendar, update it instead
         const existingEvent = await calendar.events.get({
@@ -89,13 +85,14 @@ async function syncEventToCalendar(user, event) {
             end: googleEvent.end,
             attendees: googleEvent.attendees
         };
+        console.log("Updated payload created");
         
         await calendar.events.update({
             calendarId: "primary",
             eventId: event.googleId,
             resource: updatedEvent
         });
-        console.log("Google Calendar event updated");
+        console.log("Google Calendar updated");
     } else {
         // Event not on Google Calendar, insert it
         const result = await calendar.events.insert({
@@ -111,9 +108,7 @@ async function syncEventToCalendar(user, event) {
 };
 
 async function deleteEventFromCalendar(user, event) {
-    console.log("Initialising oAuth2Client for query");
     const oAuth2Client = createOAuth2Client();
-
     oAuth2Client.setCredentials({
         access_token: user.google.accessToken,
         refresh_token: user.google.refreshToken,
@@ -133,6 +128,7 @@ async function deleteEventFromCalendar(user, event) {
             calendarId: "primary",
             eventId: event.googleId
         });
+        console.log("Event '%s' removed from %s's Google Calendar", event.name, user.name);
     } catch (error) {
         if (error.code === 410) {
             // Catches error if deleting an event that has already been deleted
@@ -142,9 +138,7 @@ async function deleteEventFromCalendar(user, event) {
             // Rethrow other errors
             throw error; 
         }
-    }
-
-    console.log("Event '%s' removed from %s's Google Calendar", event.name, user.name);
+    } 
 };
 
 async function importEventToUser(user, googleEvent) {
@@ -152,13 +146,22 @@ async function importEventToUser(user, googleEvent) {
 
     const eventExists = user.events.some(event => event.googleId === googleEvent.id);
 
-    if (eventExists) {
-        console.log("Skipping event '%s'", googleEvent.summary);
-        return;
-    }
-    
     const startDate = googleEvent.start.dateTime || googleEvent.start.date;
     const endDate = googleEvent.end.dateTime || googleEvent.end.date;
+
+    if (eventExists) {
+        await Event.findOneAndUpdate({ googleId: googleEvent.id },
+            {
+                name: googleEvent.summary,
+                description: googleEvent.description,
+                owner: user,
+                dueDate: new Date(startDate),
+                endDate: new Date(endDate)
+            }
+        );
+        console.log("Event '%s' exists, overriding PlanIt event", googleEvent.summary)
+        return;
+    }
 
     const event = await Event.create({
         googleId: googleEvent.id,
@@ -168,10 +171,10 @@ async function importEventToUser(user, googleEvent) {
         dueDate: new Date(startDate),
         endDate: new Date(endDate)
     });
-    console.log("Event '%s' created", googleEvent.summary)
+    console.log("Event '%s' created", googleEvent.summary);
 
     await user.events.push(event);
-    console.log("Event '%s' imported", googleEvent.summary)
+    console.log("Event '%s' imported", googleEvent.summary);
 }
 
 const importEvents = async (req, res) => {
