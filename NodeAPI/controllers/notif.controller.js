@@ -6,7 +6,7 @@ const Notif = require('../models/notif.model.js');
 const { Queue, Worker } = require('bullmq');
 const IORedis = require('ioredis');
 
-const connection = new IORedis();
+const connection = new IORedis(process.env.TEST_REDIS_URL, {maxRetriesPerRequest: null});
 const notificationQueue = new Queue('notifications', { connection });
 
 // Schedule a group joining notification
@@ -201,3 +201,9 @@ const worker = new Worker('notifications', async job => {
 },
     { connection }
 );
+
+module.exports = {
+    scheduleJoinGroupNotification,
+    scheduleEventNotification,
+    cancelEventNotification
+}
