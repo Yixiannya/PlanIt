@@ -39,7 +39,7 @@ async function scheduleJoinGroupNotification(user, group) {
         type: "Group",
         title: "Group Notification",
         body: `You have been added to ${group.name}.`,
-        data: {
+        info: {
             screen: notif.screen,
             group: {
                 _id: group._id.toString(),
@@ -51,7 +51,7 @@ async function scheduleJoinGroupNotification(user, group) {
         }
     }
 
-    await notificationQueue.add('send-notification', jobData, {
+    await notificationQueue.add('notifications', jobData, {
         jobId: _id,
     });
 
@@ -106,7 +106,7 @@ async function scheduleEventNotification(user, event) {
             type: "Event",
             title: "Event Notification",
             body: `${event.name || "An event"} will be happening soon.`,
-            data: {
+            info: {
                 screen: notif.screen,
                 event: {
                     _id: event._id?.toString?.(),
@@ -123,7 +123,7 @@ async function scheduleEventNotification(user, event) {
         };
         console.log("jobData created");
 
-        await notificationQueue.add('send-notification', jobData, {
+        await notificationQueue.add('notifications', jobData, {
             delay: delayMs,
             jobId: _id.toString(),
         });
@@ -173,7 +173,8 @@ async function sendPushNotification({ expoToken, title, body, data }) {
 
 // Process notifications
 const worker = new Worker('notifications', async job => {
-    const { type, expoToken, screen, event, group } = job.data;
+    const { type, expoToken, info } = job.data;
+    const { screen, event, group } = info;
 
     if (!expoToken || !type || !screen) {
         console.error("Missing required fields");
