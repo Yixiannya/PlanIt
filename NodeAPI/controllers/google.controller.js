@@ -108,6 +108,7 @@ async function syncEventToCalendar(user, event) {
     }
     console.log("Event synced");
     await scheduleEventNotification(user, event);
+    console.log("Event notif created");
 };
 
 async function deleteEventFromCalendar(user, event) {
