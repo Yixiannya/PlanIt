@@ -91,26 +91,30 @@ async function scheduleEventNotification(user, event) {
 
     const members = event.members.map(objectId => objectId.toString());
 
-    const jobData = {
-        expoToken: notif.expoToken,
-        title: "Event Notification",
-        body: `${event.name} will be happening soon.`,
-        data: {
-            screen: notif.screen,
-            event: {
-                _id: event._id,
-                name: event.name,
-                description: event.description || "",
-                owner: event.owner.toString(),
-                members: members,
-                group: event.group.toString() || "",
-                dueDate: event.dueDate,
-                endDate: event.endDate,
-                googleId: event.googleId
+    try {
+        const jobData = {
+            expoToken: notif.expoToken,
+            title: "Event Notification",
+            body: `${event.name} will be happening soon.`,
+            data: {
+                screen: notif.screen,
+                event: {
+                    _id: event._id,
+                    name: event.name,
+                    description: event.description || "",
+                    owner: event.owner.toString(),
+                    members: members,
+                    group: event.group.toString() || "",
+                    dueDate: event.dueDate,
+                    endDate: event.endDate,
+                    googleId: event.googleId
+                }
             }
         }
+        console.log("jobData created");
+    } catch (error) {
+        console.error(error);
     }
-    console.log("jobData created");
 
     await notificationQueue.add('send-notification', jobData, {
         delay: delayMs,
