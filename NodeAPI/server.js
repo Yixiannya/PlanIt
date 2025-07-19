@@ -37,7 +37,7 @@ app.use("/api/events", eventRoute);
 app.use("/api/groups", groupRoute);
 app.use("/api/mods", modRoute);
 app.use('/', authRoute);
-app.use('/google', googleRoute);
+app.use('/api/google', googleRoute);
 
 // Initialise server
 app.listen(PORT, () => {
