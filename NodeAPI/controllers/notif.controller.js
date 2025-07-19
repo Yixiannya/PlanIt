@@ -103,6 +103,7 @@ async function scheduleEventNotification(user, event) {
     try {
         const jobData = {
             expoToken: notif.expoToken,
+            type: "Event",
             title: "Event Notification",
             body: `${event.name || "An event"} will be happening soon.`,
             data: {
@@ -150,6 +151,7 @@ async function cancelEventNotification(event) {
 
 // Sends notification when time is reached
 async function sendPushNotification({ expoToken, title, body, data }) {
+    console.log("Sending notification");
     const response = await fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
         headers: {
