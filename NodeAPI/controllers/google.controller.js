@@ -55,7 +55,7 @@ async function syncEventToCalendar(user, event) {
         start: { dateTime: adjustedDueDate, timeZone: "Asia/Singapore" },
         end: { dateTime: adjustedEndDate, timeZone: "Asia/Singapore" },
         attendees: googleEventMembers,
-        location: event.location
+        location: event.venue
     };
     console.log("Google Calendar event created");
     console.log(googleEvent);
