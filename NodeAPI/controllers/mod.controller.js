@@ -177,6 +177,7 @@ async function createEventsForClass(mod, modClass, user) {
         events.push(event);
 
         console.log("Event for week %d created", originWeek);
+        await sleep(150);
     }
 };
 
@@ -664,7 +665,7 @@ const updateStatus = async (req, res) => {
         const promises = [];
         for (let i = 0; i < userClasses.length; i++) {
             const modClass = userClasses[i];
-            promises.push(createEventsForClass(mod, modClass, user));
+            createEventsForClass(mod, modClass, user);
         }
 
         await Promise.all(promises);
