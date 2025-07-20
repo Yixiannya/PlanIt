@@ -154,17 +154,23 @@ async function importEventToUser(user, googleEvent) {
     const startDate = googleEvent.start.dateTime || googleEvent.start.date;
     const endDate = googleEvent.end.dateTime || googleEvent.end.date;
 
+    const newStartDate = new Date(startDate);
+    const newEndDate = new Date(endDate);
+
+    const adjustedStartDate = new Date(newStartDate.getTime() + (8 * 60 * 60 * 1000));
+    const adjustedEndDate = new Date(newEndDate.getTime() + (8 * 60 * 60 * 1000));
+
     if (eventExists) {
         const event = await Event.findOneAndUpdate({ googleId: googleEvent.id },
             {
-                name: googleEvent.summary,
+                name: googleEvent.summary || "No title given",
                 description: googleEvent.description,
                 owner: user,
-                dueDate: new Date(startDate),
-                endDate: new Date(endDate)
+                dueDate: new Date(adjustedStartDate),
+                endDate: new Date(adjustedEndDate)
             }
         );
-        console.log("Event '%s' exists, overriding PlanIt event", googleEvent.summary);
+        console.log("Event '%s' exists, overriding PlanIt event", event.name);
         await cancelEventNotification(event);
         await scheduleEventNotification(user, event);
         return;
@@ -172,17 +178,17 @@ async function importEventToUser(user, googleEvent) {
 
     const event = await Event.create({
         googleId: googleEvent.id,
-        name: googleEvent.summary,
+        name: googleEvent.summary || "No title given",
         description: googleEvent.description,
         owner: user,
-        dueDate: new Date(startDate),
-        endDate: new Date(endDate)
+        dueDate: new Date(adjustedStartDate),
+        endDate: new Date(adjustedEndDate)
     });
-    console.log("Event '%s' created", googleEvent.summary);
+    console.log("Event '%s' created", event.name);
 
     await scheduleEventNotification(user, event);
     await user.events.push(event._id);
-    console.log("Event '%s' imported", googleEvent.summary);
+    console.log("Event '%s' imported", event.name);
 }
 
 const importEvents = async (req, res) => {
