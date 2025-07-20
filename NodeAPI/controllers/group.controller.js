@@ -121,17 +121,38 @@ const postGroup = async (req, res) => {
 // Controls to update an group
 const putGroup = async (req, res) => {
     try {
-        const {id} = req.params;
-        const group = await Group.findByIdAndUpdate(id, req.body);
-        
+        // Check requester's id and see if they're an admin
+        const userId = req.body.userId;
+        const group = await Group.findById(id);
+        const admins = group.admins;
+        let i = 0;
+        while (i < admins.length) {
+            console.log(userId);
+            if (admins[i] == userId) {
+                break;
+            }
+            i++;
+        }
+        if (i >= admins.length) {
+            return res.status(403).json({message: "Requesting User is not an admin"});
+        }
+
         // If group doesn't exist
         if (!group) {
             return res.status(404).json({message: "Group not found"});
         }
 
+        const {id} = req.params;
+        const updatedGroup = await Group.findByIdAndUpdate(id, req.body);
+        
+        // If group doesn't exist
+        if (!updatedGroup) {
+            return res.status(404).json({message: "Group not found"});
+        }
+
         // Check group again
-        const updatedGroup = await Group.findById(id);
-        res.status(200).json(updatedGroup);
+        const finalUpdatedGroup = await Group.findById(id);
+        res.status(200).json(finalUpdatedGroup);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -157,19 +178,39 @@ const getGroupEvents = async (req, res) => {
 // Controls to patch an group
 const patchGroup = async (req, res) => {
     try {
-        // TODO: have it check requester's id and see if they're an admin
-        const updateObject = req.body; // e.g. {name: "dog", members: ["id1", "id2"]}
-        const {id} = req.params;
-        const group = await Group.findByIdAndUpdate(id, {$set: updateObject});
-        
+        // Check requester's id and see if they're an admin
+        const userId = req.body.userId;
+        const group = await Group.findById(id);
+        const admins = group.admins;
+        let i = 0;
+        while (i < admins.length) {
+            console.log(userId);
+            if (admins[i] == userId) {
+                break;
+            }
+            i++;
+        }
+        if (i >= admins.length) {
+            return res.status(403).json({message: "Requesting User is not an admin"});
+        }
+
         // If group doesn't exist
         if (!group) {
             return res.status(404).json({message: "Group not found"});
         }
 
+        const updateObject = req.body; // e.g. {name: "dog", members: ["id1", "id2"]}
+        const {id} = req.params;
+        const updatedGroup = await Group.findByIdAndUpdate(id, {$set: updateObject});
+        
+        // If group doesn't exist
+        if (!updatedGroup) {
+            return res.status(404).json({message: "Group not found"});
+        }
+
         // Check group again
-        const updatedGroup = await Group.findById(id);
-        res.status(200).json(updatedGroup);
+        const finalUpdatedGroup = await Group.findById(id);
+        res.status(200).json(finalUpdatedGroup);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
