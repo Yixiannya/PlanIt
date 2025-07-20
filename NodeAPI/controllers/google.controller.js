@@ -170,7 +170,8 @@ async function importEventToUser(user, googleEvent) {
                 description: googleEvent.description,
                 owner: user,
                 dueDate: new Date(adjustedStartDate),
-                endDate: new Date(adjustedEndDate)
+                endDate: new Date(adjustedEndDate),
+                venue: googleEvent.location
             }
         );
         console.log("Event '%s' exists, overriding PlanIt event", event.name);
