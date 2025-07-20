@@ -197,7 +197,7 @@ async function leaveClassHelper(user, modClass, mod) {
         }
 
         promises.push(deleteEventFunc(event));
-        await sleep(100);
+        await sleep(250);
     }
     promises.push(user.save());
 
