@@ -57,6 +57,7 @@ async function syncEventToCalendar(user, event) {
         attendees: googleEventMembers
     };
     console.log("Google Calendar event created");
+    console.log(googleEvent);
 
     if (!user || !user.google) {
         return res.status(404).json({ message: "User not connected to Google" });
@@ -196,7 +197,7 @@ const importEvents = async (req, res) => {
         const user = await User.findById(req.body.userId);
 
         if (!user) {
-            return res.status(403).json({message: "User not found"});
+            return res.status(404).json({message: "User not found"});
         }
 
         // Initialising oAuth2Client for query

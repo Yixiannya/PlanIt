@@ -179,10 +179,15 @@ const putEvent = async (req, res) => {
 
         // Sync to Google Calendar
         const owner = await User.findById(event.owner);
-        await syncEventToCalendar(owner, event);
+
+        if (!owner) {
+            return res.status(404).json({message: "Owner not found"});
+        }
+
 
         // Check event again
         const updatedEvent = await Event.findById(id);
+        await syncEventToCalendar(owner, updatedEvent);
         res.status(200).json(updatedEvent);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -203,10 +208,10 @@ const patchEvent = async (req, res) => {
 
         // Sync to Google Calendar
         const owner = await User.findById(event.owner);
-        await syncEventToCalendar(owner, event);
-
+        
         // Check event again
         const updatedEvent = await Event.findById(id);
+        await syncEventToCalendar(owner, updatedEvent);
         res.status(200).json(updatedEvent);
     } catch (error) {
         res.status(500).json({message: error.message});
