@@ -5,6 +5,7 @@ const User = require('../models/user.model.js');
 
 const { deleteEventFunc } = require('./event.controller.js');
 const { syncEventToCalendar, deleteEventFromCalendar } = require('./google.controller.js');
+const { sleep } = require('../utils/functions');
 
 // Some functions for usage
 function createClass(mod, req) {
@@ -196,6 +197,7 @@ async function leaveClassHelper(user, modClass, mod) {
         }
 
         promises.push(deleteEventFunc(event));
+        await sleep(100);
     }
     promises.push(user.save());
 
