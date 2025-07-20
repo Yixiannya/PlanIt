@@ -54,7 +54,8 @@ async function syncEventToCalendar(user, event) {
         description: event.description,
         start: { dateTime: adjustedDueDate, timeZone: "Asia/Singapore" },
         end: { dateTime: adjustedEndDate, timeZone: "Asia/Singapore" },
-        attendees: googleEventMembers
+        attendees: googleEventMembers,
+        location: event.location
     };
     console.log("Google Calendar event created");
     console.log(googleEvent);
@@ -86,7 +87,8 @@ async function syncEventToCalendar(user, event) {
             description: googleEvent.description,
             start: googleEvent.start,
             end: googleEvent.end,
-            attendees: googleEvent.attendees
+            attendees: googleEvent.attendees,
+            location: googleEvent.location
         };
         console.log("Updated payload created");
         

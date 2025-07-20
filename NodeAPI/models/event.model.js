@@ -30,6 +30,11 @@ const EventSchema = mongoose.Schema(
             required: false
         },
 
+        venue: {
+            type: String,
+            required: false
+        },
+
         dueDate: {
             type: Date,
             required: [true, "Select a due date"]

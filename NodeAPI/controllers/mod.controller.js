@@ -165,6 +165,7 @@ async function createEventsForClass(mod, modClass, user) {
         const event = await Event.create({
             "name": eventName,
             "description": mod.description,
+            "venue": modClass.venue,
             "owner": user,
             "dueDate": eventStart,
             "endDate": eventEnd
