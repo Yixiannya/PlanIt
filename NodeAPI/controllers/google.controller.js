@@ -189,6 +189,10 @@ const importEvents = async (req, res) => {
     try {
         const user = await User.findById(req.body.userId);
 
+        if (!user) {
+            return res.status(403).json({message: "User not found"});
+        }
+
         // Initialising oAuth2Client for query
         const oAuth2Client = createOAuth2Client();
 
