@@ -563,7 +563,7 @@ const leaveMod = async (req, res) => {
         res.status(200).json({ message: "Mod left successfully" });
     } catch (error) {
         console.error(error.response?.data || error.message);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.response?.data || error.message });
     }
 }
 
@@ -603,7 +603,7 @@ const leaveClass = async (req, res) => {
         res.status(200).json({ message: "Class left successfully" });
     } catch (error) {
         console.error(error.response?.data || error.message);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.response?.data || error.message });
     }
 }
 
@@ -630,7 +630,7 @@ const deleteClass = async (req, res) => {
         res.status(200).json({ message: "Class deleted successfully" });
     } catch (error) {
         console.error(error.response?.data || error.message);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.response?.data || error.message });
     }
 }
 
