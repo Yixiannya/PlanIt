@@ -121,6 +121,7 @@ const postGroup = async (req, res) => {
 // Controls to update an group
 const putGroup = async (req, res) => {
     try {
+        const {id} = req.params;
         // Check requester's id and see if they're an admin
         const userId = req.body.userId;
         const group = await Group.findById(id);
@@ -142,7 +143,7 @@ const putGroup = async (req, res) => {
             return res.status(404).json({message: "Group not found"});
         }
 
-        const {id} = req.params;
+        
         const updatedGroup = await Group.findByIdAndUpdate(id, req.body);
         
         // If group doesn't exist
@@ -178,6 +179,7 @@ const getGroupEvents = async (req, res) => {
 // Controls to patch an group
 const patchGroup = async (req, res) => {
     try {
+        const {id} = req.params;
         // Check requester's id and see if they're an admin
         const userId = req.body.userId;
         const group = await Group.findById(id);
@@ -200,7 +202,6 @@ const patchGroup = async (req, res) => {
         }
 
         const updateObject = req.body; // e.g. {name: "dog", members: ["id1", "id2"]}
-        const {id} = req.params;
         const updatedGroup = await Group.findByIdAndUpdate(id, {$set: updateObject});
         
         // If group doesn't exist
