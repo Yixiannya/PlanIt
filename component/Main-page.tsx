@@ -61,7 +61,7 @@ console.log(actualEvents);
     const sortedEvents = sorting (today, loading, actualEvents);
 
     return (
-    <View className="bg-gray-200 flex-1 flex-col items-center">
+    <View className="bg-gray-200 flex-1 flex-col">
         <Header word = "Your Upcoming Events" image= {require('../assets/logout.png')}
          onPress = {() =>
              Alert.alert("Logout", "Are you sure you want to logout?",
@@ -93,29 +93,39 @@ const Carousel = ({ loading, events}) => {
                 <View className="flex-1 justify-center items-center">
                      <Text className="text-2xl">Loading events...</Text>
                 </View>
-            ) : (
+            ) : events.length === 0 ? (
+                    <View className="flex-1 justify-center items-center">
+                         <Text className="mr-1 px-12 text-center text-2xl"> No events? Create one by pressing "+" at the Calendar! </Text>
+                    </View>
+                    ) : (
             <ScrollView horizontal>
                 <View className="flex-row">
                  {events.map((event) => (
                    <TouchableOpacity onPress = {() => navigation.navigate('EditDeletePage',
                        {event,
-                           location: () => navigation.replace('BottomTabs', { screen: 'Main-Page' }),
+                           location: () => navigation.pop(2),
                             allEvents: events,
                        } )}>
-                   <View key={event._id} className="py-7 border-4 bg-gray-300 border-gray-300 rounded-2xl flex-col px-5 ml-3 mr-3">
-                     <Text className="pb-2 justify-center text-center font-bold text-5xl">{event.name}</Text>
+                   <View key={event._id} className="py-4 border-4 bg-gray-300 border-gray-300 rounded-2xl flex-col px-5 ml-3 mr-3">
+                     <Text className="py-1 justify-center text-center font-bold text-5xl">{event.name}</Text>
                      {event.group != null ? (
-                         <View className = "pt-1 pb-2 flex-row justify-center ">
-                         <Text className="text-center font-bold text-2xl">Group: </Text>
-                         <Text className="text-center text-2xl">{event.groupName.name}</Text>
+                         <View className = "flex-row justify-center ">
+                         <Text className="text-center font-bold text-3xl">Group: </Text>
+                         <Text className="text-center text-3xl">{event.groupName.name}</Text>
                          </View>
                      ) : (
-                         <View className = "pt-1 pb-2 flex-row justify-center ">
-                         <Text className="font-bold text-center text-2xl">Personal event</Text>
+                         <View className = "flex-row justify-center ">
+                         <Text className="font-bold text-center text-3xl">Personal event</Text>
                          </View>
                          )
                      }
-                     <Text className="justify-center text-center">
+                    {(event.venue!== undefined && event.venue !== "") &&
+                     <Text className="text-center text-2xl px-5">
+                      <Text className="font-bold">
+                      Venue:{" "}
+                      </Text>
+                      {event.venue}</Text>}
+                     <Text className="pt-1 justify-center text-center">
                      <Text className = "font-bold">
                        Start Date:{" "}
                      </Text>
@@ -168,7 +178,12 @@ const ClassReminder = ({ loading, events}) => {
             <View className="flex-1 justify-center items-center">
             <Text className="text-2xl">Loading events...</Text>
             </View>
-        ) : (
+        ) : events.length === 0 ? (
+            <View className="flex-1 justify-center items-center">
+            <Text className="py-8 mr-1 mb-7 px-8 text-center text-3xl"> No groups? Press "Your Current Groups" to create your first group!
+            </Text>
+            </View>
+            ) : (
       <ScrollView>
     <View className="w-full flex-col items-center justify-center">
       {events.map((events) => (
@@ -199,19 +214,12 @@ const GroupComponent = ({ indivEvent }) => {
             navigation.navigate('GroupTabs', {
                       screen: 'Group Info',
                     });
-            }} className="w-full flex-row items-center justify-between
-                         bg-gray-300 rounded-2xl border-2 border-gray-200">
-            <View className="h-20 w-20 items-center mt-2">
-                <Image source={require('../assets/ICON.png')}/>
-            </View>
-
-            <View className="w-full flex-col justify-center ml-2 flex-1 py-5" >
-                <Text className="font-bold text-2xl">{indivEvent.name}</Text>
-                <Text className="text-[16px] mr-2">
+            }} className= "w-full bg-gray-300 rounded-2xl border-4 border-gray-200 px-7 py-5" >
+                <Text className="px-1 font-bold text-3xl">{indivEvent.name}</Text>
+                <Text className="px-3 text-[16px] mr-2">
                 {"Description: "}
                 {indivEvent.description}
                 </Text>
-            </View>
         </TouchableOpacity>
     );
 }

@@ -1,10 +1,12 @@
 import { Text, View, Button, Image, Alert, TouchableOpacity } from 'react-native';
 import { editEvent } from '../Data/editEvent';
 import { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 const EditEventButton = ({ ID, Name, Date, Hour, Minute, endDate, endHour, endMinute, allEvents,
-    Description, Location }) => {
+    Description, Location, venue }) => {
     const [checked, setChecked] = useState(false);
+    const navigation = useNavigation();
     const iconPressed = async () => {
         if (!Name?.trim() || !Date?.trim() || !Hour?.trim() || !Minute?.trim()
             || !endDate?.trim() || !endHour?.trim() || !endMinute?.trim()
@@ -38,11 +40,19 @@ const EditEventButton = ({ ID, Name, Date, Hour, Minute, endDate, endHour, endMi
                 dueDate: `${Date}T${Hour}:${Minute}:00.000Z`,
                 description: Description,
                 endDate: `${endDate}T${endHour}:${endMinute}:00.000Z`,
+                venue: venue,
             };
             try {
+                Alert.alert('Event editing in process...')
                 await editEvent(ID, Event);
                 Alert.alert('Success', 'Event edited!',
-                [ { text: 'OK', onPress: () => Location() }, ],
+                [ { text: 'OK',
+                    onPress: () => {
+                          if (Location === "AUTO") {
+                            navigation.pop(2);
+                          } else {
+                            Location();
+                          }},} ],
                 { cancelable: false },
                 );
             } catch (error) {

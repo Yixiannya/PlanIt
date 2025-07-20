@@ -18,10 +18,28 @@ export default function CalendarFunc() {
   const today = new Date().toISOString().split('T')[0];
   const [selected, setSelected] = useState(today);
   const [actualEvents, setActualEvents] = useState([]);
+  const [highlights, setHighlights] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const user = useUserStore((state) => state.user);
   const isFocused = useIsFocused();
+
+  const expandedDates = (events) => {
+    const temp = {}
+    for (const event of events) {
+        let start = new Date(event.dueDate.split('T')[0]);
+        const end = new Date(event.endDate.split('T')[0]);
+
+        while (start <= end) {
+          temp[start.toISOString().split('T')[0]] = {
+            marked: true,
+            dotColor: 'orange',
+          };
+          start.setDate(start.getDate() + 1);
+        };
+    };
+    return temp;
+  }
 
   useEffect(() => {
       async function fetchEvents() {
@@ -41,6 +59,7 @@ export default function CalendarFunc() {
                 })
               );
           setActualEvents(Array.isArray(events) ? updatedEvents : []);
+          console.log("Its me", updatedEvents);
           setLoading(false);
       }
         if (isFocused) {
@@ -69,7 +88,9 @@ export default function CalendarFunc() {
           setSelected(day.dateString);
         }}
         markedDates={{
+            ...expandedDates(actualEvents),
           [selected]: {
+              ...(expandedDates(actualEvents)[selected]),
             selected: true,
             disableTouchEvent: true,
             selectedDotColor: 'orange',
@@ -94,7 +115,7 @@ export default function CalendarFunc() {
                {filteredEvents.map(event => (
                    <TouchableOpacity onPress = {() => navigation.navigate('EditDeletePage',
                        {event,
-                           location: () => navigation.replace('BottomTabs', { screen: 'Calendar' }),
+                          location: () => navigation.pop(2),
                            allEvents: actualEvents,
                            } )}>
                    <View className="flex-col">
@@ -130,11 +151,20 @@ export default function CalendarFunc() {
                      {event.endDate.split('T')[0].split('-')[0]},{" "}
                      {event.endDate.split('T')[1].split('.')[0]}
                      </Text>
-                     <Text className="text-xl px-5">
-                     <Text className="font-bold">
-                     Description:
+                     {(event.description !== undefined && event.description !== "") &&
+                          <Text className="text-xl px-5">
+                         <Text className="font-bold">
+                     Description:{" "}
                      </Text>
-                     {event.description}</Text>
+                     {event.description}
+                     </Text>
+                     }
+                     {(event.venue!== undefined && event.venue !== "") &&
+                     <Text className="text-xl px-5">
+                      <Text className="font-bold">
+                      Venue:{" "}
+                      </Text>
+                      {event.venue}</Text>}
                      </View>
                     </View>
                    </View>

@@ -15,14 +15,15 @@ export const handleGroupDelete= async (gp, myuser, navigation) => {
       userId: myuser._id,
   }
   try {
+      Alert.alert("Deleting group...")
      await deleteGroup(gp._id, delete_array);
-     Alert.alert('Group Deleted');
+     Alert.alert('Your group has been deleted!');
      navigation.reset({
         index: 0,
         routes: [{ name: 'BottomTabs', params: { screen: 'Main-page' } }],
      });
   } catch (error) {
-      Alert.alert('Error', 'Failed to remove admin');
+      Alert.alert('Error', 'Failed to delete group');
   }
 }
 
@@ -39,12 +40,12 @@ export const handleLeave = async (gp, own, Admins, navigation) => {
     }
 
     try {
+        Alert.alert("Leaving group...")
       if (!Admins.some((admin => admin._id == own._id))) {
         await sendUser("members", gp._id, id_array, "delete");
       } else {
         await sendUser("admins", gp._id, id_array_2, "delete");
       }
-
       Alert.alert('Left group successfully');
       navigation.reset({
         index: 0,
@@ -112,8 +113,12 @@ export default function IndivGroupPage() {
                     }}
         />
         <ScrollView>
+
         <View className = "bg-orange-300 justify-center items-center">
-            <Image source = {require('../assets/ICON.png')} className = "w-36 h-36"/>
+        {!loading &&
+            <View className = "py-3">
+            <Image source = {{uri: Admins[0].image}} className = "rounded-2xl w-36 h-36"/>
+            </View>}
             <Text className="font-bold text-4xl px-3">
                 {Group.name}
             </Text>

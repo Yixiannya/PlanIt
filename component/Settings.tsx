@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import {useEffect, useState} from 'react'
 import { useUserStore } from '../Data/userStore';
 import {editUser} from '../Data/editUser';
+import {syncCalendar} from '../Data/syncCalendar';
 
 export default function Settings() {
     const navigation = useNavigation();
@@ -13,6 +14,7 @@ export default function Settings() {
     const [id, setId] = useState();
     const [name, setName] = useState();
     const [toggleChange, setToggleChange] = useState(false)
+    const [toggleSync, setToggleSync] = useState(false)
 
     useEffect(() => {
         setSetUp(user.notificationsEnabled);
@@ -41,6 +43,15 @@ export default function Settings() {
         }
     };
 
+    const sync = async () => {
+        try {
+            await syncCalendar({userId: id})
+            Alert.alert("Success!", "Your google calendar was synced")
+        } catch (error) {
+            Alert.alert("Error", "Something went wrong while syncing. Try again")
+        }
+    };
+
     return (
         <View className = "flex-1 bg-orange-300">
             <Header word="Settings"
@@ -62,7 +73,18 @@ export default function Settings() {
                 }
             </TouchableOpacity>
             </View>
-
+            <View className = "flex-row mx-2 my-2 bg-orange-400 py-8 rounded-2xl items-start">
+            <Text className = "pl-4 w-3/4 font-bold text-[28px] ">Sync events to Google Calendar </Text>
+            <TouchableOpacity onPress = {() =>  Alert.alert("Note:",
+               "Due to limitations, this will only sync the 100 most recent events from your Google Calendar, including events from this app. Continue?",
+               [{text: "No", onPress: () => Alert.alert("Request cancelled"),},
+                { text: "Yes", onPress: () => {
+                    sync();
+                },}])}>
+            <Text className = "ml-3 text-2xl py-6 text-center font-bold rounded-3xl bg-orange-600
+            w-20 h-20 "> Sync </Text>
+            </TouchableOpacity>
+            </View>
             <View className = "mx-2 my-2 bg-orange-400 py-6 rounded-2xl items-start">
             <View className = "flex-row">
             <Text className = "pt-4 w-3/4 pl-2 font-bold text-[28px] "> Change username </Text>

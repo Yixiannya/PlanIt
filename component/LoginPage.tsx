@@ -6,12 +6,23 @@ import { useUserStore } from '../Data/userStore';
 import {editUser} from '../Data/editUser'
 import {usePushNotifications} from  '../Data/usePushNotifications'
 import {useNotificationStore} from  '../Data/notificationStore'
+import {syncCalendar} from '../Data/syncCalendar'
 
 export default function LoginPage() {
   const navigation = useNavigation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const setUser =  useUserStore((state) => state.setUser);
   const clearToken = useUserStore.getState().clearUser
+
+  const sync = async (id) => {
+      try {
+          await syncCalendar({userId: id})
+          Alert.alert("Success!", "Your google calendar was synced")
+          navigation.replace('BottomTabs', { screen: 'Main-page' });
+      } catch (error) {
+          Alert.alert("Error", "Something went wrong while syncing. Try again")
+      }
+  };
 
   const toggleNotifications = async () => {
       try {
@@ -35,8 +46,11 @@ export default function LoginPage() {
           if (isSuccessResponse(response)) {
               const photoUrl = response.data.user.photo;
               const { idToken } = response.data;
-              const passable = { idToken };
-
+              const tokens = await GoogleSignin.getTokens();
+              const { accessToken }= tokens;
+              console.log("WHERE", tokens);
+              const passable = { idToken, accessToken, serverAuth: response.data.serverAuthCode};
+              console.log(passable);
               const responseBack = await fetch('https://planit-40q0.onrender.com/auth/google', {
                   method: "POST",
                   headers: {
@@ -46,19 +60,37 @@ export default function LoginPage() {
               })
               if (responseBack.ok) {
                 const data = await responseBack.json();
-
+                console.log(data);
                 await editUser({ image: photoUrl }, data.user._id)
-
                 setIsSubmitting(false);
                 setUser(data.user);
                 navigation.replace('BottomTabs', { screen: 'Main-page' });
 
+                if (data.user.events.length === 0) {
+                    Alert.alert("Would you like to sync your events from Google Calendar?:",
+                   "Note that due to server limitations, this will only sync the 100 most recent events from your Google Calendar. Continue?",
+                   [{text: "No", onPress: () =>
+                        Alert.alert("Are you sure?",
+                    "Due to the nature of our app, some events may not be able to carry over if you have already created events here",
+                                          [{text: "No"},
+                                           { text: "Yes", onPress: () => {
+                                               sync(data.user._id);
+                                           },}]),},
+                    { text: "Yes", onPress: () => {
+                        sync(data.user._id);
+                    },}])
+
+                }
                 if (!data.user.notificationsEnabled) {
                     Alert.alert("Do you want to enable notifications?",
                         "This will allow you to receive alerts on your phone",
                         [{text: "No", onPress: () => Alert.alert("Notifications not enabled", "If you wish to enable notifications, toggle it in settings"),},
                          { text: "Yes", onPress: () => {
                              toggleNotifications();
+                             setUser({
+                               ...data.user,
+                               notificationsEnabled: true,
+                             });
                          },}]
                     );
                 } else {

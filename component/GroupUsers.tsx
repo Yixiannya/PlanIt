@@ -134,7 +134,10 @@ export default function GroupUser({route}) {
                      () => { isAdmin
                       ? setAdminAdding(true)
                       : Alert.alert("Error", "You are not an admin", [{ text: "Ok" }])}},
-               ]
+               ],
+                {
+                    cancelable: true,
+                }
              )
            }
          >
@@ -173,7 +176,10 @@ export default function GroupUser({route}) {
                     onPress: () => { isAdmin
                         ? navigation.navigate('AddUsers')
                         : Alert.alert("Error", "You are not an admin", [{ text: "Ok" }])}},
-                ]
+                ],
+            {
+                cancelable: true,
+            }
             )
         }>
         <Image source={require('../assets/edit.png')} className="w-12 h-12" />

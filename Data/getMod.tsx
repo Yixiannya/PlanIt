@@ -1,4 +1,5 @@
 export async function getMod(id) {
+    console.log(`https://api.nusmods.com/v2/${id}/moduleList.json`);
     try {
         const mod = await fetch(
           `https://api.nusmods.com/v2/${id}/moduleList.json`

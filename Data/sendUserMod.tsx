@@ -1,17 +1,13 @@
 export async function sendUserMod(information) {
   try {
       console.log(information);
-     const sendfetch = await fetch('https://planit-40q0.onrender.com/api/mods', {
+      await fetch('https://planit-40q0.onrender.com/api/mods', {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(information),
         });
-
-        if (!sendfetch.ok) {
-        throw new Error(`Response status: ${sendfetch.status}`);
-        }
 
      } catch (error) {
          console.error('Fetch error:', error);

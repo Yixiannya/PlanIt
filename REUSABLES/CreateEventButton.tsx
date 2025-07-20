@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { getEvent } from '../Data/getEvent';
 
 const CreateEventButton = ({ Name, Date, Hour, Minute, endDate, endHour, endMinute,
-    Description, allEvents, Group, Location }) => {
+    Description, allEvents, Group, Location, venue }) => {
     const user = useUserStore((state) => state.user);
     const [checked, setChecked] = useState(false);
 
@@ -43,9 +43,11 @@ const CreateEventButton = ({ Name, Date, Hour, Minute, endDate, endHour, endMinu
             dueDate: `${Date}T${Hour}:${Minute}:00.000Z`,
             endDate: `${endDate}T${endHour}:${endMinute}:00.000Z`,
             description: Description,
+            venue: venue,
             ...(Group ? { group: Group._id } : {}),
         };
         try {
+            Alert.alert('Event sending in process...')
             await sendEvent(Event);
             Alert.alert('Success', 'Event created!',
             [ { text: 'OK', onPress: () => Location() }, ],

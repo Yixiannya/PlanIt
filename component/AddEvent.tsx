@@ -9,6 +9,7 @@ import { getUser } from '../Data/getUser';
 import { getEvent } from '../Data/getEvent';
 import moment from "moment";
 import Timetable from "react-native-calendar-timetable";
+import { Calendar } from 'react-native-calendars';
 
 export default function AddEvent({route}) {
     const navigation = useNavigation();
@@ -20,6 +21,7 @@ export default function AddEvent({route}) {
     const [endsearchMinute, setendSearchMinute] = useState('');
     const [searchName, setSearchName] = useState('');
     const [searchDesc, setSearchDesc] = useState('');
+    const [venue, setVenue] = useState('');
     const [openTable, setopenTable] = useState(false);
 
     const [tempDate, settempDate] = useState([]);
@@ -54,7 +56,8 @@ export default function AddEvent({route}) {
                             .some(thing => thing === z._id))
                         .map(user => user.name), z]);
                 setuserEvents(uniqueEvents);
-                setFilteredEvents(uniqueEvents.map(pair => [pair[1].dueDate, pair[1].endDate]));
+                setFilteredEvents(uniqueEvents.map(pair => [pair[1].dueDate, pair[1].endDate]))
+                console.log(uniqueEvents.map(pair => [pair[1].dueDate, pair[1].endDate]));
                 setLoading(false);
         } catch (error) {
             Alert.alert("Error", "Something went wrong");
@@ -132,6 +135,22 @@ export default function AddEvent({route}) {
         func(text.padStart(2, '0'));
       }
     };
+    const expandedDates = (events) => {
+        const temp = {}
+        for (const event of events) {
+            let start = new Date(event[0].split('T')[0]);
+            const end = new Date(event[1].split('T')[0]);
+
+            while (start <= end) {
+              temp[start.toISOString().split('T')[0]] = {
+                marked: true,
+                dotColor: 'orange',
+              };
+              start.setDate(start.getDate() + 1);
+            };
+        };
+        return temp;
+      }
 
     return (
     <View className = "flex-1 flex-col">
@@ -149,7 +168,7 @@ export default function AddEvent({route}) {
                 <Image source= { require('../assets/arrowup.png' ) } />}
             </View>
         </TouchableOpacity>
-     {openTable && (
+     {openTable && !loading && (
             <ScrollView className = "h-[300px]">
               {loading ? (
                 <View className="flex-1 justify-center items-center">
@@ -158,7 +177,20 @@ export default function AddEvent({route}) {
               ) : (
                   <View>
                   <View className ="border-4 border-orange-500">
-                    <DateSelector actualDate={tempDate} setActualDate={settempDate} />
+                    <Calendar
+                    onDayPress={(day) => {
+                      settempDate(day.dateString);
+                    }}
+                    markedDates={{
+                        ...expandedDates(filteredEvents),
+                      [tempDate]: {
+                           ...(expandedDates(filteredEvents)[tempDate]),
+                        selected: true,
+                        disableTouchEvent: true,
+                        selectedDotColor: 'orange',
+                      },
+                    }}
+                  />
                   </View>
                 <Timetable
                 items={items}
@@ -193,11 +225,22 @@ export default function AddEvent({route}) {
             />
         </View>
 
+        <View className = "bg-orange-400 flex-col py-3">
+            <Text className = "px-1 pt-2 text-4xl text-gray-800 font-bold"> Venue: </Text>
+            <TextInput
+                  placeholder = "Enter a venue (optional)"
+                  value = {venue}
+                  onChangeText={text => setVenue(text)}
+                  className = "px-4 text-[30px]"
+            />
+        </View>
+
     <View className = "bg-orange-500 py-5 items-center justify-center">
         <Text className = "font-bold text-[36px]" > Start date </Text>
     </View>
 
-    <DateSelector actualDate={actualDate} setActualDate={setActualDate} />
+    <DateSelector actualDate={actualDate} setActualDate={setActualDate}
+    />
 
     <TimeSelector
       searchHour ={ searchHour}
@@ -229,6 +272,7 @@ export default function AddEvent({route}) {
     endDate = {actualendDate} endHour = {endsearchHour} endMinute = {endsearchMinute}
     Description = {searchDesc}
     allEvents = {filteredEvents}
+    venue = {venue}
     Group = {Group}
     Location = { () =>
         navigation.pop()} />}

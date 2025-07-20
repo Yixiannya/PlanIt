@@ -30,6 +30,7 @@ export default function EditEventPage( { route } ) {
     const [actualendDate, setActualendDate] = useState([]);
     const [endsearchHour, setendSearchHour] = useState('');
     const [endsearchMinute, setendSearchMinute] = useState('');
+    const [venue, setVenue] = useState('');
 
     const [openTable, setopenTable] = useState(false);
     const [tempDate, settempDate] = useState([]);
@@ -89,6 +90,7 @@ export default function EditEventPage( { route } ) {
               setendSearchHour(hour2);
               setendSearchMinute(minute2);
               settempDate(datePart);
+              setVenue(event.venue)
             }
     }, [event]);
 
@@ -158,6 +160,23 @@ export default function EditEventPage( { route } ) {
       }
     };
 
+    const expandedDates = (events) => {
+        const temp = {}
+        for (const event of events) {
+            let start = new Date(event[0].split('T')[0]);
+            const end = new Date(event[1].split('T')[0]);
+
+            while (start <= end) {
+              temp[start.toISOString().split('T')[0]] = {
+                marked: true,
+                dotColor: 'orange',
+              };
+              start.setDate(start.getDate() + 1);
+            };
+        };
+        return temp;
+      }
+
     return (
     <View className = "flex-1 flex-col">
          <Header word = "Edit an event" image = {require('../assets/Close.png')}
@@ -174,7 +193,7 @@ export default function EditEventPage( { route } ) {
                     <Image source= { require('../assets/arrowup.png' ) } />}
                 </View>
             </TouchableOpacity>
-         {openTable && (
+         {openTable && !loading && (
                 <ScrollView className = "h-[300px]">
                   {loading ? (
                     <View className="flex-1 justify-center items-center">
@@ -183,7 +202,20 @@ export default function EditEventPage( { route } ) {
                   ) : (
                       <View>
                       <View className ="border-4 border-orange-500">
-                        <DateSelector actualDate={tempDate} setActualDate={settempDate} />
+                       <Calendar
+                       onDayPress={(day) => {
+                         settempDate(day.dateString);
+                       }}
+                       markedDates={{
+                           ...expandedDates(filteredEvents),
+                         [tempDate]: {
+                              ...(expandedDates(filteredEvents)[tempDate]),
+                           selected: true,
+                           disableTouchEvent: true,
+                           selectedDotColor: 'orange',
+                         },
+                       }}
+                     />
                       </View>
                     <Timetable
                     items={items}
@@ -214,6 +246,16 @@ export default function EditEventPage( { route } ) {
                       placeholder = "Enter description (optional)"
                       value = {searchDesc}
                       onChangeText={text => setSearchDesc(text)}
+                      className = "px-4 text-[30px]"
+                />
+            </View>
+
+            <View className = "bg-orange-400 flex-col py-3">
+                <Text className = "px-1 pt-2 text-4xl text-gray-800 font-bold"> Venue: </Text>
+                <TextInput
+                      placeholder = "Enter a venue (optional)"
+                      value = {venue}
+                      onChangeText={text => setVenue(text)}
                       className = "px-4 text-[30px]"
                 />
             </View>
@@ -254,7 +296,8 @@ export default function EditEventPage( { route } ) {
     endDate = {actualendDate} endHour = {endsearchHour} endMinute = {endsearchMinute}
     allEvents = {filteredEvents}
     Description = {searchDesc}
-    Location = { location } />
+    Location = { location }
+    venue = {venue}/>
     </ScrollView>
     </View>
     )

@@ -41,6 +41,7 @@ export default function NewGroup() {
     const [searchUsers, setSearchUsers] = useState('');
     const [selectedUsers, setSelectedUsers] = useState([]);
     const myuser = useUserStore((state) => state.user);
+    const [started, setStarted] = useState(false);
 
     useEffect(() => {
         async function loadUsers() {
@@ -55,22 +56,25 @@ export default function NewGroup() {
       }, []);
 
     const Item = ({ item }) => (
-        <View className="flex-1 items-center justify-center m-2 p-5 bg-orange-400 rounded-2xl">
           <TouchableOpacity
           onPress = { () =>
               {
            select(item);
-           }
-          }>
-            <Text className="text-xl font-bold">{item.name}</Text>
+           }}
+            className="flex-1 items-center justify-center m-1 p-5 bg-orange-400 rounded-2xl"
+         >
+            <View className = "pt-2 pb-3 items-center">
+            <Image source = {{uri: item.image}} className = "rounded-3xl w-20 h-20"/>
+            </View>
+            <Text className="text-center text-xl font-bold">{item.name}</Text>
           </TouchableOpacity>
-        </View>
       );
 
     const search = () => {
         if (allUsers.filter(user =>
             user.name.toLowerCase().startsWith(searchUsers.toLowerCase())).length === 0) {
-             Alert.alert('Error', 'No such user')
+             Alert.alert('Error', 'No such user');
+             setStarted(false);
         } else {
             setSearchDisplay(
                     searchUsers === ""
@@ -78,6 +82,7 @@ export default function NewGroup() {
                       : allUsers.filter(user =>
                           user.name.toLowerCase().startsWith(searchUsers.toLowerCase()))
             );
+        setStarted(true);
         }
     };
 
@@ -143,7 +148,11 @@ export default function NewGroup() {
                      <View className = "flex-1 items-center justify-center">
                      <Text className = "text-2xl font-bold"> Loading users </Text>
                      </View>
-                 ):(
+                 ) : !started ? (
+                   <View className = "py-10 px-10 mr-3 flex-1 items-center justify-center">
+                    <Text className = "text-center text-2xl font-bold"> Try typing a username and pressing the search button! </Text>
+                    </View>
+                   ) : (
                      <View className="flex-1 pt-3 px-4">
                         <FlatList
                         data={searchDisplay}

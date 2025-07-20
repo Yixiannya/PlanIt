@@ -35,7 +35,7 @@ export const setUpNotifications = async () => {
          ).data;
          return pushTokenString;
        } catch (error) {
-         console.log(error)
+         console.log(error);
        }
 
        if (Platform.OS === "android") {

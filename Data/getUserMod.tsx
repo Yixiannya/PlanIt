@@ -7,7 +7,6 @@ export async function getUserMod(userId) {
         throw new Error(`Response Error status: ${eventfetch.status}`);
         }
         const data = await eventfetch.json();
-        console.log(data);
         return data.mods;
       } catch (error) {
          console.error('Fetch error:', error);

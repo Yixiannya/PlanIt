@@ -57,12 +57,13 @@ export default function EditDeletePage({ route }) {
             </Text>
           </View>
         )}
+        {(event.description !== undefined && event.description !== "") && (
         <View className="rounded-2xl border-4 border-orange-500 bg-orange-400 py-4 pb-8 w-full">
           <Text className="text-4xl font-bold px-3 py-2">Description: </Text>
           <Text className="bg-orange-300 w-full rounded-2xl border-orange-400 border-2 text-4xl font-bold px-3 py-4">
             {event.description}
           </Text>
-        </View>
+        </View>)}
         <View className="rounded-2xl border-4 border-orange-500 bg-orange-400 py-4 pb-8 w-full">
           <Text className="text-4xl font-bold px-3 py-2">Start Time: </Text>
           <Text className="bg-orange-300 w-full rounded-2xl border-orange-400 border-2 text-4xl font-bold px-3 py-4">
@@ -81,7 +82,14 @@ export default function EditDeletePage({ route }) {
             {event.endDate.split('T')[1].split('.')[0]}
           </Text>
         </View>
-
+        {event.venue !== undefined && event.venue !== "" && (
+          <View className="rounded-2xl border-4 border-orange-500 bg-orange-400 py-4 pb-8 w-full">
+            <Text className="text-4xl font-bold px-3 py-2">Venue: </Text>
+            <Text className="bg-orange-300 w-full rounded-2xl border-orange-400 border-2 text-4xl font-bold px-3 py-4">
+              {event.venue}
+            </Text>
+          </View>
+        )}
         <View className="py-20 items-center justify-center w-full px-3 pt-2 flex-row flex-1 h-[30%]">
           <View className="bg-orange-400 rounded-2xl border-orange-500 border-4 py-4 px-10">
             <TouchableOpacity
@@ -95,7 +103,7 @@ export default function EditDeletePage({ route }) {
               className="items-center justify-center"
             >
               <Image className="w-32 h-32" source={require('../assets/edit.png')} />
-              <Text className="text-[27px] font-bold text-3xl">Edit data</Text>
+              <Text className="pt-1 text-[27px] font-bold text-3xl">Edit data</Text>
             </TouchableOpacity>
           </View>
 

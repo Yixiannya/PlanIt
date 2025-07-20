@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import {getMod} from '../Data/getMod';
 import DateSelector from '../REUSABLES/DateSelector'
 import {SendModButton} from '../REUSABLES/SendModButton'
+import {getUserMod} from '../Data/getUserMod'
 
 import { useUserStore } from '../Data/userStore';
 
@@ -27,12 +28,16 @@ export default function SearchModToAdd({route}) {
                 try {
                     setLoading(true);
                     const mod = await getMod(`${year}`);
+                    const mymods = await getUserMod(myuser._id);
+                    const simple = mymods.map(x => x.moduleCode);
                     const filtermods = mod
-                      .filter(x => x.semesters.some(y => y == sem));
+                      .filter(x => x.semesters.some(y => y == sem))
+                      .filter(y => !simple.includes(y.moduleCode));
                     setAllMods(filtermods);
                     setLoading(false);
                 } catch (error) {
                       Alert.alert('Notice', 'This AY does not have any information yet, come back later');
+                      setLoading(false);
             }}
             loadAllMods();
     }, []);
@@ -52,6 +57,9 @@ export default function SearchModToAdd({route}) {
       );
 
     const search = () => {
+        if (searchMods.length < 2) {
+            Alert.alert("Warning", "The system may be laggy due to an abundance of mods, narrow your search if you wish to avoid this")
+        }
         if (allMods.filter(mod =>
             mod.moduleCode.toLowerCase().startsWith(searchMods.toLowerCase())).length === 0) {
              Alert.alert('Error', 'No such mod')
@@ -72,6 +80,7 @@ export default function SearchModToAdd({route}) {
          );
         setSearchDisplay(searchDisplay.filter(mods => mods.moduleCode !== mod.moduleCode));
         setAllMods(allMods.filter(mods => mods.moduleCode !== mod.moduleCode));
+        await new Promise(resolve => setTimeout(resolve, 400));
         setLoading(false);
      };
 
@@ -82,6 +91,7 @@ export default function SearchModToAdd({route}) {
                 onPress={() => navigation.pop()}
           />
           <ScrollView>
+          { sem >= 3 &&
           <View className = "bg-orange-500">
           <TouchableOpacity onPress = {() => setopenTable(!openTable)}>
           <View className = "border-2 border-orange-500 flex-row items-center bg-orange-400">
@@ -92,10 +102,8 @@ export default function SearchModToAdd({route}) {
               <Image source= { require('../assets/arrowup.png' ) } />}
           </View>
           </TouchableOpacity>
-          </View>
-
+          </View>}
           {openTable && <DateSelector actualDate={actualDate} setActualDate={setActualDate} />}
-
            <View className = "bg-orange-400 items-center flex-row">
                 <View className = "flex-1 w-5/6 flex-row">
                   <Text className = "pt-5 text-3xl text-gray-800 font-bold"> Code: </Text>
@@ -115,9 +123,13 @@ export default function SearchModToAdd({route}) {
            </View>
                  { loading ? (
                      <View className = "flex-1 items-center justify-center">
-                     <Text className = "text-2xl font-bold"> Loading mods </Text>
+                     <Text className = "py-20 text-3xl font-bold"> Loading mods...</Text>
                      </View>
-                 ):(
+                 ): searchDisplay.length == 0 ? (
+                     <View className = "flex-1 items-center justify-center">
+                      <Text className = "mr-1 py-20 px-16 text-center text-3xl font-bold">Enter a module's code and press the search icon to find a mod! </Text>
+                      </View>
+                     ):(
                      <View className="flex-1 pt-3 px-4">
                         <FlatList
                         data={searchDisplay}
@@ -135,14 +147,17 @@ export default function SearchModToAdd({route}) {
                 <ScrollView horizontal className=" bg-orange-400">
                     {selectedMods.map((event) => (
                     <TouchableOpacity
-                              onPress = { () =>
+                              onPress = { async () =>
                                   {
+                                      setLoading(true);
                                setSelectedMods(selectedMods.filter(mod => mod !== event));
                                if (event.moduleCode.toLowerCase().startsWith(searchMods.toLowerCase())) {
                                      setSearchDisplay([...searchDisplay, event]
                                          .sort((x, y) => x.moduleCode.localeCompare(y.moduleCode)));
                                }
-                               setAllMods([...searchDisplay, event].sort());
+                               setAllMods([...allMods, event].sort());
+                               await new Promise(resolve => setTimeout(resolve, 400));
+                               setLoading(false);
                                }
                               }>
                     <View className="rounded-xl flex-col px-3 py-3">
@@ -152,7 +167,7 @@ export default function SearchModToAdd({route}) {
                     ))}
                 </ScrollView>
            </View>
-           <SendModButton mods = {selectedMods} year = {year} semester = {sem} startDate = {actualDate}/>
+           <SendModButton mods = {selectedMods} year = {year} semester = {sem} startDate = {sem < 3 ? "2003-03-08T00:00:00.000Z" : actualDate} />
     </View>
     )
 }

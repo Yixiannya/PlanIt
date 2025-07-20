@@ -21,7 +21,7 @@ jest.mock('../Data/getGroupEvents', () => ({
 }));
 
 jest.mock('../Data/userStore', () => ({
-   useUserStore: jest.fn((fn) => fn({ user: { _id: 'user123' } })),
+   useUserStore: jest.fn((fn) => fn({ user: { _id: 'user123', admins: [1,2,3] } })),
  }));
 
 jest.spyOn(Alert, 'alert').mockImplementation(() => {});
