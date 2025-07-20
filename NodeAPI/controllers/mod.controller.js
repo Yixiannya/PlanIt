@@ -197,7 +197,7 @@ async function leaveClassHelper(user, modClass, mod) {
         }
 
         promises.push(deleteEventFunc(event));
-        await sleep(250);
+        await sleep(150);
     }
     promises.push(user.save());
 
@@ -546,10 +546,11 @@ const leaveMod = async (req, res) => {
 
         for (let i = 0; i < modClasses.length; i++) {
             const modClass = mod.classes[i];
-            promises.push(leaveClassHelper(user, modClass, mod));
+            await leaveClassHelper(user, modClass, mod);
         }
 
-        await Promise.all(promises);
+        // Not using in parallel because we're hitting Google Cloud API's rate limit
+        // await Promise.all(promises); 
 
         console.log("Removing user from mod");
         mod.userId.pull(user);
@@ -666,10 +667,10 @@ const updateStatus = async (req, res) => {
             promises.push(createEventsForClass(mod, modClass, user));
         }
 
-        await Promise.all(promises)
-            .then(promise => user.modCompleted.set(mod._id.toString(), true))
-            .then(promise => mod.save())
-            .then(promise => user.save());
+        await Promise.all(promises);
+        await user.modCompleted.set(mod._id.toString(), true);
+        await mod.save();
+        await user.save();
 
         console.log("Status updated");
         
