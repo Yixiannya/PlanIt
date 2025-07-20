@@ -181,7 +181,7 @@ async function importEventToUser(user, googleEvent) {
     console.log("Event '%s' created", googleEvent.summary);
 
     await scheduleEventNotification(user, event);
-    await user.events.push(event);
+    await user.events.push(event._id);
     console.log("Event '%s' imported", googleEvent.summary);
 }
 
@@ -214,7 +214,7 @@ const importEvents = async (req, res) => {
         const promises = [];
         eventsList.forEach(event => promises.push(importEventToUser(user, event)));
 
-        await Promise.all(promises).then((promise) => user.save());
+        await Promise.all(promises).then(promise => user.save());
         res.status(200).json({ message: "First 100 upcoming events imported successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });
