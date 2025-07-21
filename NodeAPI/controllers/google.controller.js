@@ -110,6 +110,7 @@ async function syncEventToCalendar(user, event) {
         await event.save();
     }
     console.log("Event synced");
+    await cancelEventNotification(user, event);
     await scheduleEventNotification(user, event);
     console.log("Event notif created");
 };
