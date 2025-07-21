@@ -60,6 +60,10 @@ const initiateAndroidAuth = async (req, res) => {
     console.log("Verify token function");
     const googleUser = await verifyGoogleToken(idToken);
 
+    if (!googleUser.googleId) {
+      throw new Error("No googleId found");
+    }
+
     console.log("Creating access and refresh tokens");
     const { tokens } = await oAuth2Client.getToken(serverAuth);
     console.log("Access token: %s", tokens.access_token);
