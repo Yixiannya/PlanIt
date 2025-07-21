@@ -9,13 +9,13 @@ function createOAuth2Client() {
 };
 
 async function generateTokens(authCode) {
-    const data = {
+    const data = new URLSearchParams({
         code: authCode,
         client_id: process.env.SHANE_WEB_CLIENT_ID,
         client_secret: process.env.SHANE_WEB_CLIENT_SECRET,
         redirect_uri: '',
         grant_type: 'authorization_code',
-    };
+    });
 
 
     const response = await fetch('https://oauth2.googleapis.com/token', {
