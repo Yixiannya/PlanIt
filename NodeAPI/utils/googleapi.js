@@ -17,7 +17,6 @@ async function generateTokens(authCode) {
         grant_type: 'authorization_code',
     });
 
-
     const response = await fetch('https://oauth2.googleapis.com/token', {
         method: 'POST',
         headers: {
@@ -31,8 +30,10 @@ async function generateTokens(authCode) {
         console.error('Token exchange error:', errorData);
         throw new Error(`Google token exchange failed: ${errorData.error}`);
     }
+    console.log(response.ok);
 
     const tokenData = await response.json();
+    console.log(tokenData);
     return tokenData;
 
 }
