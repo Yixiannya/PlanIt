@@ -23,7 +23,7 @@ async function generateTokens(authCode) {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: params.toString(),
+        body: data.toString(),
     });
 
     if (!response.ok) {
