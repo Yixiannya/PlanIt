@@ -67,7 +67,7 @@ const initiateAndroidAuth = async (req, res) => {
     }
 
     console.log("Creating access and refresh tokens");
-    const { tokens } = await generateTokens(serverAuth);
+    const tokens = await generateTokens(serverAuth);
     console.log("Tokens received %s", tokens);
     console.log("Access token: %s", tokens.access_token);
     console.log("Refresh token: %s", tokens.refresh_token);
