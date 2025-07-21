@@ -1,9 +1,11 @@
 // Code containing all methods used in authentication routes
+const axios = require('axios');
+
 const User = require('../models/user.model.js');
 
 const {verifyGoogleToken} = require('../utils/verifyGoogleToken.js');
 const {createJWT} = require('../utils/createJWT.js');
-const { createOAuth2Client } = require('../utils/googleapi.js');
+const { createOAuth2Client, generateTokens } = require('../utils/googleapi.js');
 
 // Login screen
 const login = async (req, res, next) => {
@@ -65,7 +67,7 @@ const initiateAndroidAuth = async (req, res) => {
     }
 
     console.log("Creating access and refresh tokens");
-    const { tokens } = await oAuth2Client.getToken(serverAuth);
+    const { tokens } = await generateTokens(serverAuth);
     console.log("Tokens received %s", tokens);
     console.log("Access token: %s", tokens.access_token);
     console.log("Refresh token: %s", tokens.refresh_token);
