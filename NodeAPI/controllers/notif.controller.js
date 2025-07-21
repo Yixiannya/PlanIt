@@ -117,7 +117,8 @@ async function scheduleEventNotification(user, event) {
                     group: event.group?.toString?.(),
                     dueDate: event.dueDate,
                     endDate: event.endDate,
-                    googleId: event.googleId || ""
+                    googleId: event.googleId || "",
+                    venue: event.venue || ""
                 }
             }
         };
