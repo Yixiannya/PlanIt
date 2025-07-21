@@ -13,7 +13,7 @@ async function generateTokens(authCode) {
         code: authCode,
         client_id: process.env.SHANE_WEB_CLIENT_ID,
         client_secret: process.env.SHANE_WEB_CLIENT_SECRET,
-        redirect_uri: '',
+        redirect_uri: 'postmessage',
         grant_type: 'authorization_code',
     });
 
