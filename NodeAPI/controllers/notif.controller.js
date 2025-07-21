@@ -12,6 +12,7 @@ const notificationQueue = new Queue('notifications', { connection });
 // Schedule a group joining notification
 async function scheduleJoinGroupNotification(user, group) {
     const { notificationToken } = user;
+    const userId = user._id;
     const { _id, admins, members } = group;
     const screen = "Group"
 
@@ -35,6 +36,7 @@ async function scheduleJoinGroupNotification(user, group) {
         : [];
 
     const jobData = {
+        userId: userId.toString() || "",
         expoToken: notif.expoToken,
         type: "Group",
         title: "Group Notification",
@@ -105,6 +107,7 @@ async function scheduleEventNotification(user, event) {
 
     try {
         const jobData = {
+            userId: userId.toString() || "",
             expoToken: notif.expoToken,
             type: "Event",
             title: "Event Notification",
@@ -189,7 +192,7 @@ async function sendPushNotification({ expoToken, title, body, data }) {
 
 // Process notifications
 const worker = new Worker('notifications', async job => {
-    const { type, expoToken, info } = job.data;
+    const { userId, type, expoToken, info } = job.data;
     const { screen, event, group } = info;
 
     if (!expoToken || !type || !screen) {
@@ -227,7 +230,7 @@ const worker = new Worker('notifications', async job => {
             return;
     }
 
-    const user = await User.findOne({ notificationToken: expoToken });
+    const user = await User.findById(userId);
 
     if (user.notificationsEnabled) {
         console.log('Sending notification:', job.data);
