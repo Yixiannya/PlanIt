@@ -48,7 +48,7 @@ const EventSchema = mongoose.Schema(
         offsetMs: {
             type: Number,
             required: true,
-            default: 0
+            default: 18000000 // By default, notify users of events 5 min before they start
         },
 
         isRecurring: {
