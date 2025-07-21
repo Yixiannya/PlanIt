@@ -74,19 +74,19 @@ const initiateAndroidAuth = async (req, res) => {
 
     if (!user) {
       console.log("No such user found, creating new user");
+      const expiryMs = new Date(tokens.expiry_date).getTime();
       user = await User.create({
         name: googleUser.name,
         email: googleUser.email,
-      });
-
-      console.log("Creating Google info");
-      const expiryMs = new Date(tokens.expiry_date).getTime();
-      user.google = {
+        google: google = {
           googleId: googleUser.googleId,
           accessToken: tokens.access_token,
           refreshToken: tokens.refresh_token,
           expiryDate: expiryMs
-      };
+        }
+      });
+
+      console.log("User created");
       await user.save();
     }
 
