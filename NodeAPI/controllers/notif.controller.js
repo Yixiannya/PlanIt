@@ -52,7 +52,7 @@ async function scheduleJoinGroupNotification(user, group) {
     }
 
     await notificationQueue.add('notifications', jobData, {
-        jobId: _id,
+        jobId: _id.toString(),
     });
 
     console.log("Notification added to queue");
