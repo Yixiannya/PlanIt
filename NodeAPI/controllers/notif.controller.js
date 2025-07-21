@@ -139,13 +139,25 @@ async function scheduleEventNotification(user, event) {
 
 // Cancel a scheduled event notification
 async function cancelEventNotification(event) {
-    const { _id } = event;
-    const job = await notificationQueue.getJob(_id.toString());
+    const { _id, name } = event;
+    const jobId = _id.toString();
+
+    if (!jobId) {
+        console.warn("Invalid event ID %s", jobId);
+        return;
+    }
+
+    const job = await notificationQueue.getJob(jobId);
     if (job) {
         await job.remove();
-        await Notif.findOneAndDelete({
-            event: _id
-        });
+        console.log("Job removed from queue");
+    } else {
+        console.warn("No job found for event '%s'", name);
+    }
+
+    const notif = await Notif.findOneAndDelete({event: _id});
+    if (!notif) {
+        console.warn("No notification for event '%s' found", name);
     }
     console.log("Notif deleted");
 };
