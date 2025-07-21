@@ -82,8 +82,9 @@ const postGroup = async (req, res) => {
         const group = await Group.create(req.body);
 
         const admins = group.admins;
-
         const members = group.members;
+
+        const promises = [];
 
         // Goes through array and assigns every user in members array to the group
         for (let i = 0; i < members.length; i++) {
@@ -96,6 +97,7 @@ const postGroup = async (req, res) => {
             if (!user) {
                 return res.status(404).json({message: "User not found"});
             }
+            promises.push(scheduleJoinGroupNotification(user, group));
         }
 
         // Goes through array and assigns every user in admins array to the group
@@ -109,9 +111,10 @@ const postGroup = async (req, res) => {
             if (!user) {
                 return res.status(404).json({message: "User not found"});
             }
+            promises.push(scheduleJoinGroupNotification(user, group));
         }
         
-
+        await Promise.all(promises);
         res.status(200).json(group);
     } catch (error) {
         res.status(500).json({message: error.message});
