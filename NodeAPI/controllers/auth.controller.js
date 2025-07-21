@@ -78,7 +78,7 @@ const initiateAndroidAuth = async (req, res) => {
       user = await User.create({
         name: googleUser.name,
         email: googleUser.email,
-        google: google = {
+        google: {
           googleId: googleUser.googleId,
           accessToken: tokens.access_token,
           refreshToken: tokens.refresh_token,
