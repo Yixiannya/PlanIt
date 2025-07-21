@@ -61,7 +61,7 @@ async function syncEventToCalendar(user, event) {
     console.log(googleEvent);
 
     if (!user || !user.google) {
-        return res.status(404).json({ message: "User not connected to Google" });
+        throw new Error("User not connected to Google");
     }
 
     const oAuth2Client = createOAuth2Client();
@@ -110,7 +110,6 @@ async function syncEventToCalendar(user, event) {
         await event.save();
     }
     console.log("Event synced");
-    await cancelEventNotification(user, event);
     await scheduleEventNotification(user, event);
     console.log("Event notif created");
 };

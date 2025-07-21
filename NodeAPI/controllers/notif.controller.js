@@ -55,14 +55,17 @@ async function scheduleJoinGroupNotification(user, group) {
         jobId: _id.toString(),
     });
 
-    console.log("Notification added to queue");
+    console.log("Group Notification added to queue");
 };
 
 // Schedule an upcoming event notification
 async function scheduleEventNotification(user, event) {
     console.log("Scheduling event notif");
+    const userId = user._id;
     const { notificationToken } = user;
     const { _id, dueDate, offsetMs } = event;
+    const jobId = _id.toString() + "-" + userId.toString();
+
     const notifTime = new Date(dueDate.getTime() - (8 * 60 * 60 * 1000) - offsetMs);
     console.log(notifTime);
     const now = new Date();
@@ -126,21 +129,21 @@ async function scheduleEventNotification(user, event) {
 
         await notificationQueue.add('notifications', jobData, {
             delay: delayMs,
-            jobId: _id.toString(),
+            jobId: jobId,
         });
 
-        console.log("Notification added to queue");
+        console.log("Event Notification added to queue");
     } catch (error) {
         console.error(error);
+        throw error;
     }
-
-    
 };
 
 // Cancel a scheduled event notification
-async function cancelEventNotification(event) {
+async function cancelEventNotification(user, event) {
+    const userId = user._id;
     const { _id, name } = event;
-    const jobId = _id.toString();
+    const jobId = _id.toString() + "-" + userId.toString();
 
     if (!jobId) {
         console.warn("Invalid event ID %s", jobId);
@@ -155,7 +158,7 @@ async function cancelEventNotification(event) {
         console.warn("No job found for event '%s'", name);
     }
 
-    const notif = await Notif.findOneAndDelete({event: _id});
+    const notif = await Notif.findOneAndDelete({eventUserPairString: jobId});
     if (!notif) {
         console.warn("No notification for event '%s' found", name);
     }

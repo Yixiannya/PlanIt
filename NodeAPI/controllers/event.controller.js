@@ -6,6 +6,7 @@ const Group = require('../models/group.model.js');
 const User = require('../models/user.model.js');
 
 const { syncEventToCalendar, deleteEventFromCalendar } = require('./google.controller.js');
+const { cancelEventNotification } = require('./notif.controller.js');
 
 // Controls to get all events
 const getAllEvents = async (req, res) => {
@@ -184,10 +185,64 @@ const putEvent = async (req, res) => {
             return res.status(404).json({message: "Owner not found"});
         }
 
-
         // Check event again
         const updatedEvent = await Event.findById(id);
-        await syncEventToCalendar(owner, updatedEvent);
+        const group = updatedEvent.group;
+
+        if (group) {
+            console.log("'%s' is a group event", updatedEvent.name);
+            const admins = group.admins;
+            const members = group.members;
+
+            const promises = [];
+
+            // Check requester's id and see if they're an admin
+            let i = 0;
+            while (i < admins.length) {
+                console.log(admins[i] == owner);
+                if (admins[i] == owner) {
+                    break;
+                }
+                i++;
+            }
+
+            if (i >= admins.length) {
+                return res.status(403).json({message: "Requesting User is not an admin of the given group"});
+            }
+
+            // Members array
+            for (let i = 0; i < members.length; i++) {
+                const member = await User.findById(members[i]);
+
+                // If user doesn't exist
+                if (!member) {
+                    return res.status(404).json({message: "User not found"});
+                }
+
+                promises.push(cancelEventNotification(member, event)
+                    .then(promise => syncEventToCalendar(member, updatedEvent)));
+            }
+
+            // Admins array
+            for (let i = 0; i < admins.length; i++) {
+                const admin = await User.findById(admins[i]);
+            
+                // If user doesn't exist
+                if (!admin) {
+                    return res.status(404).json({message: "User not found"});
+                }
+
+                promises.push(cancelEventNotification(admin, event)
+                    .then(promise => syncEventToCalendar(admin, updatedEvent)));
+            }
+
+            await Promise.all(promises);
+            console.log("Event updated and synced for all group users");
+        } else {
+            await cancelEventNotification(owner, event);
+            await syncEventToCalendar(owner, updatedEvent);
+            console.log("Event updated and synced for %s", owner.name);
+        }
         res.status(200).json(updatedEvent);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -211,7 +266,63 @@ const patchEvent = async (req, res) => {
         
         // Check event again
         const updatedEvent = await Event.findById(id);
-        await syncEventToCalendar(owner, updatedEvent);
+        const group = updatedEvent.group;
+
+        if (group) {
+            console.log("'%s' is a group event", updatedEvent.name);
+            const admins = group.admins;
+            const members = group.members;
+
+            const promises = [];
+
+            // Check requester's id and see if they're an admin
+            let i = 0;
+            while (i < admins.length) {
+                console.log(admins[i] == owner);
+                if (admins[i] == owner) {
+                    break;
+                }
+                i++;
+            }
+
+            if (i >= admins.length) {
+                return res.status(403).json({message: "Requesting User is not an admin of the given group"});
+            }
+
+            // Members array
+            for (let i = 0; i < members.length; i++) {
+                const member = await User.findById(members[i]);
+
+                // If user doesn't exist
+                if (!member) {
+                    return res.status(404).json({message: "User not found"});
+                }
+
+                promises.push(cancelEventNotification(member, event)
+                    .then(promise => syncEventToCalendar(member, updatedEvent)));
+            }
+
+            // Admins array
+            for (let i = 0; i < admins.length; i++) {
+                const admin = await User.findById(admins[i]);
+
+                // If user doesn't exist
+                if (!admin) {
+                    return res.status(404).json({message: "User not found"});
+                }
+
+                promises.push(cancelEventNotification(admin, event)
+                    .then(promise => syncEventToCalendar(admin, updatedEvent)));
+            }
+
+            await Promise.all(promises);
+            console.log("Event updated and synced for all group users");
+        } else {
+            await cancelEventNotification(owner, event);
+            await syncEventToCalendar(owner, updatedEvent);
+            console.log("Event updated and synced for %s", owner.name);
+        }
+        
         res.status(200).json(updatedEvent);
     } catch (error) {
         res.status(500).json({message: error.message});
