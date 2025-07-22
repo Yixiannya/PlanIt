@@ -208,7 +208,7 @@ async function importEventToUser(user, googleEvent) {
 
     await scheduleEventNotification(user, event);
     user.events.push(event._id);
-    user.markModified('events');
+    // user.markModified('events');
     console.log("Event '%s' imported", event.name);
 }
 
@@ -254,7 +254,7 @@ const importEvents = async (req, res) => {
         eventsList.forEach(event => promises.push(importEventToUser(user, event)));
 
         await Promise.all(promises);
-        
+        console.log("User events have been modified:", user.isModified('events'));
         await user.save();
 
         const updatedUser = await User.findById(req.body.userId);
