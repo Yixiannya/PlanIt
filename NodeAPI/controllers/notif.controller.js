@@ -14,7 +14,6 @@ async function scheduleJoinGroupNotification(user, group) {
     const userId = user._id;
     const { _id, admins, members } = group;
     const screen = "Group"
-    const jobId = _id.toString() + "+" + userId.toString();
 
     const notif = await Notif.create({
         type: "Group",
@@ -52,9 +51,7 @@ async function scheduleJoinGroupNotification(user, group) {
         }
     }
 
-    await notificationQueue.add('notifications', jobData, {
-        jobId: jobId,
-    });
+    await notificationQueue.add('notifications', jobData);
 
     console.log("Group Notification added to queue");
 };
