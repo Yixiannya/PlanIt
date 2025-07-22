@@ -389,13 +389,13 @@ async function deleteEventFunc(event) {
 
     await Promise.all(promises);
     await Event.findByIdAndDelete(eventId)
-        .then(promise => console.log("Event deleted"));
+    console.log("Event deleted");
 };
 
 const deleteEvent = async (req, res) => {
     try {
         const { id } = req.params;
-        const event = await Event.findById(id, req.body);
+        const event = await Event.findById(id);
 
         // If event doesn't exist
         if (!event) {
