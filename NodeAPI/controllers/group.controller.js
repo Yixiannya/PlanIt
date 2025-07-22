@@ -313,6 +313,7 @@ const addGroupMember = async (req, res) => {
             membersToBeNotified.push(memberId);
             group.members.push(memberId);
         }
+        console.log(membersToBeNotified);
         await group.save();
 
         // Check group again
@@ -328,6 +329,7 @@ const addGroupMember = async (req, res) => {
             if (!user) {
                 return res.status(404).json({message: "User not found"});
             }
+            console.log("User found");
 
             promises.push(scheduleJoinGroupNotification(user, updatedGroup));
             console.log("Added to group notif sent");
