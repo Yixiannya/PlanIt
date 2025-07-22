@@ -71,9 +71,13 @@ async function syncEventToCalendar(user, event) {
         expiry_date: user.google.expiryDate
     });
     console.log("oAuth2Client initialised");
-
-    await oAuth2Client.getAccessToken();
-    console.log("Tokens get");
+    try {
+        await oAuth2Client.getAccessToken();
+        console.log("Tokens get");
+    } catch (error) {
+        console.error(error.response?.data || error.message);
+        throw error;
+    }
 
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
@@ -126,7 +130,13 @@ async function deleteEventFromCalendar(user, event) {
     });
     console.log("oAuth2Client initialised");
 
-    await oAuth2Client.getAccessToken();
+    try {
+        await oAuth2Client.getAccessToken();
+        console.log("Tokens get");
+    } catch (error) {
+        console.error(error.response?.data || error.message);
+        throw error;
+    }
 
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
@@ -219,7 +229,13 @@ const importEvents = async (req, res) => {
         });
         console.log("oAuth2Client initialised");
 
-        await oAuth2Client.getAccessToken();
+        try {
+            await oAuth2Client.getAccessToken();
+            console.log("Tokens get");
+        } catch (error) {
+            console.error(error.response?.data || error.message);
+            throw error;
+        }
 
         const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
