@@ -66,11 +66,11 @@ const initiateAndroidAuth = async (req, res) => {
     if (!googleUser.googleId) {
       throw new Error("No googleId found");
     }
-
+    var tokens;
     var expiryMs;
     console.log("Creating access and refresh tokens");
     if (serverAuth) {
-      const tokens = await generateTokens(serverAuth);
+      tokens = await generateTokens(serverAuth);
       console.log("Tokens received %s", tokens);
       console.log("Access token: %s", tokens.access_token);
       console.log("Refresh token: %s", tokens.refresh_token);
