@@ -73,6 +73,7 @@ async function syncEventToCalendar(user, event) {
     console.log("oAuth2Client initialised");
 
     await oAuth2Client.getAccessToken();
+    console.log("Tokens get");
 
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
