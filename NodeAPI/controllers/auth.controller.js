@@ -58,6 +58,7 @@ const initiateAndroidAuth = async (req, res) => {
     console.log("idToken: %s", idToken);
     console.log("accessToken: %s", accessToken);
     console.log("serverAuth: %s", serverAuth);
+    console.log("serverAuth: %s", req.body.serverAuth);
 
     console.log("Verify token function");
     const googleUser = await verifyGoogleToken(idToken);
