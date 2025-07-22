@@ -173,7 +173,7 @@ async function createEventsForClass(mod, modClass, user) {
         });
 
         await syncEventToCalendar(user, event);
-        user.events.push(event);
+        user.events.push(event._id);
         events.push(event);
 
         console.log("Event for week %d created", originWeek);
@@ -422,7 +422,7 @@ const postMod = async (req, res) => {
                     console.log("User %s added to %s %s", user, modClass.lessonType, modClass.classNo);
                 }
             }
-            mod.save();
+            await mod.save();
         }
 
         console.log("Mod %s created successfully", mod.moduleCode);
@@ -665,7 +665,7 @@ const updateStatus = async (req, res) => {
         const promises = [];
         for (let i = 0; i < userClasses.length; i++) {
             const modClass = userClasses[i];
-            createEventsForClass(mod, modClass, user);
+            promises.push(createEventsForClass(mod, modClass, user));
         }
 
         await Promise.all(promises);
