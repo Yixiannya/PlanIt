@@ -308,13 +308,35 @@ const addGroupMember = async (req, res) => {
                 return res.status(404).json({message: "User not found"});
             }
 
-            promises.push(scheduleJoinGroupNotification(user, group));
             group.members.push(memberId);
-            await group.save();
         }
+        await group.save();
 
         // Check group again
         const updatedGroup = await Group.findById(id);
+
+        // Send notif to all added users, once group is finished updating
+        for (let j = 0; j < addedMembers.length; j++) {
+            const memberId = addedMembers[j];
+            if (group.members.includes(memberId)) {
+                console.log("Skipping duplicate member");
+                continue;
+            }
+
+            // Updates the user's info so they have this group
+            const user = await User.findByIdAndUpdate(
+                memberId,
+                { $push: { groups: group } }
+            );
+
+            // If user doesn't exist
+            if (!user) {
+                return res.status(404).json({message: "User not found"});
+            }
+
+            promises.push(scheduleJoinGroupNotification(user, updatedGroup));
+        }
+
         await Promise.all(promises);
         res.status(200).json(updatedGroup);
     } catch (error) {
