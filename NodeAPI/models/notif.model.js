@@ -4,7 +4,7 @@ const NotifSchema = mongoose.Schema(
     {
         expoToken: {
             type: String,
-            required: true,
+            required: false,
         },
 
         screen: {
@@ -17,10 +17,9 @@ const NotifSchema = mongoose.Schema(
             required: true
         },
 
-        event: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: false,
-            ref: "Event"
+        eventUserPairString: {
+            type: String,
+            required: false
         },
 
         group: {

@@ -17,14 +17,13 @@ async function scheduleJoinGroupNotification(user, group) {
     const screen = "Group"
 
     const notif = await Notif.create({
-        expoToken: notificationToken,
         type: "Group",
         screen: screen,
         group: group
     });
 
     if (!notif) {
-        console.warn("Invalid expoToken or screen fields");
+        console.warn("Invalid fields");
         return;
     }
 
@@ -37,7 +36,6 @@ async function scheduleJoinGroupNotification(user, group) {
 
     const jobData = {
         userId: userId.toString() || "",
-        expoToken: notif.expoToken,
         type: "Group",
         title: "Group Notification",
         body: `You have been added to ${group.name}.`,
@@ -89,7 +87,6 @@ async function scheduleEventNotification(user, event) {
         }
 
         const notif = await Notif.create({
-            expoToken: notificationToken,
             type: "Event",
             screen: screen,
             event: event
@@ -108,7 +105,6 @@ async function scheduleEventNotification(user, event) {
 
         const jobData = {
             userId: userId.toString() || "",
-            expoToken: notif.expoToken,
             type: "Event",
             title: "Event Notification",
             body: `${event.name || "An event"} will be happening soon.`,
@@ -192,10 +188,10 @@ async function sendPushNotification({ expoToken, title, body, data }) {
 
 // Process notifications
 const worker = new Worker('notifications', async job => {
-    const { userId, type, expoToken, info } = job.data;
+    const { userId, type, info } = job.data;
     const { screen, event, group } = info;
 
-    if (!expoToken || !type || !screen) {
+    if (!type || !screen) {
         console.error("Missing required fields");
         return;
     }
@@ -234,6 +230,7 @@ const worker = new Worker('notifications', async job => {
 
     if (user.notificationsEnabled) {
         console.log('Sending notification:', job.data);
+        const expoToken = user.notificationToken;
         await sendPushNotification({ expoToken, title, body, data });
         console.log("Notification sent");
     } else {

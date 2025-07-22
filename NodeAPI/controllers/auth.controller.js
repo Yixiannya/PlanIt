@@ -52,13 +52,13 @@ const initiateAndroidAuth = async (req, res) => {
     }
     if (!serverAuth) {
       console.log("No serverAuth received");
-      return res.status(400).json({ error: 'Server Auth Code required' });
+    } else {
+      console.log("serverAuth: %s", serverAuth);
     }
 
     console.log("idToken: %s", idToken);
     console.log("accessToken: %s", accessToken);
-    console.log("serverAuth: %s", serverAuth);
-    console.log("serverAuth: %s", req.body.serverAuth);
+    
 
     console.log("Verify token function");
     const googleUser = await verifyGoogleToken(idToken);
@@ -67,20 +67,22 @@ const initiateAndroidAuth = async (req, res) => {
       throw new Error("No googleId found");
     }
 
+    var expiryMs;
     console.log("Creating access and refresh tokens");
-    const tokens = await generateTokens(serverAuth);
-    console.log("Tokens received %s", tokens);
-    console.log("Access token: %s", tokens.access_token);
-    console.log("Refresh token: %s", tokens.refresh_token);
+    if (serverAuth) {
+      const tokens = await generateTokens(serverAuth);
+      console.log("Tokens received %s", tokens);
+      console.log("Access token: %s", tokens.access_token);
+      console.log("Refresh token: %s", tokens.refresh_token);
 
-    const expiry_date = Date.now() + tokens.expires_in * 1000;
-
+      const expiry_date = Date.now() + tokens.expires_in * 1000;
+      expiryMs = new Date(expiry_date).getTime();
+    }
     console.log("Finding user");
     let user = await User.findOne({ 'google.googleId': googleUser.googleId });
 
     if (!user) {
       console.log("No such user found, creating new user");
-      const expiryMs = new Date(expiry_date).getTime();
       user = await User.create({
         name: googleUser.name,
         email: googleUser.email,
