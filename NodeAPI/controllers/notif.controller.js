@@ -11,7 +11,6 @@ const notificationQueue = new Queue('notifications', { connection });
 
 // Schedule a group joining notification
 async function scheduleJoinGroupNotification(user, group) {
-    const { notificationToken } = user;
     const userId = user._id;
     const { _id, admins, members } = group;
     const screen = "Group"
