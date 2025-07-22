@@ -39,6 +39,7 @@ async function scheduleJoinGroupNotification(user, group) {
         title: "Group Notification",
         body: `You have been added to ${group.name}.`,
         info: {
+            userId: userId.toString() || "",
             screen: notif.screen,
             group: {
                 _id: group._id.toString(),
@@ -108,6 +109,7 @@ async function scheduleEventNotification(user, event) {
             title: "Event Notification",
             body: `${event.name || "An event"} will be happening soon.`,
             info: {
+                userId: userId.toString() || "",
                 screen: notif.screen,
                 event: {
                     _id: event._id?.toString?.(),
