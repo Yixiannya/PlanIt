@@ -253,7 +253,11 @@ const importEvents = async (req, res) => {
         eventsList.forEach(event => promises.push(importEventToUser(user, event)));
 
         await Promise.all(promises);
+        
         await user.save();
+
+        const updatedUser = await User.findById(req.body.userId);
+        console.log(updatedUser);
         res.status(200).json({ message: "First 100 upcoming events imported successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });
