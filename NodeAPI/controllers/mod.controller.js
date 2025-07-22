@@ -665,7 +665,7 @@ const updateStatus = async (req, res) => {
         const promises = [];
         for (let i = 0; i < userClasses.length; i++) {
             const modClass = userClasses[i];
-            promises.push(createEventsForClass(mod, modClass, user));
+            await createEventsForClass(mod, modClass, user);
         }
 
         await Promise.all(promises);
