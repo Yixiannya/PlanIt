@@ -395,6 +395,7 @@ async function deleteEventFunc(event) {
 const deleteEvent = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log("ID received:", id);
         const event = await Event.findById(id);
 
         // If event doesn't exist
