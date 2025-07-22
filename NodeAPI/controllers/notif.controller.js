@@ -191,8 +191,9 @@ async function sendPushNotification({ expoToken, title, body, data }) {
 const worker = new Worker('notifications', async job => {
     const { userId, type, info } = job.data;
     const { screen, event, group } = info;
+    const infoUserId = info.userId;
 
-    if (!type || !screen) {
+    if (!type || !screen || !infoUserId) {
         console.error("Missing required fields");
         return;
     }
@@ -210,6 +211,7 @@ const worker = new Worker('notifications', async job => {
             title = "Event Notification";
             body = `${event.name} will be happening soon.`;
             data.event = event;
+            data.userId = infoUserId;
             break;
 
         case "Group":
@@ -220,6 +222,7 @@ const worker = new Worker('notifications', async job => {
             title = `Group Notification`;
             body = `You have been added to ${group.name}.`;
             data.group = group;
+            data.userId = infoUserId;
             break;
 
         default:
