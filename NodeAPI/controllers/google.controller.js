@@ -207,7 +207,8 @@ async function importEventToUser(user, googleEvent) {
     console.log("Event created:", event);
 
     await scheduleEventNotification(user, event);
-    await user.events.push(event._id);
+    user.events.push(event._id);
+    user.markModified('events');
     console.log("Event '%s' imported", event.name);
 }
 
