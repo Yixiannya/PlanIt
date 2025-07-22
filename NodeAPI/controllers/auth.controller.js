@@ -72,12 +72,14 @@ const initiateAndroidAuth = async (req, res) => {
     console.log("Access token: %s", tokens.access_token);
     console.log("Refresh token: %s", tokens.refresh_token);
 
+    const expiry_date = Date.now() + tokens.expires_in * 1000;
+
     console.log("Finding user");
     let user = await User.findOne({ 'google.googleId': googleUser.googleId });
 
     if (!user) {
       console.log("No such user found, creating new user");
-      const expiryMs = new Date(tokens.expiry_date).getTime();
+      const expiryMs = new Date(expiry_date).getTime();
       user = await User.create({
         name: googleUser.name,
         email: googleUser.email,
