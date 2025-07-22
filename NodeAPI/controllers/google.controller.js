@@ -190,7 +190,7 @@ async function importEventToUser(user, googleEvent) {
             }
         );
         console.log("Event '%s' exists, overriding PlanIt event", event.name);
-        await cancelEventNotification(event);
+        await cancelEventNotification(user, event);
         await scheduleEventNotification(user, event);
         return;
     }
