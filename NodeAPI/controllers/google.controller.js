@@ -186,9 +186,10 @@ async function importEventToUser(user, googleEvent) {
         description: googleEvent.description,
         owner: user,
         dueDate: new Date(adjustedStartDate),
-        endDate: new Date(adjustedEndDate)
+        endDate: new Date(adjustedEndDate),
+        venue: googleEvent.location
     });
-    console.log("Event '%s' created", event.name);
+    console.log("Event created:", event);
 
     await scheduleEventNotification(user, event);
     await user.events.push(event._id);

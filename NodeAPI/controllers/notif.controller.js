@@ -62,50 +62,50 @@ async function scheduleJoinGroupNotification(user, group) {
 
 // Schedule an upcoming event notification
 async function scheduleEventNotification(user, event) {
-    console.log("Scheduling event notif");
-    const userId = user._id;
-    const { notificationToken } = user;
-    const { _id, dueDate, offsetMs } = event;
-    const jobId = _id.toString() + "-" + userId.toString();
-
-    const notifTime = new Date(dueDate.getTime() - (8 * 60 * 60 * 1000) - offsetMs);
-    console.log(notifTime);
-    const now = new Date();
-    console.log(now);
-
-    const delayMs = notifTime - now;
-
-    if (delayMs < 0) {
-        console.warn("Event has finished");
-        return;
-    }
-    console.log(delayMs);
-
-    var screen = "Indiv Event";
-
-    if (event.group) {
-        screen = "Group Event";
-    }
-
-    const notif = await Notif.create({
-        expoToken: notificationToken,
-        type: "Event",
-        screen: screen,
-        event: event
-    });
-
-    if (!notif) {
-        console.warn("Invalid fields");
-        return;
-    }
-    console.log("Notif created");
-
-    const members = Array.isArray(event.members)
-        ? event.members.map(id => id?.toString?.())
-        : [];
-    console.log(members);
-
     try {
+        console.log("Scheduling event notif");
+        const userId = user._id;
+        const { notificationToken } = user;
+        const { _id, dueDate, offsetMs } = event;
+        const jobId = _id.toString() + "-" + userId.toString();
+
+        const notifTime = new Date(dueDate.getTime() - (8 * 60 * 60 * 1000) - offsetMs);
+        console.log(notifTime);
+        const now = new Date();
+        console.log(now);
+
+        const delayMs = notifTime - now;
+
+        if (delayMs < 0) {
+            console.warn("Event has finished");
+            return;
+        }
+        console.log(delayMs);
+
+        var screen = "Indiv Event";
+
+        if (event.group) {
+            screen = "Group Event";
+        }
+
+        const notif = await Notif.create({
+            expoToken: notificationToken,
+            type: "Event",
+            screen: screen,
+            event: event
+        });
+
+        if (!notif) {
+            console.warn("Invalid fields");
+            return;
+        }
+        console.log("Notif created");
+
+        const members = Array.isArray(event.members)
+            ? event.members.map(id => id?.toString?.())
+            : [];
+        console.log(members);
+
         const jobData = {
             userId: userId.toString() || "",
             expoToken: notif.expoToken,
