@@ -338,6 +338,7 @@ async function deleteEventFunc(event) {
     console.log("Deleting Event '%s'", event.name);
     
     const eventId = event._id;
+    console.log("Deleting event of id:", eventId);
 
     const ownerId = event.owner;
 
@@ -368,7 +369,7 @@ async function deleteEventFunc(event) {
         // If member doesn't exist
         if (!member) {
             console.log("Member not found");
-            return;
+            continue;
         }
 
         promises.push(deleteEventFromCalendar(member, event));
@@ -388,7 +389,8 @@ async function deleteEventFunc(event) {
     promises.push(deleteEventFromCalendar(owner, event));
 
     await Promise.all(promises);
-    await Event.findByIdAndDelete(eventId)
+    console.log(eventId);
+    await Event.findByIdAndDelete(eventId);
     console.log("Event deleted");
 };
 

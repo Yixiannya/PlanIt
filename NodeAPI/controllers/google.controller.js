@@ -151,7 +151,7 @@ async function deleteEventFromCalendar(user, event) {
             eventId: event.googleId
         });
         console.log("Event '%s' removed from %s's Google Calendar", event.name, user.name);
-        await cancelEventNotification(event);
+        await cancelEventNotification(user, event);
     } catch (error) {
         if (error.code === 410) {
             // Catches error if deleting an event that has already been deleted
