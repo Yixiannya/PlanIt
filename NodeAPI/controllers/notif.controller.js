@@ -14,7 +14,7 @@ async function scheduleJoinGroupNotification(user, group) {
     const userId = user._id;
     const { _id, admins, members } = group;
     const screen = "Group"
-    const jobId = _id.toString() + "-" + userId.toString();
+    const jobId = _id.toString() + "+" + userId.toString();
 
     const notif = await Notif.create({
         type: "Group",
