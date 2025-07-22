@@ -322,7 +322,6 @@ const addGroupMember = async (req, res) => {
         // Send notif to all added users, once group is finished updating
         for (let j = 0; j < membersToBeNotified.length; j++) {
             const memberId = membersToBeNotified[j];
-            // Updates the user's info so they have this group
             const user = await User.findById(memberId);
 
             // If user doesn't exist
@@ -336,6 +335,7 @@ const addGroupMember = async (req, res) => {
         }
 
         await Promise.all(promises);
+        console.log("All notifs sent");
         res.status(200).json(updatedGroup);
     } catch (error) {
         res.status(500).json({message: error.message});
