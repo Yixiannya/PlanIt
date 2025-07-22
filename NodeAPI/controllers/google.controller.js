@@ -72,6 +72,8 @@ async function syncEventToCalendar(user, event) {
     });
     console.log("oAuth2Client initialised");
 
+    await oAuth2Client.getAccessToken();
+
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
     if (event.googleId) {
@@ -122,6 +124,8 @@ async function deleteEventFromCalendar(user, event) {
         expiry_date: user.google.expiryDate
     });
     console.log("oAuth2Client initialised");
+
+    await oAuth2Client.getAccessToken();
 
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
@@ -213,6 +217,8 @@ const importEvents = async (req, res) => {
             expiry_date: user.google.expiryDate
         });
         console.log("oAuth2Client initialised");
+
+        await oAuth2Client.getAccessToken();
 
         const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
