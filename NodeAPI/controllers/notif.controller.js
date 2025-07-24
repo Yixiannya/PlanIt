@@ -119,7 +119,8 @@ async function scheduleEventNotification(user, event) {
                     dueDate: event.dueDate,
                     endDate: event.endDate,
                     googleId: event.googleId || "",
-                    venue: event.venue || ""
+                    venue: event.venue || "",
+                    offsetMs: event.offsetMs
                 }
             }
         };
