@@ -82,6 +82,7 @@ async function scheduleEventNotification(user, event) {
 
         if (event.group) {
             screen = "Group Event";
+            await event.populate('group');
         }
 
         const notif = await Notif.create({
