@@ -263,7 +263,7 @@ const patchEvent = async (req, res) => {
             return res.status(404).json({message: "Event not found"});
         }
 
-        // Sync to Google Calendar
+        // Find owner
         const owner = await User.findById(event.owner);
         
         // Check event again
@@ -279,7 +279,7 @@ const patchEvent = async (req, res) => {
 
             console.log("Checking if requesting user is admin");
             // Check requester's id and see if they're an admin
-            let i = 0;
+            /* let i = 0;
             while (i < admins.length) {
                 console.log(admins[i] === owner);
                 if (admins[i] === owner) {
@@ -290,7 +290,7 @@ const patchEvent = async (req, res) => {
 
             if (i >= admins.length) {
                 return res.status(403).json({message: "Requesting User is not an admin of the given group"});
-            }
+            } */
 
             console.log("User is an admin");
 
