@@ -186,6 +186,7 @@ async function leaveClassHelper(user, modClass, mod) {
     const promises = [];
     console.log("Modifying %s in class", user.name);
 
+    // Changed to sequential here too due to rate limit
     console.log("Deleting class events");
     const userClassEvents = allEvents.filter(e => e.owner.toString() === user._id.toString());
     for (let i = 0; i < userClassEvents.length; i++) {
@@ -197,7 +198,7 @@ async function leaveClassHelper(user, modClass, mod) {
             return res.status(404).json({ message: "Event not found" });
         }
 
-        promises.push(deleteEventFunc(event));
+        await deleteEventFunc(event);
         await sleep(150);
     }
     promises.push(user.save());
@@ -498,11 +499,12 @@ const deleteMod = async (req, res) => {
             }
 
             // Remove every event within the mod from the user
+            // Changed to sequential because of rate limit
             const promises = [];
             for (let j = 0; j < modClasses.length; j++) {
                 // delete class events
                 const modClass = modClasses[j];
-                promises.push(deleteClassEvents(modClass));
+                await deleteClassEvents(modClass);
             }
 
             // Remove the mod from the user
@@ -510,7 +512,7 @@ const deleteMod = async (req, res) => {
             promises.push(user.modCompleted.delete(mod._id.toString()));
 
             await Promise.all(promises)
-                .then(p => user.save());
+            await user.save();
         }
 
         console.log("Mod %s deleted successfully", mod.moduleCode);
