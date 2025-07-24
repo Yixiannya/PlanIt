@@ -187,6 +187,7 @@ const putEvent = async (req, res) => {
 
         // Check event again
         const updatedEvent = await Event.findById(id);
+        await updatedEvent.populate('group');
         const group = updatedEvent.group;
 
         if (group) {
@@ -197,7 +198,7 @@ const putEvent = async (req, res) => {
             const promises = [];
 
             // Check requester's id and see if they're an admin
-            let i = 0;
+            /* let i = 0;
             while (i < admins.length) {
                 console.log(admins[i] == owner);
                 if (admins[i] == owner) {
@@ -210,7 +211,7 @@ const putEvent = async (req, res) => {
                 return res.status(403).json({message: "Requesting User is not an admin of the given group"});
             }
 
-            console.log("User is an admin");
+            console.log("User is an admin"); */
 
             // Members array
             for (let i = 0; i < members.length; i++) {
@@ -268,6 +269,7 @@ const patchEvent = async (req, res) => {
         
         // Check event again
         const updatedEvent = await Event.findById(id);
+        await updatedEvent.populate('group');
         const group = updatedEvent.group;
 
         if (group) {
@@ -277,7 +279,6 @@ const patchEvent = async (req, res) => {
 
             const promises = [];
 
-            console.log("Checking if requesting user is admin");
             // Check requester's id and see if they're an admin
             /* let i = 0;
             while (i < admins.length) {
@@ -292,7 +293,7 @@ const patchEvent = async (req, res) => {
                 return res.status(403).json({message: "Requesting User is not an admin of the given group"});
             } */
 
-            console.log("User is an admin");
+            console.log("Checking member array");
 
             // Members array
             for (let i = 0; i < members.length; i++) {
@@ -306,6 +307,8 @@ const patchEvent = async (req, res) => {
                 await cancelEventNotification(member, event);
                 await syncEventToCalendar(member, updatedEvent);
             }
+
+            console.log("Checking admins array");
 
             // Admins array
             for (let i = 0; i < admins.length; i++) {
