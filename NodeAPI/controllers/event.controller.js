@@ -289,6 +289,8 @@ const patchEvent = async (req, res) => {
                 return res.status(403).json({message: "Requesting User is not an admin of the given group"});
             }
 
+            console.log("User is an admin");
+
             // Members array
             for (let i = 0; i < members.length; i++) {
                 const member = await User.findById(members[i]);
@@ -298,7 +300,7 @@ const patchEvent = async (req, res) => {
                     return res.status(404).json({message: "User not found"});
                 }
 
-                await cancelEventNotification(member, event);
+                await cancelEventNotification(member, updatedEvent);
                 await syncEventToCalendar(member, updatedEvent);
             }
 
@@ -311,7 +313,7 @@ const patchEvent = async (req, res) => {
                     return res.status(404).json({message: "User not found"});
                 }
 
-                await cancelEventNotification(admin, event);
+                await cancelEventNotification(admin, updatedEvent);
                 await syncEventToCalendar(admin, updatedEvent);
             }
 
