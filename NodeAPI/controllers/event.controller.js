@@ -298,8 +298,8 @@ const patchEvent = async (req, res) => {
                     return res.status(404).json({message: "User not found"});
                 }
 
-                promises.push(cancelEventNotification(member, event)
-                    .then(promise => syncEventToCalendar(member, updatedEvent)));
+                await cancelEventNotification(member, event);
+                await syncEventToCalendar(member, updatedEvent);
             }
 
             // Admins array
@@ -311,8 +311,8 @@ const patchEvent = async (req, res) => {
                     return res.status(404).json({message: "User not found"});
                 }
 
-                promises.push(cancelEventNotification(admin, event)
-                    .then(promise => syncEventToCalendar(admin, updatedEvent)));
+                await cancelEventNotification(admin, event);
+                await syncEventToCalendar(admin, updatedEvent);
             }
 
             await Promise.all(promises);
