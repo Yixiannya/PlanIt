@@ -679,7 +679,7 @@ const updateStatus = async (req, res) => {
             const modClass = userClasses[i];
             // Delete all classes events first, before adding them back in
             await leaveClassHelper(user, modClass, mod);
-            await modClass.push(user);
+            await modClass.userId.push(user);
             await createEventsForClass(mod, modClass, user);
         }
 
