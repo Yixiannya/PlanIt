@@ -545,7 +545,8 @@ const leaveMod = async (req, res) => {
         await mod.populate("classes.events");
 
         const modClasses = mod.classes.filter(c => c.userId.includes(user._id));   
-        const promises = [];
+        console.log(modClasses);
+        // const promises = [];
 
         for (let i = 0; i < modClasses.length; i++) {
             const modClass = mod.classes[i];
