@@ -65,6 +65,8 @@ async function scheduleEventNotification(user, event) {
         const { _id, dueDate, offsetMs } = event;
         const jobId = _id.toString() + "-" + userId.toString();
 
+        console.log("JobId is:", jobId);
+
         const notifTime = new Date(dueDate.getTime() - (8 * 60 * 60 * 1000) - offsetMs);
         console.log(notifTime);
         const now = new Date();

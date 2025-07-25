@@ -214,6 +214,7 @@ const putEvent = async (req, res) => {
             console.log("User is an admin"); */
 
             // Members array
+            console.log("Checking members array");
             for (let i = 0; i < members.length; i++) {
                 const member = await User.findById(members[i]);
 
@@ -227,6 +228,7 @@ const putEvent = async (req, res) => {
             }
 
             // Admins array
+            console.log("Checking admins array");
             for (let i = 0; i < admins.length; i++) {
                 const admin = await User.findById(admins[i]);
 

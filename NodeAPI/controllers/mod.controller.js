@@ -665,8 +665,12 @@ const updateStatus = async (req, res) => {
         console.log(userClasses);
 
         const promises = [];
+        await mod.populate("classes.events");
+
         for (let i = 0; i < userClasses.length; i++) {
             const modClass = userClasses[i];
+            // Delete all classes events first, before adding them back in
+            await leaveClassHelper(user, modClass, mod);
             await createEventsForClass(mod, modClass, user);
         }
 
