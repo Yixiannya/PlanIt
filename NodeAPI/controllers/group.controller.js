@@ -4,7 +4,8 @@ const Event = require('../models/event.model.js');
 const User = require('../models/user.model.js');
 
 const { deleteEventFunc } = require('./event.controller.js');
-const { scheduleJoinGroupNotification } = require('./notif.controller.js');
+const { deleteEventFromCalendar } = require('./google.controller.js');
+const { scheduleJoinGroupNotification, cancelEventNotification } = require('./notif.controller.js');
 
 // Controls to get all groups
 const getAllGroups = async (req, res) => {
@@ -344,13 +345,52 @@ const addGroupMember = async (req, res) => {
 
 const deleteGroupMember = async (req, res) => {
     try {
-        
+        console.log("deleting member");
         const {id} = req.params;
         const userId = req.body.userId;
         const group = await Group.findById(id);
         const admins = group.admins;
         // Must be array of members id to delete
         const deletedMembers = req.body.deletedMembers; 
+
+        // If group doesn't exist
+        if (!group) {
+            return res.status(404).json({message: "Group not found"});
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({message: "User not found"});
+        }
+
+        // For deleting self from group (because frontend coded it this way without consulting me)
+        if (deletedMembers.length == 1 && deletedMembers[0] == userId) {
+            group.members.pull(userId);
+            await group.save();
+
+            // Updates the user's info so they don't have this group
+            const user = await User.findByIdAndUpdate(
+                userId,
+                { $pull: { groups: group._id } }
+            );
+
+            await user.populate('events');
+            const events = user.events.filter(e => e.group.toString() == id.toString());
+
+            for (let i = 0; i < events.length; i++) {
+                const event = events[i];
+                await deleteEventFromCalendar(user, event);
+                await cancelEventNotification(user, event);
+                await user.events.pull(event);
+            }
+
+            await user.save();
+
+            // Check group again
+            const updatedGroup = await Group.findById(id);
+            res.status(200).json(updatedGroup);
+            return;
+        }
 
         // Check requester's id and see if they're an admin
         let i = 0;
@@ -362,12 +402,8 @@ const deleteGroupMember = async (req, res) => {
         }
 
         if (i >= admins.length) {
+            console.log("Not an admin");
             return res.status(403).json({message: "Requesting User is not an admin"});
-        }
-
-        // If group doesn't exist
-        if (!group) {
-            return res.status(404).json({message: "Group not found"});
         }
 
         for (let j = 0; j < deletedMembers.length; j++) {
@@ -382,12 +418,22 @@ const deleteGroupMember = async (req, res) => {
                 { $pull: { groups: group._id } }
             );
 
-            
             // If user doesn't exist
             if (!user) {
                 return res.status(404).json({message: "User not found"});
             }
 
+            await user.populate('events');
+            const events = user.events.filter(e => e.group.toString() == id.toString());
+
+            for (let i = 0; i < events.length; i++) {
+                const event = events[i];
+                await deleteEventFromCalendar(user, event);
+                await cancelEventNotification(user, event);
+                await user.events.pull(event);
+            }
+
+            await user.save();
         }
 
         
@@ -505,12 +551,42 @@ const addGroupAdmin = async (req, res) => {
 
 const deleteGroupAdmin = async (req, res) => {
     try {
+        console.log("deleting admin");
         const {id} = req.params;
         const userId = req.body.userId;
         const group = await Group.findById(id);
         const admins = group.admins;
         // Must be array of admins to delete
         const deletedAdmins = req.body.deletedAdmins; 
+
+        // For deleting self from group (because frontend coded it this way without consulting me)
+        if (deletedAdmins.length == 1 && deletedAdmins[0] == userId) {
+            group.admins.pull(userId);
+            await group.save();
+
+            // Updates the user's info so they don't have this group
+            const user = await User.findByIdAndUpdate(
+                userId,
+                { $pull: { groups: group._id } }
+            );
+
+            await user.populate('events');
+            const events = user.events.filter(e => e.group.toString() == id.toString());
+
+            for (let i = 0; i < events.length; i++) {
+                const event = events[i];
+                await deleteEventFromCalendar(user, event);
+                await cancelEventNotification(user, event);
+                await user.events.pull(event);
+            }
+
+            await user.save();
+
+            // Check group again
+            const updatedGroup = await Group.findById(id);
+            res.status(200).json(updatedGroup);
+            return;
+        }
 
         // Check requester's id and see if they're an admin
         let i = 0;
@@ -522,6 +598,7 @@ const deleteGroupAdmin = async (req, res) => {
         }
 
         if (i >= admins.length) {
+            console.log("Not an admin");
             return res.status(403).json({message: "Requesting User is not an admin"});
         }
 
@@ -544,6 +621,19 @@ const deleteGroupAdmin = async (req, res) => {
             if (!user) {
                 return res.status(404).json({message: "User not found"});
             }
+
+            // Deletes events from the user
+            await user.populate('events');
+            const events = user.events.filter(e => e.group.toString() == id.toString());
+
+            for (let i = 0; i < events.length; i++) {
+                const event = events[i];
+                await deleteEventFromCalendar(user, event);
+                await cancelEventNotification(user, event);
+                await user.events.pull(event);
+            }
+
+            await user.save();
         }
 
         // Check to make sure there is an admin in the group.

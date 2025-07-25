@@ -341,7 +341,6 @@ const getUserModClasses = async (req, res) => {
         console.log("Mod found");
 
         await mod.populate('classes');
-        console.log(mod.classes);
 
         const ownedClasses = mod.classes.filter(c => c.userId.includes(user._id));
         console.log(ownedClasses);
