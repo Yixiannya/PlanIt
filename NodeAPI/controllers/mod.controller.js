@@ -311,6 +311,7 @@ const getAllUserClasses = async (req, res) => {
         // Searches every mod the user is in
         for (let i = 0; i < mods.length; i++) {
             const mod = mods[i];
+            await mod.populate('classes');
             const ownedClasses = mod.classes.filter(c => c.userId.includes(user._id));
             allOwnedClasses = allOwnedClasses.concat(ownedClasses);
         }
@@ -330,14 +331,20 @@ const getUserModClasses = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
+        console.log("User found");
 
         // Finds mod
         const mod = await Mod.findById(id);
         if (!mod) {
             return res.status(404).json({ message: "Mod not found" });
         }
+        console.log("Mod found");
+
+        await mod.populate('classes');
+        console.log(mod.classes);
 
         const ownedClasses = mod.classes.filter(c => c.userId.includes(user._id));
+        console.log(ownedClasses);
 
         res.status(200).json(ownedClasses);
     } catch (error) {
@@ -672,6 +679,7 @@ const updateStatus = async (req, res) => {
             const modClass = userClasses[i];
             // Delete all classes events first, before adding them back in
             await leaveClassHelper(user, modClass, mod);
+            await modClass.push(user);
             await createEventsForClass(mod, modClass, user);
         }
 
