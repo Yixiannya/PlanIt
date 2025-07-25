@@ -549,7 +549,7 @@ const leaveMod = async (req, res) => {
         // const promises = [];
 
         for (let i = 0; i < modClasses.length; i++) {
-            const modClass = mod.classes[i];
+            const modClass = modClasses[i];
             await leaveClassHelper(user, modClass, mod);
         }
 
