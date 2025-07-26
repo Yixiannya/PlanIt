@@ -366,7 +366,8 @@ const deleteGroupMember = async (req, res) => {
         }
 
         // For deleting self from group (because frontend coded it this way without consulting me)
-        if (deletedMembers.length == 1 && deletedMembers[0].toString() == userId.toString()) {
+        // By right this should be used
+        /* if (deletedMembers.length == 1 && deletedMembers[0].toString() == userId.toString()) {
             console.log("removing self");
             group.members.pull(userId);
             await group.save();
@@ -398,7 +399,7 @@ const deleteGroupMember = async (req, res) => {
             const updatedGroup = await Group.findById(id);
             res.status(200).json(updatedGroup);
             return;
-        }
+        } */
 
         // Check requester's id and see if they're an admin
         let i = 0;
@@ -434,6 +435,7 @@ const deleteGroupMember = async (req, res) => {
             await user.populate('events');
             const events = user.events.filter(e => e.group.toString() == id.toString());
 
+            console.log("removing events");
             for (let i = 0; i < events.length; i++) {
                 const event = events[i];
                 await deleteEventFromCalendar(user, event);
@@ -444,6 +446,7 @@ const deleteGroupMember = async (req, res) => {
             await user.save();
         }
 
+        console.log("members removed");
 
         // Check group again
         const updatedGroup = await Group.findById(id);
@@ -569,7 +572,7 @@ const deleteGroupAdmin = async (req, res) => {
         console.log("Deleted admins are:", deletedAdmins);
 
         // For deleting self from group (because frontend coded it this way without consulting me)
-        if (deletedAdmins.length == 1 && deletedAdmins[0].toString() == userId.toString()) {
+        /* if (deletedAdmins.length == 1 && deletedAdmins[0].toString() == userId.toString()) {
             console.log("removing self");
             group.admins.pull(userId);
             await group.save();
@@ -603,7 +606,7 @@ const deleteGroupAdmin = async (req, res) => {
             const updatedGroup = await Group.findById(id);
             res.status(200).json(updatedGroup);
             return;
-        }
+        } */
 
         // Check requester's id and see if they're an admin
         let i = 0;
@@ -641,6 +644,7 @@ const deleteGroupAdmin = async (req, res) => {
             await user.populate('events');
             const events = user.events.filter(e => e.group.toString() == id.toString());
 
+            console.log("removing events");
             for (let i = 0; i < events.length; i++) {
                 const event = events[i];
                 await deleteEventFromCalendar(user, event);
@@ -659,6 +663,7 @@ const deleteGroupAdmin = async (req, res) => {
 
         await group.save();
         // Check group again
+        console.log("admins removed");
         const updatedGroup = await Group.findById(id);
         res.status(200).json(updatedGroup);
     } catch (error) {
