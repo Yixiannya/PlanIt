@@ -124,8 +124,6 @@ const postEvent = async (req, res) => {
                 if (!member) {
                     return res.status(404).json({message: "User not found"});
                 }
-
-                promises.push(syncEventToCalendar(member, event));
             }
 
             // Fill up event with Admins array
@@ -162,7 +160,7 @@ const postEvent = async (req, res) => {
                 }
                 promises.push(syncEventToCalendar(admin, event));
             }
-            
+
             await Promise.all(promises);
         } else {
             // No group specificed, so event is a personal event.
