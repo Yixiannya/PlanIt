@@ -608,6 +608,9 @@ const leaveClass = async (req, res) => {
             && c.startTime == req.body.startTime
             && c.endTime == req.body.endTime
         );
+        if (!modClass) {
+            return res.status(404).json({ message: "Class not found" });
+        }
 
         console.log("Deleting class events owned by user %s", user.name);
         await leaveClassHelper(user, modClass, mod);
@@ -631,11 +634,10 @@ const deleteClass = async (req, res) => {
             && c.startTime == req.body.startTime
             && c.endTime == req.body.endTime
         );
-        const modClassId = modClass._id;
-
         if (!modClass) {
             return res.status(404).json({ message: "Class not found" });
         }
+        const modClassId = modClass._id;
 
         // delete class events
         console.log("Deleting class events");
