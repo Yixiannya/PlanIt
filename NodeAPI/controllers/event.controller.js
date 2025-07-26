@@ -310,8 +310,13 @@ const patchEvent = async (req, res) => {
                     return res.status(404).json({message: "User not found"});
                 }
 
+                if (!member.events.includes(event._id)) {
+                    member.events.push(updatedEvent);
+                    await member.save();
+                }
                 await cancelEventNotification(member, event);
                 await syncEventToCalendar(member, updatedEvent);
+                
             }
 
             console.log("Checking admins array");
@@ -325,6 +330,10 @@ const patchEvent = async (req, res) => {
                     return res.status(404).json({message: "User not found"});
                 }
 
+                if (!admin.events.includes(event._id)) {
+                    admin.events.push(updatedEvent);
+                    await admin.save();
+                }
                 await cancelEventNotification(admin, event);
                 await syncEventToCalendar(admin, updatedEvent);
             }
