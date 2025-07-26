@@ -365,6 +365,7 @@ const deleteGroupMember = async (req, res) => {
 
         // For deleting self from group (because frontend coded it this way without consulting me)
         if (deletedMembers.length == 1 && deletedMembers[0] == userId) {
+            console.log("removing self");
             group.members.pull(userId);
             await group.save();
 
@@ -376,6 +377,7 @@ const deleteGroupMember = async (req, res) => {
 
             await user.populate('events');
             const events = user.events.filter(e => e.group.toString() == id.toString());
+            console.log(events);
 
             for (let i = 0; i < events.length; i++) {
                 const event = events[i];
