@@ -364,7 +364,7 @@ const deleteGroupMember = async (req, res) => {
         }
 
         // For deleting self from group (because frontend coded it this way without consulting me)
-        if (deletedMembers.length == 1 && deletedMembers[0] == userId) {
+        if (deletedMembers.length == 1 && deletedMembers[0].toString() == userId.toString()) {
             console.log("removing self");
             group.members.pull(userId);
             await group.save();
@@ -563,7 +563,7 @@ const deleteGroupAdmin = async (req, res) => {
         const deletedAdmins = req.body.deletedAdmins; 
 
         // For deleting self from group (because frontend coded it this way without consulting me)
-        if (deletedAdmins.length == 1 && deletedAdmins[0] == userId) {
+        if (deletedAdmins.length == 1 && deletedAdmins[0].toString() == userId.toString()) {
             console.log("removing self");
             group.admins.pull(userId);
             await group.save();
