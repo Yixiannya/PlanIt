@@ -87,8 +87,9 @@ async function syncEventToCalendar(user, event) {
         // Event is already on Google Calendar, update it instead
         const existingEvent = await calendar.events.get({
             calendarId: "primary",
-            eventId: event.googleId
+            eventId: userGoogleId
         });
+        console.log("Event get from Google Calendar");
 
         const updatedEvent = {
             ...existingEvent.data,
