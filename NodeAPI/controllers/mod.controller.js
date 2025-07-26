@@ -633,6 +633,10 @@ const deleteClass = async (req, res) => {
         );
         const modClassId = modClass._id;
 
+        if (!modClass) {
+            return res.status(404).json({ message: "Class not found" });
+        }
+
         // delete class events
         console.log("Deleting class events");
         await deleteClassEvents(modClass);

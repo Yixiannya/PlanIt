@@ -578,6 +578,9 @@ const deleteGroupAdmin = async (req, res) => {
                 await deleteEventFromCalendar(user, event);
                 await cancelEventNotification(user, event);
                 await user.events.pull(event);
+                // I would edit the event to pull the user from it, but that requires
+                // further editing and checks if user is event owner and whatnot,
+                // and I do not have time to finish this before Milestone 3.
             }
 
             await user.save();
