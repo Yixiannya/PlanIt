@@ -104,7 +104,7 @@ async function syncEventToCalendar(user, event) {
         
         await calendar.events.update({
             calendarId: "primary",
-            eventId: event.googleId,
+            eventId: userGoogleId,
             resource: updatedEvent
         });
         console.log("Google Calendar updated");
@@ -144,7 +144,10 @@ async function deleteEventFromCalendar(user, event) {
 
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
-    if (!event.googleId) {
+    const userGoogleId = event.googleIdMap?.get(user._id.toString());
+    console.log("Event Google ID found:", userGoogleId);
+
+    if (!userGoogleId) {
         console.warn("Event '%s' has no googleId, terminating sync", event.name);
         return;
     }
@@ -152,7 +155,7 @@ async function deleteEventFromCalendar(user, event) {
     try {
         await calendar.events.delete({
             calendarId: "primary",
-            eventId: event.googleId
+            eventId: userGoogleId
         });
         console.log("Event '%s' removed from %s's Google Calendar", event.name, user.name);
         await cancelEventNotification(user, event);
@@ -171,7 +174,13 @@ async function deleteEventFromCalendar(user, event) {
 async function importEventToUser(user, googleEvent) {
     await user.populate('events');
 
-    const eventExists = user.events.some(event => event.googleId === googleEvent.id);
+    // Dynamically computes the field name for googleIdMap.userId and checks if it matches
+    // the imported event's googleId
+    const existingEvent = await Event.findOne({
+        [`googleIdMap.${userIdStr}`]: googleEvent.id
+    });
+
+    // const eventExists = user.events.some(event => event.googleId === googleEvent.id);
 
     const startDate = googleEvent.start.dateTime || googleEvent.start.date;
     const endDate = googleEvent.end.dateTime || googleEvent.end.date;
@@ -182,8 +191,8 @@ async function importEventToUser(user, googleEvent) {
     const adjustedStartDate = new Date(newStartDate.getTime() + (8 * 60 * 60 * 1000));
     const adjustedEndDate = new Date(newEndDate.getTime() + (8 * 60 * 60 * 1000));
 
-    if (eventExists) {
-        const event = await Event.findOneAndUpdate({ googleId: googleEvent.id },
+    if (existingEvent) {
+        /*const event = await Event.findOneAndUpdate({ googleId: googleEvent.id },
             {
                 name: googleEvent.summary || "No title given",
                 description: googleEvent.description,
@@ -192,7 +201,15 @@ async function importEventToUser(user, googleEvent) {
                 endDate: new Date(adjustedEndDate),
                 venue: googleEvent.location
             }
-        );
+        );*/
+        existingEvent.name = googleEvent.summary || "No title given";
+        existingEvent.description = googleEvent.description;
+        existingEvent.owner = user._id;
+        existingEvent.dueDate = adjustedStartDate;
+        existingEvent.endDate = adjustedEndDate;
+        existingEvent.venue = googleEvent.location;
+
+        await existingEvent.save();
         console.log("Event '%s' exists, overriding PlanIt event", event.name);
         await cancelEventNotification(user, event);
         await scheduleEventNotification(user, event);
@@ -200,7 +217,7 @@ async function importEventToUser(user, googleEvent) {
     }
 
     const event = await Event.create({
-        googleId: googleEvent.id,
+        googleIdMap: { [userIdStr]: googleEvent.id },
         name: googleEvent.summary || "No title given",
         description: googleEvent.description,
         owner: user,
@@ -212,7 +229,6 @@ async function importEventToUser(user, googleEvent) {
 
     await scheduleEventNotification(user, event);
     user.events.push(event._id);
-    // user.markModified('events');
     console.log("Event '%s' imported", event.name);
 }
 
