@@ -403,6 +403,7 @@ async function deleteEventFunc(event) {
     promises.push(deleteEventFromCalendar(owner, event));
 
     await Promise.all(promises);
+    await event.save();
     console.log(eventId);
     await Event.findByIdAndDelete(eventId);
     console.log("Event deleted");

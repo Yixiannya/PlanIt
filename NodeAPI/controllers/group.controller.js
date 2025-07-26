@@ -383,8 +383,10 @@ const deleteGroupMember = async (req, res) => {
                 const event = events[i];
                 await deleteEventFromCalendar(user, event);
                 await user.events.pull(event);
+                await event.save();
             }
 
+            
             await user.save();
 
             // Check group again
@@ -431,6 +433,7 @@ const deleteGroupMember = async (req, res) => {
                 const event = events[i];
                 await deleteEventFromCalendar(user, event);
                 await user.events.pull(event);
+                await event.save();
             }
 
             await user.save();
@@ -561,6 +564,7 @@ const deleteGroupAdmin = async (req, res) => {
 
         // For deleting self from group (because frontend coded it this way without consulting me)
         if (deletedAdmins.length == 1 && deletedAdmins[0] == userId) {
+            console.log("removing self");
             group.admins.pull(userId);
             await group.save();
 
@@ -578,6 +582,7 @@ const deleteGroupAdmin = async (req, res) => {
                 await deleteEventFromCalendar(user, event);
                 await cancelEventNotification(user, event);
                 await user.events.pull(event);
+                await event.save();
                 // I would edit the event to pull the user from it, but that requires
                 // further editing and checks if user is event owner and whatnot,
                 // and I do not have time to finish this before Milestone 3.
@@ -634,6 +639,7 @@ const deleteGroupAdmin = async (req, res) => {
                 await deleteEventFromCalendar(user, event);
                 await cancelEventNotification(user, event);
                 await user.events.pull(event);
+                await event.save();
             }
 
             await user.save();

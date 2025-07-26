@@ -153,6 +153,7 @@ async function deleteEventFromCalendar(user, event) {
     }
 
     try {
+        event.googleMap.delete(user._id.toString());
         await calendar.events.delete({
             calendarId: "primary",
             eventId: userGoogleId
