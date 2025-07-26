@@ -142,6 +142,7 @@ const postEvent = async (req, res) => {
             }
 
             // Then go through both arrays again to sync to Google Calendar
+            // Must be sequential because we are setting a googleIdMap, which will have issues if concurrent
             for (let i = 0; i < members.length; i++) {
                 const member = await User.findById(members[i]);
             
@@ -150,7 +151,7 @@ const postEvent = async (req, res) => {
                     return res.status(404).json({message: "User not found"});
                 }
 
-                promises.push(syncEventToCalendar(member, event));
+                await syncEventToCalendar(member, event);
             }
             for (let i = 0; i < admins.length; i++) {
                 const admin = await User.findById(admins[i]);
@@ -158,7 +159,7 @@ const postEvent = async (req, res) => {
                 if (!admin) {
                     return res.status(404).json({message: "User not found"});
                 }
-                promises.push(syncEventToCalendar(admin, event));
+                await syncEventToCalendar(admin, event);
             }
 
             await Promise.all(promises);
