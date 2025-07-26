@@ -382,7 +382,6 @@ const deleteGroupMember = async (req, res) => {
             for (let i = 0; i < events.length; i++) {
                 const event = events[i];
                 await deleteEventFromCalendar(user, event);
-                await cancelEventNotification(user, event);
                 await user.events.pull(event);
             }
 
