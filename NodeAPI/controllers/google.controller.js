@@ -91,7 +91,6 @@ async function syncEventToCalendar(user, event) {
         });
 
         const updatedEvent = {
-            ...existingEvent.data,
             summary: googleEvent.summary,
             description: googleEvent.description,
             start: googleEvent.start,
