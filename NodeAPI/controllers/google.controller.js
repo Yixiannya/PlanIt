@@ -179,6 +179,7 @@ async function importEventToUser(user, googleEvent) {
     const existingEvent = await Event.findOne({
         [`googleIdMap.${userIdStr}`]: googleEvent.id
     });
+    console.log("Existing event if any:", existingEvent);
 
     // const eventExists = user.events.some(event => event.googleId === googleEvent.id);
 
@@ -210,9 +211,9 @@ async function importEventToUser(user, googleEvent) {
         existingEvent.venue = googleEvent.location;
 
         await existingEvent.save();
-        console.log("Event '%s' exists, overriding PlanIt event", event.name);
-        await cancelEventNotification(user, event);
-        await scheduleEventNotification(user, event);
+        console.log("Event '%s' exists, overriding PlanIt event", existingEvent.name);
+        await cancelEventNotification(user, existingEvent);
+        await scheduleEventNotification(user, existingEvent);
         return;
     }
 
