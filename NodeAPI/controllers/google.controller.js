@@ -176,6 +176,7 @@ async function importEventToUser(user, googleEvent) {
 
     // Dynamically computes the field name for googleIdMap.userId and checks if it matches
     // the imported event's googleId
+    const userIdStr = user._id.toString();
     const existingEvent = await Event.findOne({
         [`googleIdMap.${userIdStr}`]: googleEvent.id
     });
