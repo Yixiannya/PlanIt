@@ -635,8 +635,10 @@ const deleteGroupAdmin = async (req, res) => {
             // Updates the user's info so they don't have this group
             const user = await User.findById(adminId);
             if (!user) {
+                console.log("Admin not found");
                 return res.status(404).json({ message: "User not found" });
             }
+            console.log("Admin found");
 
             user.groups.pull(group._id);
             await user.save();
@@ -645,7 +647,7 @@ const deleteGroupAdmin = async (req, res) => {
             await user.populate('events');
             const events = user.events.filter(e => e.group.toString() == id.toString());
 
-            console.log("removing events");
+            console.log("removing events:", events);
             for (let i = 0; i < events.length; i++) {
                 const event = events[i];
                 await deleteEventFromCalendar(user, event);
