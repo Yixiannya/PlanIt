@@ -352,6 +352,7 @@ const deleteGroupMember = async (req, res) => {
         const admins = group.admins;
         // Must be array of members id to delete
         const deletedMembers = req.body.deletedMembers;
+        console.log("Deleted members are:", deletedMembers);
 
         // If group doesn't exist
         if (!group) {
@@ -564,6 +565,7 @@ const deleteGroupAdmin = async (req, res) => {
         const admins = group.admins;
         // Must be array of admins to delete
         const deletedAdmins = req.body.deletedAdmins;
+        console.log("Deleted admins are:", deletedAdmins);
 
         // For deleting self from group (because frontend coded it this way without consulting me)
         if (deletedAdmins.length == 1 && deletedAdmins[0].toString() == userId.toString()) {
