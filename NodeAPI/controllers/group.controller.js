@@ -353,6 +353,7 @@ const deleteGroupMember = async (req, res) => {
         // Must be array of members id to delete
         const deletedMembers = req.body.deletedMembers;
         console.log("Deleted members are:", deletedMembers);
+        console.log("User ID is:", userId);
 
         // If group doesn't exist
         if (!group) {
