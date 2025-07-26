@@ -627,12 +627,13 @@ const deleteGroupAdmin = async (req, res) => {
             return res.status(404).json({ message: "Group not found" });
         }
 
+        console.log("deleting specified admins")
         for (let j = 0; j < deletedAdmins.length; j++) {
             const adminId = deletedAdmins[j];
             group.admins.pull(adminId);
 
             // Updates the user's info so they don't have this group
-            const user = await User.findById(memberId);
+            const user = await User.findById(adminId);
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }
