@@ -259,6 +259,7 @@ const patchEvent = async (req, res) => {
     try {
         const updateObject = req.body;
         const {id} = req.params;
+        const originalEvent = await Event.findById(id);
         const event = await Event.findByIdAndUpdate(id, {$set: updateObject});
         
         // If event doesn't exist
@@ -280,20 +281,6 @@ const patchEvent = async (req, res) => {
             const members = group.members;
 
             const promises = [];
-
-            // Check requester's id and see if they're an admin
-            /* let i = 0;
-            while (i < admins.length) {
-                console.log(admins[i] === owner);
-                if (admins[i] === owner) {
-                    break;
-                }
-                i++;
-            }
-
-            if (i >= admins.length) {
-                return res.status(403).json({message: "Requesting User is not an admin of the given group"});
-            } */
 
             console.log("Checking member array");
 

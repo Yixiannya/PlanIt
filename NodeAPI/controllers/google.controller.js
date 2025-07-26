@@ -36,9 +36,6 @@ async function syncEventToCalendar(user, event) {
     console.log("Syncing event");
     const members = event.members;
     const googleEventMembers = [];
-
-    console.log(event.googleId);
-    
     
     for (let i = 0; i < members.length; i++) {
         const member = await User.findById(members[i]);
@@ -83,7 +80,9 @@ async function syncEventToCalendar(user, event) {
 
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
-    if (event.googleId) {
+    const userGoogleId = event.googleIds?.get(user._id.toString());
+    console.log("Event Google ID found:", userGoogleId);
+    if (userGoogleId) {
         // Event is already on Google Calendar, update it instead
         const existingEvent = await calendar.events.get({
             calendarId: "primary",
@@ -91,6 +90,7 @@ async function syncEventToCalendar(user, event) {
         });
 
         const updatedEvent = {
+            ...existingEvent.data,
             summary: googleEvent.summary,
             description: googleEvent.description,
             start: googleEvent.start,
@@ -114,9 +114,10 @@ async function syncEventToCalendar(user, event) {
         });
         console.log("Insertion successful");
 
-        event.googleId = result.data.id;
+        event.googleIds.set(user._id.toString(), result.data.id);
         await event.save();
     }
+    
     console.log("Event synced");
     await scheduleEventNotification(user, event);
     console.log("Event notif created");
