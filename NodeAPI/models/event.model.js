@@ -68,7 +68,8 @@ const EventSchema = mongoose.Schema(
 
         googleIdMap: {
             type: Map,
-            of: String
+            of: String,
+            default: {}
         }
     },
     {

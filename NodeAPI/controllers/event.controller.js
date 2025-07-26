@@ -111,7 +111,7 @@ const postEvent = async (req, res) => {
                 return res.status(403).json({message: "Requesting User is not an admin of the given group"});
             }
 
-            // Members array
+            // Fill up event with Members array
             for (let i = 0; i < members.length; i++) {
                 const member = await User.findByIdAndUpdate(
                     members[i],
@@ -128,7 +128,7 @@ const postEvent = async (req, res) => {
                 promises.push(syncEventToCalendar(member, event));
             }
 
-            // Admins array
+            // Fill up event with Admins array
             for (let i = 0; i < admins.length; i++) {
                 const admin = await User.findByIdAndUpdate(
                     admins[i],
@@ -141,10 +141,28 @@ const postEvent = async (req, res) => {
                 if (!admin) {
                     return res.status(404).json({message: "User not found"});
                 }
-
-                promises.push(syncEventToCalendar(admin, event));
             }
 
+            // Then go through both arrays again to sync to Google Calendar
+            for (let i = 0; i < members.length; i++) {
+                const member = await User.findById(members[i]);
+            
+                // If user doesn't exist
+                if (!member) {
+                    return res.status(404).json({message: "User not found"});
+                }
+
+                promises.push(syncEventToCalendar(member, event));
+            }
+            for (let i = 0; i < admins.length; i++) {
+                const admin = await User.findById(admins[i]);
+                // If user doesn't exist
+                if (!admin) {
+                    return res.status(404).json({message: "User not found"});
+                }
+                promises.push(syncEventToCalendar(admin, event));
+            }
+            
             await Promise.all(promises);
         } else {
             // No group specificed, so event is a personal event.
