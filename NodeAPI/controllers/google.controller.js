@@ -36,6 +36,8 @@ async function syncEventToCalendar(user, event) {
     console.log("Syncing event");
     const members = event.members;
     const googleEventMembers = [];
+
+    console.log(event.googleId);
     
     
     for (let i = 0; i < members.length; i++) {
