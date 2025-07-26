@@ -80,8 +80,9 @@ async function syncEventToCalendar(user, event) {
 
     const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
-    const userGoogleId = event.googleIds?.get(user._id.toString());
+    const userGoogleId = event.googleIdMap?.get(user._id.toString());
     console.log("Event Google ID found:", userGoogleId);
+
     if (userGoogleId) {
         // Event is already on Google Calendar, update it instead
         const existingEvent = await calendar.events.get({
@@ -114,7 +115,7 @@ async function syncEventToCalendar(user, event) {
         });
         console.log("Insertion successful");
 
-        event.googleIds.set(user._id.toString(), result.data.id);
+        event.googleIdMap.set(user._id.toString(), result.data.id);
         await event.save();
     }
     
