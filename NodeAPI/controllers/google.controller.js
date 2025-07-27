@@ -105,14 +105,16 @@ async function syncEventToCalendar(user, event) {
         await calendar.events.update({
             calendarId: "primary",
             eventId: userGoogleId,
-            resource: updatedEvent
+            resource: updatedEvent,
+            sendUpdates: "all"
         });
         console.log("Google Calendar updated");
     } else {
         // Event not on Google Calendar, insert it
         const result = await calendar.events.insert({
             calendarId: "primary",
-            resource: googleEvent
+            resource: googleEvent,
+            sendUpdates: "all"
         });
         console.log("Insertion successful");
 
