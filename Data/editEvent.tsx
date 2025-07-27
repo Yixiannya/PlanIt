@@ -8,9 +8,6 @@ export async function editEvent(id, edit) {
         body: JSON.stringify(edit),
      });
 
-     if (!editfetch.ok) {
-        throw new Error(`Cannot edit: ${editfetch.status}`);
-     }
 
      } catch (error) {
          console.error('Edit error:', error);

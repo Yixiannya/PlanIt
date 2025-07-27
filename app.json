@@ -1,47 +1,56 @@
 {
   "expo": {
-    "name": "MyNewApp",
-    "slug": "MyNewApp",
+    "name": "PlanIT",
+    "slug": "PlanIT",
     "scheme": "myapp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/PlanItAppLogo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/PlanItAppLogoBlank.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFFFFF"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.raylong268.planit",
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/PlanItAppLogo.png",
+        "backgroundColor": "#EC942E"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.raylong268.planit",
+      "googleServicesFile": "./google-services.json",
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
-    "extra": {
-      "eas": {
-        "projectId": "6ac8d5db-e62d-4daf-98e1-85516c76e31a"
-      }
-    },
-    "plugins" : [
+    "plugins": [
       [
         "@react-native-google-signin/google-signin",
         {
           "iosUrlScheme": "com.googleusercontent.apps.1058453984266-39br9cbp3sc3k8r7a0ukdm06v5735i9m"
         }
-      ]
-    ]
+      ],
+      "expo-notifications"
+    ],
+    "updates": {
+      "url": "https://u.expo.dev/6ac8d5db-e62d-4daf-98e1-85516c76e31a"
+    },
+    "owner": "raylong268",
+    "extra": {
+      "eas": {
+        "projectId": "ce8ff9f5-6497-44df-948c-1c7fa2956f1d"
+      }
+    }
   }
-
 }

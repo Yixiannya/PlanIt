@@ -7,6 +7,9 @@ import {getUser} from '../Data/getUser';
 import {getGroups} from '../Data/getGroups';
 import { useUserStore } from '../Data/userStore';
 import {useGroupStore} from '../Data/groupStore'
+import {getGroup} from '../Data/getGroup';
+import {useNotificationStore} from  '../Data/notificationStore'
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 export function sorting (today, loading, actualEvents) {
     return !loading
@@ -24,7 +27,7 @@ export default function MainPage() {
     const setUser =  useUserStore((state) => state.setUser);
     const clearToken = useUserStore.getState().clearUser;
     const isFocused = useIsFocused();
-    const today = new Date();
+    const [today, setToday] = useState();
     console.log(today);
 
 useEffect(() => {
@@ -35,26 +38,45 @@ useEffect(() => {
     const mygroups = await getGroups(user._id);
     setGroups(mygroups);
     const events = await getEvent(user._id);
-    setActualEvents(Array.isArray(events) ? events : []);
+    const updatedEvents = await Promise.all(
+      events.map(async (event) => {
+        if (event.group != null) {
+          const groupName = await getGroup(event.group);
+          return {
+            ...event,
+            groupName: groupName,
+          };
+        } else {
+          return event;
+        }
+      })
+    );
+    const nowUtc = new Date();
+    setToday(new Date(nowUtc.getTime() + 8 * 60 * 60 * 1000));
+    setActualEvents(Array.isArray(events) ? updatedEvents : []);
     setLoading(false);
   }
   if (isFocused) {
       fetchEvents();
   }
 }, [isFocused]);
-console.log(actualEvents);
+
     const sortedEvents = sorting (today, loading, actualEvents);
 
     return (
-    <View className="bg-gray-200 flex-1 flex-col items-center">
+    <View className="bg-gray-200 flex-1 flex-col">
         <Header word = "Your Upcoming Events" image= {require('../assets/logout.png')}
          onPress = {() =>
              Alert.alert("Logout", "Are you sure you want to logout?",
                  [
                     { text: "No"},
                     { text: "Yes", onPress:
-                        () => {
+                        async () => {
                          clearToken();
+                         if (useNotificationStore.getState().listener) {
+                             useNotificationStore.getState().clearListener();
+                         }
+                         await GoogleSignin.signOut();
                          navigation.replace("LoginPage");
                          } },
                  ]
@@ -75,21 +97,39 @@ const Carousel = ({ loading, events}) => {
                 <View className="flex-1 justify-center items-center">
                      <Text className="text-2xl">Loading events...</Text>
                 </View>
-            ) : (
+            ) : events.length === 0 ? (
+                    <View className="flex-1 justify-center items-center">
+                         <Text className="mr-1 px-12 text-center text-2xl"> No events? Create one by pressing "+" at the Calendar! </Text>
+                    </View>
+                    ) : (
             <ScrollView horizontal>
                 <View className="flex-row">
-                 {events.map((event) => (
+                 {events.slice(0, 20).map((event) => (
                    <TouchableOpacity onPress = {() => navigation.navigate('EditDeletePage',
                        {event,
-                           location: () => navigation.replace('BottomTabs', { screen: 'Main-Page' }),
+                           location: () => navigation.pop(2),
                             allEvents: events,
                        } )}>
-                   <View key={event._id} className="py-2 border-4 bg-gray-300 border-gray-300 rounded-2xl flex-col px-5 ml-3 mr-3">
-                   <View className="py-3 justify-center items-center">
-                     <Image source = {require('../assets/ICON.png')} />
-                   </View>
-                     <Text className="justify-center text-center font-bold text-4xl">{event.name}</Text>
-                     <Text className="justify-center text-center">
+                   <View key={event._id} className="py-4 border-4 bg-gray-300 border-gray-300 rounded-2xl flex-col px-5 ml-3 mr-3">
+                     <Text className="py-1 justify-center text-center font-bold text-5xl">{event.name}</Text>
+                     {event.group != null ? (
+                         <View className = "flex-row justify-center ">
+                         <Text className="text-center font-bold text-3xl">Group: </Text>
+                         <Text className="text-center text-3xl">{event.groupName.name}</Text>
+                         </View>
+                     ) : (
+                         <View className = "flex-row justify-center ">
+                         <Text className="font-bold text-center text-3xl">Personal event</Text>
+                         </View>
+                         )
+                     }
+                    {(event.venue!== undefined && event.venue !== "") &&
+                     <Text className="text-center text-2xl px-5">
+                      <Text className="font-bold">
+                      Venue:{" "}
+                      </Text>
+                      {event.venue}</Text>}
+                     <Text className="pt-1 justify-center text-center">
                      <Text className = "font-bold">
                        Start Date:{" "}
                      </Text>
@@ -140,9 +180,14 @@ const ClassReminder = ({ loading, events}) => {
     return (
         loading ? (
             <View className="flex-1 justify-center items-center">
-            <Text className="text-2xl">Loading events...</Text>
+            <Text className="text-2xl">Loading groups...</Text>
             </View>
-        ) : (
+        ) : events.length === 0 ? (
+            <View className="flex-1 justify-center items-center">
+            <Text className="py-8 mr-1 mb-7 px-8 text-center text-3xl"> No groups? Press "Your Current Groups" to create your first group!
+            </Text>
+            </View>
+            ) : (
       <ScrollView>
     <View className="w-full flex-col items-center justify-center">
       {events.map((events) => (
@@ -173,19 +218,12 @@ const GroupComponent = ({ indivEvent }) => {
             navigation.navigate('GroupTabs', {
                       screen: 'Group Info',
                     });
-            } }className="w-full flex-row items-center justify-between
-                         bg-gray-300 rounded-2xl border-2 border-gray-200">
-            <View className="h-20 w-20 items-center mt-2">
-                <Image source={require('../assets/ICON.png')}/>
-            </View>
-
-            <View className="w-full flex-col justify-center ml-2 flex-1 py-5" >
-                <Text className="font-bold text-2xl">{indivEvent.name}</Text>
-                <Text className="text-[16px] mr-2">
+            }} className= "w-full bg-gray-300 rounded-2xl border-4 border-gray-200 px-7 py-5" >
+                <Text className="px-1 font-bold text-3xl">{indivEvent.name}</Text>
+                <Text className="px-3 text-[16px] mr-2">
                 {"Description: "}
                 {indivEvent.description}
                 </Text>
-            </View>
         </TouchableOpacity>
     );
 }

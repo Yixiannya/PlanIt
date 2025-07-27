@@ -41,6 +41,7 @@ export default function NewGroup() {
     const [searchUsers, setSearchUsers] = useState('');
     const [selectedUsers, setSelectedUsers] = useState([]);
     const myuser = useUserStore((state) => state.user);
+    const [started, setStarted] = useState(false);
 
     useEffect(() => {
         async function loadUsers() {
@@ -55,22 +56,25 @@ export default function NewGroup() {
       }, []);
 
     const Item = ({ item }) => (
-        <View className="flex-1 items-center justify-center m-2 p-5 bg-orange-400 rounded-2xl">
           <TouchableOpacity
           onPress = { () =>
               {
            select(item);
-           }
-          }>
-            <Text className="text-xl font-bold">{item.name}</Text>
+           }}
+            className="flex-1 items-center justify-center m-1 p-5 bg-orange-400 rounded-2xl"
+         >
+            <View className = "pt-2 pb-3 items-center">
+            <Image source = {{uri: item.image}} className = "rounded-3xl w-20 h-20"/>
+            </View>
+            <Text className="text-center text-xl font-bold">{item.name}</Text>
           </TouchableOpacity>
-        </View>
       );
 
     const search = () => {
         if (allUsers.filter(user =>
             user.name.toLowerCase().startsWith(searchUsers.toLowerCase())).length === 0) {
-             Alert.alert('Error', 'No such user')
+             Alert.alert('Error', 'No such user');
+             setStarted(false);
         } else {
             setSearchDisplay(
                     searchUsers === ""
@@ -78,10 +82,12 @@ export default function NewGroup() {
                       : allUsers.filter(user =>
                           user.name.toLowerCase().startsWith(searchUsers.toLowerCase()))
             );
+        setStarted(true);
         }
     };
 
-     const select = (user) => {
+     const select = async (user) => {
+         setLoading(true);
          setSelectedUsers (
             selectedUsers.concat(user)
          );
@@ -91,6 +97,8 @@ export default function NewGroup() {
         setAllUsers (
             allUsers.filter(users => users !== user)
         );
+        await new Promise(resolve => setTimeout(resolve, 400));
+        setLoading(false);
      };
 
     return (
@@ -100,13 +108,14 @@ export default function NewGroup() {
                 onPress={() => navigation.pop()}
           />
           <ScrollView>
-          <View className = "items-center bg-orange-400 flex-col">
+          <View className = "items-center justify-center bg-orange-400 flex-col">
               <Text className = "pt-4 text-4xl text-gray-800 font-bold"> Group Name: </Text>
                 <TextInput
                     placeholder = "Enter group name"
                     value = {groupName}
                     onChangeText={text => setGroupName(text)}
-                    className = "text-[28px] py-4"
+                    maxLength={20}
+                    className = "text-[28px] py-4 w-full text-center"
                 />
           </View>
           <View className = "items-center bg-orange-300 flex-col">
@@ -115,7 +124,8 @@ export default function NewGroup() {
                 placeholder = "Enter group description"
                 value = {groupDesc}
                 onChangeText={text => setGroupDesc(text)}
-                className = "text-[28px] py-4"
+                maxLength={ 300 }
+                className = "text-[28px] py-4 w-full text-center "
             />
           </View>
 
@@ -135,15 +145,22 @@ export default function NewGroup() {
                   />
                   </TouchableOpacity>
                 </View>
+                <View className = "mr-2 mt-1">
                  <TouchableOpacity onPress = {() => search()}>
                  <Image source = {require('../assets/search.png')} />
                  </TouchableOpacity>
+                 </View>
            </View>
                  { loading ? (
                      <View className = "flex-1 items-center justify-center">
                      <Text className = "text-2xl font-bold"> Loading users </Text>
                      </View>
-                 ):(
+                 ) : !started ? (
+                   <View className = "py-10 px-10 mr-3 flex-1 items-center justify-center">
+                    <Text className = "text-center text-2xl font-bold"> Try typing a username and pressing the search button! </Text>
+                    <Text className = "py-2 text-center text-xl">(Alternatively, click the search button with no name to see all users!) </Text>
+                    </View>
+                   ) : (
                      <View className="flex-1 pt-3 px-4">
                         <FlatList
                         data={searchDisplay}
@@ -161,14 +178,16 @@ export default function NewGroup() {
                 <ScrollView horizontal className=" bg-orange-400">
                     {selectedUsers.map((event) => (
                     <TouchableOpacity
-                              onPress = { () =>
-                                  {
+                              onPress = { async () => {
+                                  setLoading(true);
                                setSelectedUsers(selectedUsers.filter(user => user !== event));
-                               setSearchDisplay(searchDisplay.concat([event]));
-                               setAllUsers(searchDisplay.concat([event]));
-                               setAllUsers(searchDisplay.concat([event]));
-                               }
-                              }>
+                              if (event.name.toLowerCase().startsWith(searchUsers.toLowerCase())) {
+                                    setSearchDisplay([...searchDisplay, event]);
+                              };
+                               setAllUsers([...allUsers, event]);
+                               await new Promise(resolve => setTimeout(resolve, 400));
+                               setLoading(false);
+                               }}>
                     <View key={event._id} className="rounded-xl flex-col px-3 py-3">
                         <Text className="rounded-xl px-3 py-3 bg-orange-300 font-bold text-2xl">{event.name}</Text>
                     </View>

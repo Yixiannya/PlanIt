@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar } from 'react-native-calendars';
-import { Text, View, Dimensions, ScrollView, TouchableOpacity, Image} from 'react-native';
+import { Text, View, ScrollView, TouchableOpacity, Image} from 'react-native';
 import Header from '../REUSABLES/HeaderBanner';
 import { getEvent } from '../Data/getEvent';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { useUserStore } from '../Data/userStore';
+import {getGroup} from '../Data/getGroup';
 
 export function sorter(loading, selected, actualEvents) {
     return !loading && selected
@@ -16,18 +17,50 @@ export function sorter(loading, selected, actualEvents) {
 export default function CalendarFunc() {
   const today = new Date().toISOString().split('T')[0];
   const [selected, setSelected] = useState(today);
-  const screenHeight = Dimensions.get('window').height;
   const [actualEvents, setActualEvents] = useState([]);
+  const [highlights, setHighlights] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const user = useUserStore((state) => state.user);
   const isFocused = useIsFocused();
+  const [wait, setWait] = useState(false);
+
+  const expandedDates = (events) => {
+    const temp = {}
+    for (const event of events) {
+        let start = new Date(event.dueDate.split('T')[0]);
+        const end = new Date(event.endDate.split('T')[0]);
+
+        while (start <= end) {
+          temp[start.toISOString().split('T')[0]] = {
+            marked: true,
+            dotColor: 'orange',
+          };
+          start.setDate(start.getDate() + 1);
+        };
+    };
+    return temp;
+  }
 
   useEffect(() => {
       async function fetchEvents() {
           setLoading(true);
           const events = await getEvent(user._id);
-          setActualEvents(Array.isArray(events) ? events : []);
+          const updatedEvents = await Promise.all(
+                events.map(async (event) => {
+                  if (event.group != null) {
+                    const groupName = await getGroup(event.group);
+                    return {
+                      ...event,
+                      groupName: groupName,
+                    };
+                  } else {
+                    return event;
+                  }
+                })
+              );
+          setActualEvents(Array.isArray(events) ? updatedEvents : []);
+          console.log("Its me", updatedEvents);
           setLoading(false);
       }
         if (isFocused) {
@@ -45,10 +78,14 @@ export default function CalendarFunc() {
         if (loading) {
           Alert.alert("Too fast", "Wait for loading to finish");
         } else {
-          navigation.navigate('Add Event', {
-            Group: "",
-            allEvents: actualEvents
-          });
+            if (!wait) {
+            setWait(true);
+         navigation.navigate('Add Event', {
+             Group: "",
+             allEvents: actualEvents
+           });
+          setTimeout(() => setWait(false), 3000);
+          }
         }
       }}/>
       <Calendar
@@ -56,7 +93,9 @@ export default function CalendarFunc() {
           setSelected(day.dateString);
         }}
         markedDates={{
+            ...expandedDates(actualEvents),
           [selected]: {
+              ...(expandedDates(actualEvents)[selected]),
             selected: true,
             disableTouchEvent: true,
             selectedDotColor: 'orange',
@@ -81,13 +120,24 @@ export default function CalendarFunc() {
                {filteredEvents.map(event => (
                    <TouchableOpacity onPress = {() => navigation.navigate('EditDeletePage',
                        {event,
-                           location: () => navigation.replace('BottomTabs', { screen: 'Calendar' }),
+                          location: () => navigation.pop(2),
                            allEvents: actualEvents,
                            } )}>
                    <View className="flex-col">
                    <View className = "bg-orange-400 flex-row rounded-2xl border-4 border-orange-300">
                      <View className = "flex-col flex-1 px-2 py-5">
                      <Text className="px-1 text-3xl font-bold ml-1 mb-1">Name: {event.name}</Text>
+                     {event.group != null ? (
+                          <View className = "flex-row">
+                          <Text className="ml-5 text-center font-bold text-2xl">Group: </Text>
+                          <Text className="text-center text-2xl">{event.groupName.name}</Text>
+                          </View>
+                      ) : (
+                          <View className = "flex-row">
+                          <Text className="ml-5 font-bold text-center text-2xl">Personal event</Text>
+                          </View>
+                          )
+                      }
                      <Text className="text-xl px-5">
                      <Text className = "font-bold">
                      {"Start Time: "}
@@ -106,11 +156,20 @@ export default function CalendarFunc() {
                      {event.endDate.split('T')[0].split('-')[0]},{" "}
                      {event.endDate.split('T')[1].split('.')[0]}
                      </Text>
-                     <Text className="text-xl px-5">
-                     <Text className="font-bold">
-                     Description:
+                     {(event.description !== undefined && event.description !== "") &&
+                          <Text className="text-xl px-5">
+                         <Text className="font-bold">
+                     Description:{" "}
                      </Text>
-                     {event.description}</Text>
+                     {event.description}
+                     </Text>
+                     }
+                     {(event.venue!== undefined && event.venue !== "") &&
+                     <Text className="text-xl px-5">
+                      <Text className="font-bold">
+                      Venue:{" "}
+                      </Text>
+                      {event.venue}</Text>}
                      </View>
                     </View>
                    </View>

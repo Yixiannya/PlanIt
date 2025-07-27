@@ -2,8 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import EditDeletePage from '../component/EditDeletePage';
 import { Alert } from 'react-native';
-import {getGroupEvents} from '../Data/getGroupEvents'
-import {userStore} from '../Data/userStore'
+import { useUserStore } from '../Data/userStore';
 
 
 jest.mock('@react-navigation/native', () => ({
@@ -13,16 +12,9 @@ jest.mock('@react-navigation/native', () => ({
   }),
 }));
 
-jest.mock('../Data/getGroupEvents', () => ({
-  getGroupEvents: jest.fn().mockResolvedValue({
-      name: 'Test Group',
-      admins: ['user1'],
-    }),
-}));
-
-jest.mock('../Data/userStore', () => ({
-   useUserStore: jest.fn((fn) => fn({ user: { _id: 'user123' } })),
- }));
+  useUserStore.setState({
+    user: { _id: 'user123', admins: [1, 2, 3], notificationsEnabled: true },
+  });
 
 jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 
@@ -46,8 +38,29 @@ beforeEach(() => {
         description: 'Description here',
         dueDate: '2025-06-28T14:30:00',
         endDate: '2026-07-29T17:30:00',
-        group: 'bruh'
+        groupName: {name: "help", admins: [1,2,3]},
+        group: "scam",
+        venue: "Place",
+        offsetMs: 0,
   };
+
+  const Event3 = {
+          _id: '1',
+          name: 'Test Event',
+          description: 'Description here',
+          dueDate: '2025-06-28T14:30:00',
+          endDate: '2026-07-29T17:30:00',
+          offsetMs: 300000
+    };
+
+    const Event4 = {
+              _id: '1',
+              name: 'Test Event',
+              description: 'Description here',
+              dueDate: '2025-06-28T14:30:00',
+              endDate: '2026-07-29T17:30:00',
+              offsetMs: 10800000
+        };
 
 test('renders EditDeletePage correctly without group', async () => {
 
@@ -66,7 +79,7 @@ test('renders EditDeletePage correctly without group', async () => {
   expect(queryByText('Group:')).toBeNull();
 });
 
-test('renders EditDeletePage correctly with group', async () => {
+test('renders EditDeletePage correctly with group, venue and event starts', async () => {
 
   const { findByText, queryByText } = render(
     <EditDeletePage
@@ -79,6 +92,44 @@ test('renders EditDeletePage correctly with group', async () => {
 
   expect(await findByText('28/06/2025, 14:30:00')).toBeTruthy();
   expect(await findByText('29/07/2026, 17:30:00')).toBeTruthy();
+  expect(await findByText("Place")).toBeTruthy();
+  expect(await findByText("When event starts")).toBeTruthy();
 
-  expect(await findByText('Test Group')).toBeTruthy();
+  expect(await findByText("help")).toBeTruthy();
+});
+
+test('renders EditDeletePage correctly with 5 minutes', async () => {
+
+  const { findByText, queryByText } = render(
+    <EditDeletePage
+      route={{ params: { event: Event3, location: location, allEvents: Event } }}
+    />
+  );
+
+  expect(await findByText('Test Event')).toBeTruthy();
+  expect(await findByText('Description here')).toBeTruthy();
+
+  expect(await findByText('28/06/2025, 14:30:00')).toBeTruthy();
+  expect(await findByText('29/07/2026, 17:30:00')).toBeTruthy();
+  expect(await findByText('5 minutes before event starts')).toBeTruthy();
+
+  expect(queryByText('Group:')).toBeNull();
+});
+
+test('renders EditDeletePage correctly with 3 hours', async () => {
+
+  const { findByText, queryByText } = render(
+    <EditDeletePage
+      route={{ params: { event: Event4, location: location, allEvents: Event } }}
+    />
+  );
+
+  expect(await findByText('Test Event')).toBeTruthy();
+  expect(await findByText('Description here')).toBeTruthy();
+
+  expect(await findByText('28/06/2025, 14:30:00')).toBeTruthy();
+  expect(await findByText('29/07/2026, 17:30:00')).toBeTruthy();
+  expect(await findByText('3 hours before event starts')).toBeTruthy();
+
+  expect(queryByText('Group:')).toBeNull();
 });

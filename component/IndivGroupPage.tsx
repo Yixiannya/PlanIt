@@ -15,14 +15,15 @@ export const handleGroupDelete= async (gp, myuser, navigation) => {
       userId: myuser._id,
   }
   try {
+      Alert.alert("Deleting group...")
      await deleteGroup(gp._id, delete_array);
-     Alert.alert('Group Deleted');
+     Alert.alert('Your group has been deleted!');
      navigation.reset({
         index: 0,
         routes: [{ name: 'BottomTabs', params: { screen: 'Main-page' } }],
      });
   } catch (error) {
-      Alert.alert('Error', 'Failed to remove admin');
+      Alert.alert('Error', 'Failed to delete group');
   }
 }
 
@@ -39,12 +40,12 @@ export const handleLeave = async (gp, own, Admins, navigation) => {
     }
 
     try {
+        Alert.alert("Leaving group...")
       if (!Admins.some((admin => admin._id == own._id))) {
         await sendUser("members", gp._id, id_array, "delete");
       } else {
         await sendUser("admins", gp._id, id_array_2, "delete");
       }
-
       Alert.alert('Left group successfully');
       navigation.reset({
         index: 0,
@@ -82,6 +83,7 @@ export default function IndivGroupPage() {
         setGroup(replace);
         const users = await fetchUser(replace.members);
         const admins = await fetchUser(replace.admins);
+        console.log(admins[0].image)
         setGroupMembers(users);
         setAdmins(admins);
         setLoading(false);
@@ -107,15 +109,28 @@ export default function IndivGroupPage() {
         <Header word= "Group Info"
                     image={require('../assets/Close.png')}
                     onPress={() => {
-                      navigation.pop();
+                      navigation.pop(3);
                     }}
         />
         <ScrollView>
+
         <View className = "bg-orange-300 justify-center items-center">
-            <Image source = {require('../assets/ICON.png')} className = "w-36 h-36"/>
-            <Text className="font-bold text-4xl px-3">
+        {!loading &&
+            <View className = "py-3 flex-row">
+            <Image source = {{uri: Admins[0].image}} className = "rounded-2xl w-36 h-36"/>
+            </View>}
+            <View className = "pr-2 pb-1 ml-14 flex-row">
+            <View className = "justify-center">
+            <Text className="font-bold text-4xl px-1">
                 {Group.name}
             </Text>
+            </View>
+                <View className = "pr-2 pl-2 py-1">
+                <TouchableOpacity onPress = {() => navigation.navigate("Group Settings")}>
+                <Image source={require('../assets/edit.png')}  className = "w-10 h-10"/>
+                </TouchableOpacity>
+                </View>
+            </View>
             <Text className="font-bold text-2xl pb-3 py-1 px-3">
                 {Admins.length} Admins, {GroupMembers.length} Members
             </Text>
@@ -145,8 +160,8 @@ export default function IndivGroupPage() {
              <ScrollView horizontal>
                 {Admins.map((member) => (
                     <View key={member._id} className="flex-col px-4 py-2">
-                        <View className="py-2 justify-center items-center">
-                        <Image source = {require('../assets/ICON.png')} />
+                        <View className="py-2 justify-center items-center flex-col">
+                        <Image source = {{uri: member.image}} className = "rounded-3xl w-20 h-20"/>
                         </View>
                         <Text className="pt-2 justify-center text-center font-bold text-2xl">
                             {member.name}
@@ -159,7 +174,7 @@ export default function IndivGroupPage() {
                 GroupMembers.map((member) => (
                     <View key={member._id} className="flex-col px-4 py-2">
                          <View className="py-2 justify-center items-center">
-                           <Image source = {require('../assets/ICON.png')} />
+                          <Image source = {{uri: member.image}} className = "rounded-3xl w-20 h-20"/>
                          </View>
                          <Text className="py-2 justify-center text-center font-bold text-2xl">
                          {member.name}

@@ -24,14 +24,35 @@ export default function GroupCalendar() {
     const myuser = useUserStore((state) => state.user);
     const isAdmin = Admins.some((admin => admin == myuser._id));
     const isFocused = useIsFocused();
+    const [wait, setWait] = useState(false);
+
+    const expandedDates = (events) => {
+        const temp = {}
+        for (const event of events) {
+            let start = new Date(event.dueDate.split('T')[0]);
+            const end = new Date(event.endDate.split('T')[0]);
+
+            while (start <= end) {
+              temp[start.toISOString().split('T')[0]] = {
+                marked: true,
+                dotColor: 'orange',
+              };
+              start.setDate(start.getDate() + 1);
+            };
+        };
+        return temp;
+      }
 
     useEffect(() => {
       async function fetchEvents() {
           setLoading(true);
         const events = await getGroupEvents(Group._id, "/events");
-        setActualEvents(events.events);
+        setActualEvents(events.events.map((event) => ({
+           ...event,
+           groupName: Group,
+        })));
         const replace = await getGroupEvents(Group._id, "");
-        console.log(events.events);
+        console.log(Group);
         setAdmins(replace.admins);
         setLoading(false);
       }
@@ -42,13 +63,17 @@ export default function GroupCalendar() {
     const YourComponent = ({ style, item, dayIndex, daysTotal }) => {
           return(
               <TouchableOpacity
-                onPress={() => navigation.navigate('EditDeletePage', {
-                  event: actualEvents.filter(x => x._id === item.id)[0],
-                  location: () => {
-                      navigation.pop();
-                      navigation.replace('GroupTabs', { screen: 'Group Calendar' });},
-                  allEvents: actualEvents,
-                })}
+                onPress={() =>
+                    { if (!wait) {
+                         setWait(true);
+                       navigation.navigate('EditDeletePage', {
+                        event: actualEvents.filter(x => x._id === item.id)[0],
+                        location: () => {
+                            navigation.pop()},
+                        allEvents: [],
+                      })
+                       setTimeout(() => setWait(false), 3000);
+                    }}}
                 style={{
                     ...style,
                     backgroundColor: 'orange',
@@ -56,7 +81,9 @@ export default function GroupCalendar() {
                     elevation: 5,
                 }}>
               <View className = "bg-orange-400 rounded-xl flex-1 flex-col justify-center items-center">
-                  <Text className = "text-center font-bold text-2xl">{item.title}</Text>
+                  <Text className = "text-center font-bold text-2xl">{item.title}
+                  {item.venue !== undefined && item.venue !== '' && ` (Venue: ${item.venue})`}
+                  </Text>
                   <Text className = "text-center text-sm">
                     Start date: {item.startDate.toLocaleDateString()}, {item.startDate.toLocaleTimeString()}
                   </Text>
@@ -73,7 +100,8 @@ export default function GroupCalendar() {
         title: `${event.name}`,
         startDate: new Date(event.dueDate.replace("Z", "")),
         endDate: new Date(event.endDate.replace("Z", "")),
-        id: event._id
+        id: event._id,
+        venue: event.venue,
         }));
 
     return (
@@ -93,7 +121,9 @@ export default function GroupCalendar() {
             setSelected(day.dateString);
             }}
             markedDates={{
+                 ...expandedDates(actualEvents),
                 [selected]: {
+                     ...(expandedDates(actualEvents)[selected]),
                     selected: true,
                     disableTouchEvent: true,
                     selectedDotColor: "orange",

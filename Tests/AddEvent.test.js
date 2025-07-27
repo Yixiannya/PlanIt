@@ -33,6 +33,8 @@ test('calls sendEvent with proper structure when Group prop is provided', async 
       allEvents={[]}
       Group={{ _id: 'group456' }}
       Location={mockLocation}
+      venue = "Something"
+      offsetMs = {3000}
     />
   );
 
@@ -45,12 +47,14 @@ test('calls sendEvent with proper structure when Group prop is provided', async 
       endDate: '2024-06-27T11:00:00.000Z',
       description: 'Project discussion',
       group: 'group456',
+      venue: "Something",
+      offsetMs: 3000,
   });
 });
 
 const location = jest.fn();
 
-test('calls sendEvent with proper structure when Group prop is not provided', async () => {
+test('calls sendEvent with proper structure when Group is not provided', async () => {
 
   const { getByText } = render(
     <CreateEventButton
@@ -65,6 +69,8 @@ test('calls sendEvent with proper structure when Group prop is not provided', as
       allEvents={[]}
       Group={null}
       Location={location}
+      venue = ""
+      offsetMs = {0}
     />
   );
 
@@ -76,5 +82,7 @@ test('calls sendEvent with proper structure when Group prop is not provided', as
       dueDate: '2024-06-27T15:30:00.000Z',
       endDate: '2024-06-27T16:30:00.000Z',
       description: 'Working alone',
+      venue: "",
+      offsetMs: 0,
   });
 });

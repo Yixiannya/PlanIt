@@ -1,13 +1,16 @@
 import { Text, View, Button, Image, Alert, TouchableOpacity } from 'react-native';
 import { editEvent } from '../Data/editEvent';
 import { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
-const EditEventButton = ({ ID, Name, Date, Hour, Minute, endDate, endHour, endMinute, allEvents,
-    Description, Location }) => {
+const EditEventButton = ({ ID, Name, Date, Hour, Minute, endDate, endHour, endMinute, allEvents, Group,
+    Description, Location, venue, offsetMs }) => {
     const [checked, setChecked] = useState(false);
+    const navigation = useNavigation();
+   console.log({ Name, Date, Hour, Minute, endDate, endHour, endMinute });
     const iconPressed = async () => {
-        if (!Name?.trim() || !Date?.trim() || !Hour?.trim() || !Minute?.trim()
-            || !endDate?.trim() || !endHour?.trim() || !endMinute?.trim()
+        if (!Name?.trim() || Date == undefined || !Hour?.trim() || !Minute?.trim()
+         || endDate == undefined || !endHour?.trim() || !endMinute?.trim()
         ) {
         Alert.alert(
            'Insufficient information',
@@ -26,7 +29,7 @@ const EditEventButton = ({ ID, Name, Date, Hour, Minute, endDate, endHour, endMi
                                       && end >= `${endDate}T${endHour}:${endMinute}:00.000Z`
                       )) && !checked) {
                          Alert.alert(
-                           "Note: This time clashes with one of your events",
+                           `Note: This time clashes with one of your ${Group ? "group member's " : ""}events`,
                            "Press edit event again if this is intended",
                            [
                              { text: "Ok", onPress: () => setChecked(true) }
@@ -38,11 +41,20 @@ const EditEventButton = ({ ID, Name, Date, Hour, Minute, endDate, endHour, endMi
                 dueDate: `${Date}T${Hour}:${Minute}:00.000Z`,
                 description: Description,
                 endDate: `${endDate}T${endHour}:${endMinute}:00.000Z`,
+                venue: venue,
+                offsetMs: offsetMs
             };
             try {
+                Alert.alert('Event editing in process...')
                 await editEvent(ID, Event);
                 Alert.alert('Success', 'Event edited!',
-                [ { text: 'OK', onPress: () => Location() }, ],
+                [ { text: 'OK',
+                    onPress: () => {
+                          if (Location === "AUTO") {
+                            navigation.pop(2);
+                          } else {
+                            Location();
+                          }},} ],
                 { cancelable: false },
                 );
             } catch (error) {
@@ -54,7 +66,7 @@ const EditEventButton = ({ ID, Name, Date, Hour, Minute, endDate, endHour, endMi
 
     return (
         <TouchableOpacity onPress = {iconPressed}>
-        <View className = "h-64 bg-orange-50 flex-col justify-center items-center">
+        <View className = "h-64 bg-orange-500 flex-col justify-center items-center">
             <Text className = "pb-5 text-4xl text-gray-800 font-bold"> Edit event </Text>
         </View>
          </TouchableOpacity>

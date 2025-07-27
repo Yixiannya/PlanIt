@@ -1,4 +1,9 @@
 import {sorting} from "../component/Main-page"
+
+jest.mock('@react-native-google-signin/google-signin', () => ({
+  GoogleSignin: {
+    signOut: jest.fn(() => Promise.resolve()),
+  },}));
 const today = new Date("2025-06-27T14:30:00")
 const loading = false;
 const actualEvents = [

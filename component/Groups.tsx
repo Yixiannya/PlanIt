@@ -18,7 +18,7 @@ export default function Groups({route}) {
           screen: 'Group Info',
         });
       }}>
-        <Text className="text-xl font-bold">{item.name}</Text>
+        <Text className="text-center text-xl font-bold">{item.name}</Text>
       </TouchableOpacity>
   );
 

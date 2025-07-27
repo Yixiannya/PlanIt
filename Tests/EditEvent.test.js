@@ -7,6 +7,13 @@ jest.mock('../Data/editEvent', () => ({
   editEvent: jest.fn(),
 }));
 
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({
+    navigate: jest.fn(),
+    pop: jest.fn(),
+  }),
+}));
+
 const location = jest.fn();
 
 test('calls editEvent with correct structure', async () => {

@@ -9,18 +9,22 @@ import { getUser } from '../Data/getUser';
 import { getEvent } from '../Data/getEvent';
 import moment from "moment";
 import Timetable from "react-native-calendar-timetable";
+import { Calendar } from 'react-native-calendars';
+import { useUserStore } from '../Data/userStore';
 
 export default function AddEvent({route}) {
     const navigation = useNavigation();
-    const [actualDate, setActualDate] = useState([]);
-    const [actualendDate, setActualendDate] = useState([]);
+    const [actualDate, setActualDate] = useState();
+    const [actualendDate, setActualendDate] = useState();
     const [searchHour, setSearchHour] = useState('');
     const [searchMinute, setSearchMinute] = useState('');
     const [endsearchHour, setendSearchHour] = useState('');
     const [endsearchMinute, setendSearchMinute] = useState('');
     const [searchName, setSearchName] = useState('');
     const [searchDesc, setSearchDesc] = useState('');
+    const [venue, setVenue] = useState('');
     const [openTable, setopenTable] = useState(false);
+    const [notifyTime, setNotifyTime] = useState(300000);
 
     const [tempDate, settempDate] = useState([]);
     const [userEvents, setuserEvents] = useState([]);
@@ -54,7 +58,8 @@ export default function AddEvent({route}) {
                             .some(thing => thing === z._id))
                         .map(user => user.name), z]);
                 setuserEvents(uniqueEvents);
-                setFilteredEvents(uniqueEvents.map(pair => [pair[1].dueDate, pair[1].endDate]));
+                setFilteredEvents(uniqueEvents.map(pair => [pair[1].dueDate, pair[1].endDate]))
+                console.log(uniqueEvents.map(pair => [pair[1].dueDate, pair[1].endDate]));
                 setLoading(false);
         } catch (error) {
             Alert.alert("Error", "Something went wrong");
@@ -132,9 +137,25 @@ export default function AddEvent({route}) {
         func(text.padStart(2, '0'));
       }
     };
+    const expandedDates = (events) => {
+        const temp = {}
+        for (const event of events) {
+            let start = new Date(event[0].split('T')[0]);
+            const end = new Date(event[1].split('T')[0]);
+
+            while (start <= end) {
+              temp[start.toISOString().split('T')[0]] = {
+                marked: true,
+                dotColor: 'orange',
+              };
+              start.setDate(start.getDate() + 1);
+            };
+        };
+        return temp;
+      }
 
     return (
-    <View className = "flex-1 flex-col">
+    <View className = "flex-1 flex-col bg-orange-500">
      <Header word = "Add an event" image = {require('../assets/Close.png')}
             onPress = {() => navigation.pop()} />
 
@@ -149,7 +170,7 @@ export default function AddEvent({route}) {
                 <Image source= { require('../assets/arrowup.png' ) } />}
             </View>
         </TouchableOpacity>
-     {openTable && (
+     {openTable && !loading && (
             <ScrollView className = "h-[300px]">
               {loading ? (
                 <View className="flex-1 justify-center items-center">
@@ -158,7 +179,20 @@ export default function AddEvent({route}) {
               ) : (
                   <View>
                   <View className ="border-4 border-orange-500">
-                    <DateSelector actualDate={tempDate} setActualDate={settempDate} />
+                    <Calendar
+                    onDayPress={(day) => {
+                      settempDate(day.dateString);
+                    }}
+                    markedDates={{
+                        ...expandedDates(filteredEvents),
+                      [tempDate]: {
+                           ...(expandedDates(filteredEvents)[tempDate]),
+                        selected: true,
+                        disableTouchEvent: true,
+                        selectedDotColor: 'orange',
+                      },
+                    }}
+                  />
                   </View>
                 <Timetable
                 items={items}
@@ -193,11 +227,22 @@ export default function AddEvent({route}) {
             />
         </View>
 
+        <View className = "bg-orange-400 flex-col py-3">
+            <Text className = "px-1 pt-2 text-4xl text-gray-800 font-bold"> Venue: </Text>
+            <TextInput
+                  placeholder = "Enter a venue (optional)"
+                  value = {venue}
+                  onChangeText={text => setVenue(text)}
+                  className = "px-4 text-[30px]"
+            />
+        </View>
+
     <View className = "bg-orange-500 py-5 items-center justify-center">
         <Text className = "font-bold text-[36px]" > Start date </Text>
     </View>
 
-    <DateSelector actualDate={actualDate} setActualDate={setActualDate} />
+    <DateSelector actualDate={actualDate} setActualDate={setActualDate}
+    />
 
     <TimeSelector
       searchHour ={ searchHour}
@@ -224,11 +269,77 @@ export default function AddEvent({route}) {
           onChangeMinute = { onChangeEndMinute }
           onBlurPad = { onBlurPad }
     />
+
+
+    { useUserStore.getState().user.notificationsEnabled !== false &&
+        <View>
+        <View className = "bg-orange-500 pr-1 py-5 items-center justify-center">
+            <Text className = "px-6 text-center font-bold text-3xl" >When will you like to be notified of the event? </Text>
+        </View>
+        <ScrollView horizontal className = "py-2 flex-row bg-orange-400">
+         <TouchableOpacity
+           className={`m-1 px-3 py-3 ${notifyTime == 0 ? 'bg-orange-600' : 'bg-orange-500'} rounded-2xl`}
+           onPress = {() => setNotifyTime(0)}
+           >
+            <Text className = "font-bold text-xl" > When event starts </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+        className={`m-1 px-3 py-3 ${notifyTime == 300000 ? 'bg-orange-600' : 'bg-orange-500'} rounded-2xl`}
+        onPress = {() => setNotifyTime(300000)}
+        >
+            <Text className = "font-bold text-xl"> 5 minutes before </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+        className={`m-1 px-3 py-3 ${notifyTime == 900000 ? 'bg-orange-600' : 'bg-orange-500'} rounded-2xl`}
+        onPress = {() => setNotifyTime(900000)}
+        >
+            <Text className = "font-bold text-xl" > 15 minutes before </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+        className={`m-1 px-3 py-3 ${notifyTime == 1800000 ? 'bg-orange-600' : 'bg-orange-500'} rounded-2xl`}
+        onPress = {() => setNotifyTime(1800000)}
+        >
+            <Text className = "font-bold text-xl" > 30 minutes before </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+         className={`m-1 px-3 py-3 ${notifyTime == 3600000 ? 'bg-orange-600' : 'bg-orange-500'} rounded-2xl`}
+         onPress = {() => setNotifyTime(3600000)}
+         >
+            <Text className = "font-bold text-xl" > 1 hour before </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+         className={`m-1 px-3 py-3 ${notifyTime == 10800000 ? 'bg-orange-600' : 'bg-orange-500'} rounded-2xl`}
+         onPress = {() => setNotifyTime(10800000)}
+         >
+            <Text className = "font-bold text-xl" > 3 hours before </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+         className={`m-1 px-3 py-3 ${notifyTime == 21600000 ? 'bg-orange-600' : 'bg-orange-500'} rounded-2xl`}
+         onPress = {() => setNotifyTime(21600000)}
+         >
+            <Text className = "font-bold text-xl" > 6 hours before </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+         className={`m-1 px-3 py-3 ${notifyTime == 43200000 ? 'bg-orange-600' : 'bg-orange-500'} rounded-2xl`}
+         onPress = {() => setNotifyTime(43200000)}
+         >
+            <Text className = "font-bold text-xl" > 12 hours before </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+         className={`m-1 px-3 py-3 ${notifyTime == 86400000 ? 'bg-orange-600' : 'bg-orange-500'} rounded-2xl`}
+         onPress = {() => setNotifyTime(86400000)}
+         >
+            <Text className = "font-bold text-xl" > 24 hours before </Text>
+        </TouchableOpacity>
+    </ScrollView>
+    </View>}
     {!loading && <CreateEventButton Name = {searchName}
     Date = {actualDate} Hour = {searchHour} Minute = {searchMinute}
     endDate = {actualendDate} endHour = {endsearchHour} endMinute = {endsearchMinute}
     Description = {searchDesc}
     allEvents = {filteredEvents}
+    venue = {venue}
+    offsetMs = {notifyTime}
     Group = {Group}
     Location = { () =>
         navigation.pop()} />}
