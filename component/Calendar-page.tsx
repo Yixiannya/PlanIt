@@ -23,6 +23,7 @@ export default function CalendarFunc() {
   const navigation = useNavigation();
   const user = useUserStore((state) => state.user);
   const isFocused = useIsFocused();
+  const [wait, setWait] = useState(false);
 
   const expandedDates = (events) => {
     const temp = {}
@@ -77,10 +78,14 @@ export default function CalendarFunc() {
         if (loading) {
           Alert.alert("Too fast", "Wait for loading to finish");
         } else {
-          navigation.navigate('Add Event', {
-            Group: "",
-            allEvents: actualEvents
-          });
+            if (!wait) {
+            setWait(true);
+         navigation.navigate('Add Event', {
+             Group: "",
+             allEvents: actualEvents
+           });
+          setTimeout(() => setWait(false), 3000);
+          }
         }
       }}/>
       <Calendar

@@ -24,6 +24,7 @@ export default function GroupCalendar() {
     const myuser = useUserStore((state) => state.user);
     const isAdmin = Admins.some((admin => admin == myuser._id));
     const isFocused = useIsFocused();
+    const [wait, setWait] = useState(false);
 
     const expandedDates = (events) => {
         const temp = {}
@@ -62,12 +63,17 @@ export default function GroupCalendar() {
     const YourComponent = ({ style, item, dayIndex, daysTotal }) => {
           return(
               <TouchableOpacity
-                onPress={() => navigation.navigate('EditDeletePage', {
-                  event: actualEvents.filter(x => x._id === item.id)[0],
-                  location: () => {
-                      navigation.pop()},
-                  allEvents: [],
-                })}
+                onPress={() =>
+                    { if (!wait) {
+                         setWait(true);
+                       navigation.navigate('EditDeletePage', {
+                        event: actualEvents.filter(x => x._id === item.id)[0],
+                        location: () => {
+                            navigation.pop()},
+                        allEvents: [],
+                      })
+                       setTimeout(() => setWait(false), 3000);
+                    }}}
                 style={{
                     ...style,
                     backgroundColor: 'orange',

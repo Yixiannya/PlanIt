@@ -109,19 +109,28 @@ export default function IndivGroupPage() {
         <Header word= "Group Info"
                     image={require('../assets/Close.png')}
                     onPress={() => {
-                      navigation.pop();
+                      navigation.pop(3);
                     }}
         />
         <ScrollView>
 
         <View className = "bg-orange-300 justify-center items-center">
         {!loading &&
-            <View className = "py-3">
+            <View className = "py-3 flex-row">
             <Image source = {{uri: Admins[0].image}} className = "rounded-2xl w-36 h-36"/>
             </View>}
-            <Text className="font-bold text-4xl px-3">
+            <View className = "pr-2 pb-1 ml-14 flex-row">
+            <View className = "justify-center">
+            <Text className="font-bold text-4xl px-1">
                 {Group.name}
             </Text>
+            </View>
+                <View className = "pr-2 pl-2 py-1">
+                <TouchableOpacity onPress = {() => navigation.navigate("Group Settings")}>
+                <Image source={require('../assets/edit.png')}  className = "w-10 h-10"/>
+                </TouchableOpacity>
+                </View>
+            </View>
             <Text className="font-bold text-2xl pb-3 py-1 px-3">
                 {Admins.length} Admins, {GroupMembers.length} Members
             </Text>
@@ -151,7 +160,7 @@ export default function IndivGroupPage() {
              <ScrollView horizontal>
                 {Admins.map((member) => (
                     <View key={member._id} className="flex-col px-4 py-2">
-                        <View className="py-2 justify-center items-center">
+                        <View className="py-2 justify-center items-center flex-col">
                         <Image source = {{uri: member.image}} className = "rounded-3xl w-20 h-20"/>
                         </View>
                         <Text className="pt-2 justify-center text-center font-bold text-2xl">

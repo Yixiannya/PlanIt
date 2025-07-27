@@ -51,7 +51,7 @@ export default function SearchModToAdd({route}) {
            select(item);
            }
           }>
-            <Text className="text-xl font-bold">{item.moduleCode}</Text>
+            <Text className="text-[15px] font-bold">{item.moduleCode}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -68,7 +68,7 @@ export default function SearchModToAdd({route}) {
                     searchMods === ""
                       ? []
                       : allMods.filter(mod =>
-                          mod.moduleCode.toLowerCase().startsWith(searchMods.toLowerCase()))
+                          mod.moduleCode.toLowerCase().startsWith(searchMods.toLowerCase())).sort((x, y) => x.moduleCode.localeCompare(y.moduleCode))
             );
         }
     };

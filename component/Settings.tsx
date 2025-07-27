@@ -10,7 +10,8 @@ import {syncCalendar} from '../Data/syncCalendar';
 export default function Settings() {
     const navigation = useNavigation();
     const user = useUserStore((state) => state.user);
-    const [setUp, setSetUp] = useState();
+    const setUser =  useUserStore((state) => state.setUser);
+    const [setUp, setSetUp] = useState(false);
     const [id, setId] = useState();
     const [name, setName] = useState();
     const [toggleChange, setToggleChange] = useState(false)
@@ -23,14 +24,30 @@ export default function Settings() {
     }, []);
 
     const toggleNotifications = async () => {
+        const oldSetUp = setUp;
+        const newSetUp = !setUp;
         try {
-          const newSetUp = !setUp;
+            Alert.alert("Changing notification setting...");
           setSetUp(newSetUp);
           await usePushNotifications(newSetUp);
+          if (newSetUp) {
+              setUser({
+                 ...user,
+                 notificationsEnabled: true,
+               });
+           } else {
+               setUser({
+                  ...user,
+                  notificationsEnabled: false,
+                });
+            }
           Alert.alert('Notification setting updated');
-        } catch (e) {
+        } catch (error) {
           Alert.alert('Failed to update notification setting');
-          console.log(e)
+          console.log(error)
+          setTimeout(() => {
+                setSetUp(oldSetUp);
+          }, 50);
         }
       };
 
@@ -74,7 +91,7 @@ export default function Settings() {
             </TouchableOpacity>
             </View>
             <View className = "flex-row mx-2 my-2 bg-orange-400 py-8 rounded-2xl items-start">
-            <Text className = "pl-4 w-3/4 font-bold text-[28px] ">Sync events to Google Calendar </Text>
+            <Text className = "pl-4 w-3/4 font-bold text-[28px] ">Import events from Google Calendar </Text>
             <TouchableOpacity onPress = {() =>  Alert.alert("Note:",
                "Due to limitations, this will only sync the 100 most recent events from your Google Calendar, including events from this app. Continue?",
                [{text: "No", onPress: () => Alert.alert("Request cancelled"),},

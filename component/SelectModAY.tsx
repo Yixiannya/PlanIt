@@ -15,6 +15,7 @@ export default function SelectModAY() {
                  image={require('../assets/Close.png')}
             onPress={() => navigation.pop()}
             />
+            <ScrollView>
             <Text className = "mb-4 py-5 px-3 bg-orange-400 text-4xl font-bold">
             Academic Year (AY) </Text>
 
@@ -69,7 +70,7 @@ export default function SelectModAY() {
                     Special Term 2</Text>
                 </TouchableOpacity>
             </View>
-        <TouchableOpacity className = "mt-8 flex-1 bg-orange-400 item-center justify-center"
+        <TouchableOpacity className = "mt-8 flex-1 bg-orange-400 py-20 item-end justify-center"
         onPress={() => {
           if (AY == "" || sem == "") {
             Alert.alert('Please choose an Academic year and a Semester')
@@ -77,8 +78,9 @@ export default function SelectModAY() {
             navigation.navigate("SearchModToAdd", {year: AY, sem})
           }
         }}>
-            <Text className = "mb-12 text-4xl font-bold text-center"> Next </Text>
+            <Text className = "mr-1 mb-10 text-center text-5xl font-bold text-center"> Next </Text>
         </TouchableOpacity>
+        </ScrollView>
     </View>
         )
 }

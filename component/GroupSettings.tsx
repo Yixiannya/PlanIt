@@ -7,6 +7,8 @@ import { useUserStore } from '../Data/userStore';
 import {useGroupStore} from '../Data/groupStore'
 import {editGroup} from '../Data/editGroup';
 import {deleteGroup} from '../Data/deleteGroup'
+import {sendUser} from '../Data/sendUser'
+
 
 export default function GroupSettings() {
     const navigation = useNavigation();
@@ -15,6 +17,7 @@ export default function GroupSettings() {
     const [toggleChange, setToggleChange] = useState(false);
     const [toggleChange2, setToggleChange2] = useState(false);
     const isAdmin = useGroupStore.getState().group.admins.some((admin => admin == useUserStore.getState().user._id));
+    const Group = useGroupStore((state) => state.group);
 
     const changeGroupName = async () => {
         if (isAdmin) {
@@ -48,6 +51,7 @@ export default function GroupSettings() {
           Groupid: gp,
           userId: myuser,
       }
+  console.log(delete_array);
       try {
           Alert.alert("Deleting group...")
          await deleteGroup(gp, delete_array);
@@ -60,6 +64,36 @@ export default function GroupSettings() {
           Alert.alert('Error', 'Failed to delete group');
       }
     }
+
+    const handleLeave = async (gp, own, navigation) => {
+        const id_array = {
+            id: gp._id,
+             userId: gp.admins[0],
+            deletedMembers: [own],
+        }
+        const id_array_2 = {
+            id: gp._id,
+            userId: gp.admins[0],
+            deletedAdmins: [own],
+        }
+
+        try {
+            Alert.alert("Leaving group...")
+          if (!gp.admins.some((admin => admin == own))) {
+            await sendUser("members", gp._id, id_array, "delete");
+          } else {
+            await sendUser("admins", gp._id, id_array_2, "delete");
+          }
+          Alert.alert('Left group successfully');
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'BottomTabs', params: { screen: 'Main-page' } }],
+          });
+        } catch (error) {
+          Alert.alert('Error', 'Failed to leave group');
+          console.error('Error:', error);
+        }
+      };
 
     return (
         <View className = "flex-1 bg-orange-300">
@@ -85,9 +119,10 @@ export default function GroupSettings() {
             {toggleChange &&
             <View className = "flex-row py-1">
             <TextInput
-                 placeholder = "Enter name"
+                 placeholder = "Enter name (max 20.)"
                  value = {name}
                  onChangeText={text => setName(text)}
+                 maxLength={20}
                  className = "w-80 ml-3 px-4 bg-white rounded-2xl text-[30px]"
             />
             <TouchableOpacity onPress = {() => changeGroupName()}>
@@ -102,7 +137,7 @@ export default function GroupSettings() {
             <TouchableOpacity onPress = {() => {
                 setToggleChange2(!toggleChange2);
             }}>
-            {toggleChange ? (
+            {toggleChange2 ? (
                 <Image source = {require('../assets/arrowup.png')}
                              className="w-20 h-20 ml-3"/>
                 ) : (
@@ -117,6 +152,7 @@ export default function GroupSettings() {
                  placeholder = "Enter description"
                  value = {description}
                  onChangeText={text => setDescription(text)}
+                 maxLength={ 300 }
                  className = "w-80 ml-3 px-4 bg-white rounded-2xl text-[30px]"
             />
             <TouchableOpacity onPress = {() => changeGroupDesc()}>
@@ -125,8 +161,27 @@ export default function GroupSettings() {
             </View>}
             </View>
 
+            <View className = "px-2 flex-1 justify-end flex-col items-center">
+               <TouchableOpacity onPress={() => {
+                   if (isAdmin && useGroupStore.getState().group.admins.length === 1) {
+                       Alert.alert('Promote someone to admin before leaving');
+                   } else {
+                       Alert.alert(
+                           "Leave group",
+                           "Are you sure you want to leave?",
+                           [
+                               { text: "No" },
+                               { text: "Yes", onPress: () =>
+                                   handleLeave(useGroupStore.getState().group, useUserStore.getState().user._id,
+                                   navigation) }
+                           ]
+                       );
+                   }
+               }}  className = "mb-2 bg-orange-500 rounded-xl w-full">
+                    <Text className = "text-center text-white py-3 px-2 rounded font-bold text-2xl" > Leave Group </Text>
+                </TouchableOpacity>
             {isAdmin &&
-              <View className = "px-2 flex-1 justify-end flex-col py-6 items-center mt-2">
+              <View className = "pb-2 w-full">
                 <TouchableOpacity onPress = {() =>
                     Alert.alert(
                         "Delete Group",
@@ -141,6 +196,7 @@ export default function GroupSettings() {
                 </TouchableOpacity>
               </View>
               }
+          </View>
           </View>
     )
 }

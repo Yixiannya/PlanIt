@@ -40,7 +40,11 @@ const setUser = useUserStore((state) => state.setUser);
             <View className = "flex-1 items-center justify-center">
             <Text className = "text-4xl text-center font-bold"> Loading mods... </Text>
             </View>
-        ):(
+        ): yourMods.length === 0 ? (
+            <View className = "flex-1 items-center justify-center">
+            <Text className = "text-4xl text-center font-bold"> Press the "+" button to start adding a new NUS mod!</Text>
+            </View>
+            ): (
             <View className = "flex-1" >
             <ScrollView className = "pb-50">
             {yourMods.map(event => (

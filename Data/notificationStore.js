@@ -12,10 +12,10 @@ export const useNotificationStore = create((set) => ({
     setListener: () => {
       if (!useNotificationStore.getState().listener) {
             set({
-               listener: Notifications.addNotificationReceivedListener((notification) => {
+               listener: Notifications.addNotificationReceivedListener(async (notification) => {
                  console.log("RECEIVED");
                  if (useUserStore.getState().user) {
-                     if (notification.request.content.data.screen == "Group") {
+                     if (notification.request.content.data.screen == "Group" && notification.request.content.data.group.members.some(x => x === useUserStore.getState().user._id)) {
                          Toast.show({
                            type: 'success',
                            text1: notification.request.content.title,
@@ -29,25 +29,28 @@ export const useNotificationStore = create((set) => ({
                              },
                          });
                       } else if (notification.request.content.data.screen == "Group Event") {
+                      console.log(notification.request.content.data.event.group);
+                      const thegroup = await getGroup(notification.request.content.data.event.group);
+                     console.log(thegroup)
+                      if (thegroup.members.some(x => x == useUserStore.getState().user._id)
+                      || thegroup.admins.some(x => x == useUserStore.getState().user._id)) {
                         Toast.show({
                            type: 'success',
                            text1: notification.request.content.title,
                            text2: notification.request.content.body,
                            onPress: async () => {
-                                 const group = await getGroup(notification.request.content.data.event.group);
-                                 console.log("WHAT ARE YOU", group);
                                  if (navigationRef.isReady()) {
                                  navigationRef.navigate('EditDeletePage', {
                                    event: {...notification.request.content.data.event,
-                                            groupName: group},
+                                            groupName: thegroup},
                                    location: "AUTO",
                                    allEvents: [],
                                  });
                                  }
                                Toast.hide();
                              },
-                         });
-                     } else if (notification.request.content.data.screen == "Indiv Event") {
+                         })};
+                     } else if (notification.request.content.data.screen == "Indiv Event" && useUserStore.getState().user._id === notification.request.content.data.userId) {
                        user = useUserStore.getState().user._id;
                        Toast.show({
                           type: 'success',

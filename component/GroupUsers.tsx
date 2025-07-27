@@ -109,13 +109,16 @@ export default function GroupUser({route}) {
               <TouchableOpacity onPress= { () => {
                   setAdminDeleting(false);
                   setAdminAdding(false);
-                  }
+              }
               }
               >
                 <Image source={require('../assets/Close.png')} className="w-12 h-12" />
               </TouchableOpacity>
          ): (
-             <TouchableOpacity onPress={() =>
+             <TouchableOpacity onPress={() => {
+                 if (!isAdmin) {
+                    Alert.alert("Error", "You are not an admin")
+                 } else {
              Alert.alert(
                "Admins",
                "What would you like to do?",
@@ -138,7 +141,7 @@ export default function GroupUser({route}) {
                 {
                     cancelable: true,
                 }
-             )
+             )}}
            }
          >
          <Image source={require('../assets/edit.png')} className="w-12 h-12" />
@@ -163,7 +166,10 @@ export default function GroupUser({route}) {
                 <Image source={require('../assets/Close.png')} className="w-12 h-12" />
             </TouchableOpacity>
         ) : (
-        <TouchableOpacity onPress={ () =>
+        <TouchableOpacity onPress={ () => {
+              if (!isAdmin) {
+                Alert.alert("Error", "You are not an admin")
+             } else {
             Alert.alert(
                 "Users",
                 "What would you like to do?",
@@ -180,7 +186,7 @@ export default function GroupUser({route}) {
             {
                 cancelable: true,
             }
-            )
+            )}}
         }>
         <Image source={require('../assets/edit.png')} className="w-12 h-12" />
         </TouchableOpacity>

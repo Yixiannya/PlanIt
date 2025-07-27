@@ -5,13 +5,13 @@ import { useEffect, useState } from 'react';
 import { getEvent } from '../Data/getEvent';
 
 const CreateEventButton = ({ Name, Date, Hour, Minute, endDate, endHour, endMinute,
-    Description, allEvents, Group, Location, venue }) => {
+    Description, allEvents, Group, Location, venue, offsetMs }) => {
     const user = useUserStore((state) => state.user);
     const [checked, setChecked] = useState(false);
-
+    console.log("this is", endDate);
     const iconPressed = async () => {
-             if (!Name?.trim() || !Date?.trim() || !Hour?.trim() || !Minute?.trim()
-                 || !endDate?.trim() || !endHour?.trim() || !endMinute?.trim()
+             if (!Name?.trim() || Date == undefined || !Hour?.trim() || !Minute?.trim()
+                 || endDate == undefined || !endHour?.trim() || !endMinute?.trim()
              ) {
              Alert.alert(
                 'Insufficient information',
@@ -29,9 +29,9 @@ const CreateEventButton = ({ Name, Date, Hour, Minute, endDate, endHour, endMinu
                              start <= `${endDate}T${endHour}:${endMinute}:00.000Z`
                              && end >= `${endDate}T${endHour}:${endMinute}:00.000Z`
              )) && !checked) {
-                Alert.alert(
-                  "Note: This time clashes with one of your events",
-                  "Press add new event again if this is intended",
+               Alert.alert(
+                 `Note: This time clashes with one of your ${Group ? "group member's " : ""}events`,
+                 "Press add new event again if this is intended",
                   [
                     { text: "Ok", onPress: () => setChecked(true) }
                   ]
@@ -44,6 +44,7 @@ const CreateEventButton = ({ Name, Date, Hour, Minute, endDate, endHour, endMinu
             endDate: `${endDate}T${endHour}:${endMinute}:00.000Z`,
             description: Description,
             venue: venue,
+            offsetMs: offsetMs,
             ...(Group ? { group: Group._id } : {}),
         };
         try {

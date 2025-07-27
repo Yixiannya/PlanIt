@@ -9,6 +9,7 @@ import { useUserStore } from '../Data/userStore';
 import {useGroupStore} from '../Data/groupStore'
 import {getGroup} from '../Data/getGroup';
 import {useNotificationStore} from  '../Data/notificationStore'
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 export function sorting (today, loading, actualEvents) {
     return !loading
@@ -26,7 +27,7 @@ export default function MainPage() {
     const setUser =  useUserStore((state) => state.setUser);
     const clearToken = useUserStore.getState().clearUser;
     const isFocused = useIsFocused();
-    const today = new Date();
+    const [today, setToday] = useState();
     console.log(today);
 
 useEffect(() => {
@@ -50,6 +51,8 @@ useEffect(() => {
         }
       })
     );
+    const nowUtc = new Date();
+    setToday(new Date(nowUtc.getTime() + 8 * 60 * 60 * 1000));
     setActualEvents(Array.isArray(events) ? updatedEvents : []);
     setLoading(false);
   }
@@ -57,7 +60,7 @@ useEffect(() => {
       fetchEvents();
   }
 }, [isFocused]);
-console.log(actualEvents);
+
     const sortedEvents = sorting (today, loading, actualEvents);
 
     return (
@@ -68,11 +71,12 @@ console.log(actualEvents);
                  [
                     { text: "No"},
                     { text: "Yes", onPress:
-                        () => {
+                        async () => {
                          clearToken();
                          if (useNotificationStore.getState().listener) {
                              useNotificationStore.getState().clearListener();
                          }
+                         await GoogleSignin.signOut();
                          navigation.replace("LoginPage");
                          } },
                  ]
@@ -100,7 +104,7 @@ const Carousel = ({ loading, events}) => {
                     ) : (
             <ScrollView horizontal>
                 <View className="flex-row">
-                 {events.map((event) => (
+                 {events.slice(0, 20).map((event) => (
                    <TouchableOpacity onPress = {() => navigation.navigate('EditDeletePage',
                        {event,
                            location: () => navigation.pop(2),
@@ -176,7 +180,7 @@ const ClassReminder = ({ loading, events}) => {
     return (
         loading ? (
             <View className="flex-1 justify-center items-center">
-            <Text className="text-2xl">Loading events...</Text>
+            <Text className="text-2xl">Loading groups...</Text>
             </View>
         ) : events.length === 0 ? (
             <View className="flex-1 justify-center items-center">

@@ -5,33 +5,48 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a9308190-0a32-45ab-a646-753c15a6880d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Data/deleteClass.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/editGroup.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/getClasses.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/navigation.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/syncCalendar.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Data/updateMod.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Tests/ConfigureMods.test.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Tests/ModClasses.test.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Tests/SelectModAY.test.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Tests/SendModButton.test.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/component/GroupSettings.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/PlanItAppLogo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/PlanItAppLogoBlank.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.expo/devices.json" beforeDir="false" afterPath="$PROJECT_DIR$/.expo/devices.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/studiobot.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/studiobot.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/deleteUserMod.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Data/deleteUserMod.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/getMod.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Data/getMod.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/getUserMod.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Data/getUserMod.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/editEvent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Data/editEvent.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/editUser.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Data/editUser.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data/notificationStore.js" beforeDir="false" afterPath="$PROJECT_DIR$/Data/notificationStore.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/sendUserMod.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Data/sendUserMod.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data/usePushNotifications.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Data/usePushNotifications.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/REUSABLES/CreateEventButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/REUSABLES/CreateEventButton.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/REUSABLES/EditEventButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/REUSABLES/EditEventButton.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/REUSABLES/SendModButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/REUSABLES/SendModButton.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/REUSABLES/deleteModButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/REUSABLES/deleteModButton.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/REUSABLES/HeaderBanner.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/REUSABLES/HeaderBanner.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/AddEvent.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/AddEvent.test.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Tests/EditDeletePage.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/EditDeletePage.test.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tests/EditEvent.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/EditEvent.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/MainPage.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/MainPage.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/drawable-hdpi/splashscreen_logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/drawable-hdpi/splashscreen_logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/drawable-mdpi/splashscreen_logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/drawable-mdpi/splashscreen_logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/drawable-xhdpi/splashscreen_logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/drawable-xhdpi/splashscreen_logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/drawable-xxhdpi/splashscreen_logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/drawable-xxhdpi/splashscreen_logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/drawable-xxxhdpi/splashscreen_logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/drawable-xxxhdpi/splashscreen_logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-hdpi/ic_launcher.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-hdpi/ic_launcher.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-mdpi/ic_launcher.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-mdpi/ic_launcher.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xhdpi/ic_launcher.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xhdpi/ic_launcher.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/values/colors.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/values/styles.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/settings.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/AddEvent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/AddEvent.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/AddUsers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/AddUsers.tsx" afterDir="false" />
@@ -40,21 +55,18 @@
       <change beforePath="$PROJECT_DIR$/component/EditDeletePage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/EditDeletePage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/EditEventPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/EditEventPage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/GroupCalendar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/GroupCalendar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/component/GroupSettings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/GroupSettings.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/GroupUsers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/GroupUsers.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/component/Groups.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/Groups.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/IndivGroupPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/IndivGroupPage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/LoginPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/LoginPage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/Main-page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/Main-page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/ModClasses.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/ModClasses.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/NewGroup.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/NewGroup.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/SearchModToAdd.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/SearchModToAdd.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/component/SelectModAY.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/SelectModAY.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/Settings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/Settings.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/ViewMods.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/ViewMods.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/_expo/static/js/android/index-1831ed359d23bca6dcd2f37f63654e67.hbc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/_expo/static/js/android/index-1831ed359d23bca6dcd2f37f63654e67.hbc.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/_expo/static/js/ios/index-2df86413880f146f62db9abe8ac8e81d.hbc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/_expo/static/js/ios/index-2df86413880f146f62db9abe8ac8e81d.hbc.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/assetmap.json" beforeDir="false" afterPath="$PROJECT_DIR$/dist/assetmap.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/dist/metadata.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +98,8 @@
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;PlanIT-UI-with-tests&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Admin/Downloads/PlanIt-PlanIT-UI&quot;
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Admin/Downloads/PlanIt-PlanIT-UI&quot;,
+    &quot;structure.view.defaults.are.configured&quot;: &quot;true&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -110,5 +123,16 @@
       <updated>1749720865166</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

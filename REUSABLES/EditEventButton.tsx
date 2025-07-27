@@ -3,13 +3,14 @@ import { editEvent } from '../Data/editEvent';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
-const EditEventButton = ({ ID, Name, Date, Hour, Minute, endDate, endHour, endMinute, allEvents,
-    Description, Location, venue }) => {
+const EditEventButton = ({ ID, Name, Date, Hour, Minute, endDate, endHour, endMinute, allEvents, Group,
+    Description, Location, venue, offsetMs }) => {
     const [checked, setChecked] = useState(false);
     const navigation = useNavigation();
+   console.log({ Name, Date, Hour, Minute, endDate, endHour, endMinute });
     const iconPressed = async () => {
-        if (!Name?.trim() || !Date?.trim() || !Hour?.trim() || !Minute?.trim()
-            || !endDate?.trim() || !endHour?.trim() || !endMinute?.trim()
+        if (!Name?.trim() || Date == undefined || !Hour?.trim() || !Minute?.trim()
+         || endDate == undefined || !endHour?.trim() || !endMinute?.trim()
         ) {
         Alert.alert(
            'Insufficient information',
@@ -28,7 +29,7 @@ const EditEventButton = ({ ID, Name, Date, Hour, Minute, endDate, endHour, endMi
                                       && end >= `${endDate}T${endHour}:${endMinute}:00.000Z`
                       )) && !checked) {
                          Alert.alert(
-                           "Note: This time clashes with one of your events",
+                           `Note: This time clashes with one of your ${Group ? "group member's " : ""}events`,
                            "Press edit event again if this is intended",
                            [
                              { text: "Ok", onPress: () => setChecked(true) }
@@ -41,6 +42,7 @@ const EditEventButton = ({ ID, Name, Date, Hour, Minute, endDate, endHour, endMi
                 description: Description,
                 endDate: `${endDate}T${endHour}:${endMinute}:00.000Z`,
                 venue: venue,
+                offsetMs: offsetMs
             };
             try {
                 Alert.alert('Event editing in process...')

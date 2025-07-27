@@ -12,6 +12,7 @@ export default function EditDeletePage({ route }) {
   const [Group, setGroup] = useState('')
   const [loading, setLoading] = useState(true);
   const myuser = useUserStore((state) => state.user);
+  const [wait, setWait] = useState(false);
 
  useEffect(() => {
    if (event.group !== undefined) {
@@ -90,12 +91,34 @@ export default function EditDeletePage({ route }) {
             </Text>
           </View>
         )}
+        {useUserStore.getState().user.notificationsEnabled !== false && (
+          <View className="rounded-2xl border-4 border-orange-500 bg-orange-400 py-4 pb-8 w-full">
+            <Text className="text-4xl font-bold px-3 py-2">Notification sends: </Text>
+            {event.offsetMs == 0 ? (
+                <Text className="bg-orange-300 w-full rounded-2xl border-orange-400 border-2 text-4xl font-bold px-3 py-4">
+                  When event starts
+                </Text>) :
+             event.offsetMs < 3600000 ? (
+                <Text className="bg-orange-300 w-full rounded-2xl border-orange-400 border-2 text-4xl font-bold px-3 py-4">
+                  {event.offsetMs / 60 / 1000} minutes before event starts
+                </Text>
+             ) : (
+                 <Text className="bg-orange-300 w-full rounded-2xl border-orange-400 border-2 text-4xl font-bold px-3 py-4">
+                   {event.offsetMs / 60 / 1000 / 60} hour{event.offsetMs / 1000 / 60 / 60 !== 1 ? 's' : ''} before event starts
+                 </Text>
+             )}
+          </View>
+        )}
         <View className="py-20 items-center justify-center w-full px-3 pt-2 flex-row flex-1 h-[30%]">
           <View className="bg-orange-400 rounded-2xl border-orange-500 border-4 py-4 px-10">
             <TouchableOpacity
               onPress={() => {
                 if (ohmyAdmins && !loading) {
-                  navigation.replace('EditEventPage', { event, location, allEvents});
+                    if (!wait) {
+                        setWait(true);
+                      navigation.replace('EditEventPage', { event, location, allEvents});
+                      setTimeout(() => setWait(false), 3000);
+                      }
                 } else {
                   Alert.alert("Not an admin", "You are not an admin in this group");
                 }

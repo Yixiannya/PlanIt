@@ -12,30 +12,52 @@ export default function LoginPage() {
   const navigation = useNavigation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const setUser =  useUserStore((state) => state.setUser);
-  const clearToken = useUserStore.getState().clearUser
+  const clearToken = useUserStore.getState().clearUser;
 
-  const sync = async (id) => {
+  const sync = async (id, data) => {
       try {
           await syncCalendar({userId: id})
           Alert.alert("Success!", "Your google calendar was synced")
           navigation.replace('BottomTabs', { screen: 'Main-page' });
+          await toggleNotif(data);
       } catch (error) {
           Alert.alert("Error", "Something went wrong while syncing. Try again")
       }
   };
 
-  const toggleNotifications = async () => {
+  const toggleNotifications = async (data) => {
       try {
         await usePushNotifications(true);
+        setUser({
+           ...data.user,
+           notificationsEnabled: true,
+         });
         Alert.alert('Notification enabled', "You can now receive notifications");
       } catch (e) {
         Alert.alert('Failed to activate notifications', "Please try again in settings");
         console.log(e)
+        setTimeout(() => {
+            setUser({
+               ...data.user,
+               notificationsEnabled: false,
+             });
+      }, 50);
       }
     };
+
+    const toggleNotif = (data) => {
+        if (!data.user.notificationsEnabled) {
+        Alert.alert("Do you want to enable notifications?",
+            "This will allow you to receive alerts on your phone",
+            [{text: "No", onPress: () => Alert.alert("Notifications not enabled", "If you wish to enable notifications, toggle it in settings"),},
+             { text: "Yes", onPress: () => {
+                 toggleNotifications(data);
+             },}]
+        );
+    } else {
+        useNotificationStore.getState().setListener();
+    }}
   const handleGoogleSignIn = async () => {
-      clearToken();
-      await GoogleSignin.signOut();
       try {
           await GoogleSignin.hasPlayServices();
           const response = await GoogleSignin.signIn();
@@ -66,36 +88,25 @@ export default function LoginPage() {
                 setUser(data.user);
                 navigation.replace('BottomTabs', { screen: 'Main-page' });
 
+
                 if (data.user.events.length === 0) {
-                    Alert.alert("Would you like to sync your events from Google Calendar?:",
+                    Alert.alert("Would you like to sync your events from Google Calendar?",
                    "Note that due to server limitations, this will only sync the 100 most recent events from your Google Calendar. Continue?",
-                   [{text: "No", onPress: () =>
+                   [{text: "Don't sync", onPress: () =>
                         Alert.alert("Are you sure?",
                     "Due to the nature of our app, some events may not be able to carry over if you have already created events here",
-                                          [{text: "No"},
-                                           { text: "Yes", onPress: () => {
-                                               sync(data.user._id);
+                                          [{text: "Don't sync", onPress: () => {toggleNotif(data)},},
+                                           { text: "Sync", onPress: async () => {
+                                               await sync(data.user._id, data);
                                            },}]),},
-                    { text: "Yes", onPress: () => {
-                        sync(data.user._id);
+                    { text: "Sync", onPress: async () => {
+                        sync(data.user._id, data);
                     },}])
-
-                }
-                if (!data.user.notificationsEnabled) {
-                    Alert.alert("Do you want to enable notifications?",
-                        "This will allow you to receive alerts on your phone",
-                        [{text: "No", onPress: () => Alert.alert("Notifications not enabled", "If you wish to enable notifications, toggle it in settings"),},
-                         { text: "Yes", onPress: () => {
-                             toggleNotifications();
-                             setUser({
-                               ...data.user,
-                               notificationsEnabled: true,
-                             });
-                         },}]
-                    );
                 } else {
-                    useNotificationStore.getState().setListener();
+                    toggleNotif(data);
                 }
+
+
               } else {
                 const errorData = await responseBack.json();
                 console.error('Error:', responseBack.status, errorData);

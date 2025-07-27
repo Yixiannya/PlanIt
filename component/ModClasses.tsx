@@ -53,7 +53,7 @@ export default function ModClasses({route}) {
 
   const select = (item) => {
       if (selected.some(ev => ev.lessonType == item.lessonType && ev.classNo == item.classNo)) {
-          setSelected(selected.filter(x => x !== item))
+          setSelected(selected.filter(x => !(x.lessonType == item.lessonType && x.classNo == item.classNo)))
       } else {
          setSelected(selected.concat(
              events.filter(ev => ev.lessonType == item.lessonType && ev.classNo == item.classNo)))
@@ -78,10 +78,13 @@ export default function ModClasses({route}) {
       console.log(event)
        console.log("This is mods", mods);
       try {
+          if (mods.length !== 0) {
           Alert.alert('Class deletion in process...', 'Please be patient');
+          }
           setLoading(true);
        for (const mod of mods) {
          await deleteClass(event._id, mod);
+         await new Promise(resolve => setTimeout(resolve, 800));
        }
         Alert.alert("Success", "Classes deleted");
         setLoading(false);
@@ -112,7 +115,7 @@ export default function ModClasses({route}) {
                 className = " rounded-2xl border-2 border-orange-600 flex-1 items-center justify-center bg-orange-500 pt-5 pb-10"
                 >
             <Image className="w-32 h-32 " source={require('../assets/edit.png')} />
-            <Text className = "font-bold text-3xl flex-1"> Edit classes </Text>
+            <Text className = "text-center font-bold text-3xl flex-1"> Edit classes </Text>
             </TouchableOpacity>
             ) : (
             <TouchableOpacity onPress = {() =>
@@ -120,7 +123,7 @@ export default function ModClasses({route}) {
                 className = "rounded-2xl border-2 border-orange-600 flex-1 items-center justify-center bg-orange-500 pt-5 pb-10"
                 >
             <Image className="w-32 h-32 " source={require('../assets/Close.png')} />
-            <Text className = "font-bold text-3xl flex-1"> Cancel </Text>
+            <Text className = "text-center font-bold text-3xl flex-1"> Cancel </Text>
             </TouchableOpacity>
                 )}
             {selected[0] === "hide"
@@ -130,7 +133,7 @@ export default function ModClasses({route}) {
                 className = "rounded-2xl border-2 border-orange-600 flex-1 items-center justify-center bg-orange-500 pt-5 pb-10"
                 >
             <Image className="w-32 h-32 " source={require('../assets/delete.png')} />
-            <Text className = "font-bold text-3xl flex-1"> Delete classes </Text>
+            <Text className = "text-center font-bold text-3xl flex-1"> Delete classes </Text>
             </TouchableOpacity>
             ) : (
             <TouchableOpacity
@@ -138,7 +141,7 @@ export default function ModClasses({route}) {
                 onPress = {() => handleClassDelete()}
             >
             <Image className="w-32 h-32 " source={require('../assets/delete.png')} />
-            <Text className = "font-bold text-3xl flex-1"> Confirm delete </Text>
+            <Text className = "text-center font-bold text-3xl flex-1"> Confirm delete </Text>
             </TouchableOpacity>
                 )}
         </View>

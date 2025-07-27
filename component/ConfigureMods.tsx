@@ -64,11 +64,16 @@ export default function ConfigureMods({route}) {
           setLoading(true);
             Alert.alert('Mod editing in process...', 'Please be patient');
            await handleClassDelete();
-           await Promise.all(
-              mymods.map(async (mod) => {
-                await sendUserMod(mod);
-              })
-            );
+           await new Promise(resolve => setTimeout(resolve, 800));
+           for (const mod of mymods) {
+               try {
+             await sendUserMod(mod);
+             await new Promise(resolve => setTimeout(resolve, 1200));
+             } catch (error) {
+                 Alert.alert("Something went wrong, please try again")
+             }
+           }
+           await new Promise(resolve => setTimeout(resolve, 1200));
             await updateMod(event._id, {
               userId: useUserStore.getState().user._id,
             });
@@ -95,7 +100,12 @@ export default function ConfigureMods({route}) {
          try {
              setLoading(true);
           for (const mod of mods) {
+              try {
             await deleteClass(event._id, mod);
+            await new Promise(resolve => setTimeout(resolve, 800));
+            } catch (error) {
+              Alert.alert("Something went wrong, please try again")
+          }
           }
          } catch (error) {
            console.log("Is it me", error);
@@ -130,7 +140,8 @@ export default function ConfigureMods({route}) {
           )) {
            setSelected(selected.filter(ev => !(ev.lessonType === item.lessonType && ev.classNo === item.classNo)))
       } else {
-          setSelected(selected.concat(
+          setSelected(selected.filter(
+              ev => !(ev.lessonType === item.lessonType)).concat(
               events.filter(ev => ev.lessonType == item.lessonType && ev.classNo == item.classNo)))
       }
   }
@@ -149,7 +160,20 @@ export default function ConfigureMods({route}) {
         <View className = "bg-orange-600">
         <TouchableOpacity
         className = "rounded-2xl border-2 border-orange-600 items-center justify-center bg-orange-500 py-10"
-        onPress= {() => sendClasses()}
+        onPress={() => {
+            const adding = selected.map(x => `${x.lessonType} (${x.classNo})`);
+            Alert.alert(
+              "Confirm that your mod will have these classes?",
+              `${[...new Set(adding)].join(", ")}`,
+              [
+                { text: "No", style: "cancel" },
+                { text: "Yes", onPress: () => sendClasses() }
+              ],
+              {
+                  cancelable: true,
+              }
+            );
+          }}
         >
         <Image className="w-32 h-32 " source={require('../assets/edit.png')} />
         <Text className = "font-bold text-3xl"> Add classes </Text>

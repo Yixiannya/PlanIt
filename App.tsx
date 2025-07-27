@@ -175,22 +175,23 @@ function GroupTabs() {
 export default function App() {
 
      useEffect(() => {
-        GoogleSignin.configure({
-            iosClientId: "1058453984266-39br9cbp3sc3k8r7a0ukdm06v5735i9m.apps.googleusercontent.com",
-            webClientId: "1058453984266-m04g8chf7p1fc88oj0ldmfq1t78julra.apps.googleusercontent.com",
-            offlineAccess: true,
-            profileImageSize: 50,
-            scopes: [
-                'profile',
-                'email',
-                'https://www.googleapis.com/auth/calendar'
-            ],
-        });
-    });
+         GoogleSignin.configure({
+             iosClientId: "1058453984266-39br9cbp3sc3k8r7a0ukdm06v5735i9m.apps.googleusercontent.com",
+             webClientId: "1058453984266-m04g8chf7p1fc88oj0ldmfq1t78julra.apps.googleusercontent.com",
+             offlineAccess: true,
+             forceCodeForRefreshToken: true,
+             profileImageSize: 50,
+             scopes: [
+                 'profile',
+                 'email',
+                 'https://www.googleapis.com/auth/calendar'
+             ],
+         });
+     }, []);
 
     const toastStyle = {
       success: ({ text1, text2, onPress }) => (
-          <TouchableOpacity onPress = {onPress} className = "flex-row w-full bg-orange-300 rounded-xl py-2">
+          <TouchableOpacity onPress = {onPress} className = "px-1 flex-row w-full bg-orange-300 rounded-xl py-2">
         <View className = "pl-2">
         <Image className = "w-20 h-20" source={require('./assets/PlanIt.png')} />
         </View>

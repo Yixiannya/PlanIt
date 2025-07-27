@@ -52,16 +52,11 @@ export const setUpNotifications = async () => {
 export const usePushNotifications = async (setUp) => {
     const userID = useUserStore.getState().user._id;
         if (setUp === true) {
-            try {
              const token = await setUpNotifications();
              console.log(token);
              await editUser({notificationsEnabled: true, notificationToken: token}
                                   , userID);
              useNotificationStore.getState().setListener();
-             } catch (error) {
-                 Alert.alert("Error", "Something went wrong");
-                 console.log(error);
-             }
        } else {
            await editUser({notificationsEnabled: false}
                                 , userID);
