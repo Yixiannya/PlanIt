@@ -1,7 +1,8 @@
 // Code containing the routes used for users
 const express = require('express');
 const router = express.Router();
-const {getAllUsers, getUserById, getUserEvents, getUserGroups, postUser, putUser, patchUser, deleteUser} = require('../controllers/user.controller.js');
+const {getAllUsers, getUserById, getUserEvents, getUserGroups, getUserMods,
+    postUser, putUser, patchUser, deleteUser} = require('../controllers/user.controller.js');
 
 // Get all users
 router.get('/', getAllUsers);
@@ -14,6 +15,8 @@ router.get('/:id/events', getUserEvents);
 
 // Get all groups the user has
 router.get('/:id/groups', getUserGroups);
+
+router.get('/:id/mods', getUserMods);
 
 // Create user
 router.post('/', postUser);

@@ -1,8 +1,11 @@
 // Code containing all methods used in authentication routes
+const axios = require('axios');
+
 const User = require('../models/user.model.js');
 
 const {verifyGoogleToken} = require('../utils/verifyGoogleToken.js');
 const {createJWT} = require('../utils/createJWT.js');
+const { createOAuth2Client, generateTokens } = require('../utils/googleapi.js');
 
 // Login screen
 const login = async (req, res, next) => {
@@ -36,26 +39,63 @@ const initiatePasswordAuth = async (req, res) => {
 const initiateAndroidAuth = async (req, res) => {
   try {
     console.log("Received token");
-    const { idToken } = req.body;
-
+    const { idToken, accessToken, serverAuth } = req.body;
+    const oAuth2Client = createOAuth2Client();
+    
     if (!idToken) {
-      console.log("No token received");
+      console.log("No idToken received");
       return res.status(400).json({ error: 'ID token required' });
     }
+    if (!accessToken) {
+      console.log("No accessToken received");
+      return res.status(400).json({ error: 'Access token required' });
+    }
+    if (!serverAuth) {
+      console.log("No serverAuth received");
+    } else {
+      console.log("serverAuth: %s", serverAuth);
+    }
+
+    console.log("idToken: %s", idToken);
+    console.log("accessToken: %s", accessToken);
+    
 
     console.log("Verify token function");
     const googleUser = await verifyGoogleToken(idToken);
 
+    if (!googleUser.googleId) {
+      throw new Error("No googleId found");
+    }
+    var tokens;
+    var expiryMs;
+    console.log("Creating access and refresh tokens");
+    if (serverAuth) {
+      tokens = await generateTokens(serverAuth);
+      console.log("Tokens received %s", tokens);
+      console.log("Access token: %s", tokens.access_token);
+      console.log("Refresh token: %s", tokens.refresh_token);
+
+      const expiry_date = Date.now() + tokens.expires_in * 1000;
+      expiryMs = new Date(expiry_date).getTime();
+    }
     console.log("Finding user");
-    let user = await User.findOne({ googleId: googleUser.googleId });
+    let user = await User.findOne({ 'google.googleId': googleUser.googleId });
 
     if (!user) {
-      console.log("No such user found");
+      console.log("No such user found, creating new user");
       user = await User.create({
-        googleId: googleUser.googleId,
         name: googleUser.name,
         email: googleUser.email,
+        google: {
+          googleId: googleUser.googleId,
+          accessToken: tokens.access_token,
+          refreshToken: tokens.refresh_token,
+          expiryDate: expiryMs
+        }
       });
+
+      console.log("User created");
+      await user.save();
     }
 
     console.log("User found, creating JWT");

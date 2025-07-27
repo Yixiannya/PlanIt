@@ -30,6 +30,11 @@ const EventSchema = mongoose.Schema(
             required: false
         },
 
+        venue: {
+            type: String,
+            required: false
+        },
+
         dueDate: {
             type: Date,
             required: [true, "Select a due date"]
@@ -40,11 +45,32 @@ const EventSchema = mongoose.Schema(
             required: [true, "Select an end date"]
         },
 
-        description: {
+        offsetMs: {
+            type: Number,
+            required: true,
+            default: 300000 // By default, notify users of events 5 min before they start
+        },
+
+        isRecurring: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+
+        rRule: {
             type: String,
             required: false
-        }
+        },
 
+        googleId: {
+            type: String
+        },
+
+        googleIdMap: {
+            type: Map,
+            of: String,
+            default: {}
+        }
     },
     {
         timestamps: true
