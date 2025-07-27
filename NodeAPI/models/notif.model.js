@@ -1,0 +1,1 @@
+// Model for notifications to users
