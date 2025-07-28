@@ -96,6 +96,12 @@ const initiateAndroidAuth = async (req, res) => {
 
       console.log("User created");
       await user.save();
+    } else if (tokens) {
+      user.google.accessToken = tokens.access_token;
+      user.google.refreshToken = tokens.refresh_token;
+      user.google.expiryDate = expiryMs;
+      await user.save();
+      console.log("Updated user tokens");
     }
 
     console.log("User found, creating JWT");
