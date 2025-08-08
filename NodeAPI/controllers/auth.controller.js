@@ -7,11 +7,6 @@ const {verifyGoogleToken} = require('../utils/verifyGoogleToken.js');
 const {createJWT} = require('../utils/createJWT.js');
 const { createOAuth2Client, generateTokens } = require('../utils/googleapi.js');
 
-// Login screen
-const login = async (req, res, next) => {
-  res.render('login');
-};
-
 // Android Oauth method
 const initiateAndroidAuth = async (req, res) => {
   try {
@@ -113,7 +108,6 @@ const logout = async (req, res) => {
 };
 
 module.exports = {
-  login,
   initiateAndroidAuth,
   getProfileInfo,
   logout
