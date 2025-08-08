@@ -12,26 +12,6 @@ const SCOPES = [
     'profile'
 ];
 
-/*
-const consent = (req, res) => {
-  const url = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
-  });
-  res.redirect(url);
-};
-
-const redirect = async (req, res) => {
-  const code = req.query.code;
-
-  const { tokens } = await oAuth2Client.getToken(code);
-  oAuth2Client.setCredentials(tokens);
-
-  // Store tokens in DB if needed
-  res.send('Google Calendar connected');
-};
-*/
-
 async function syncEventToCalendar(user, event) {
     console.log("Syncing event");
     const members = event.members;
@@ -185,8 +165,6 @@ async function importEventToUser(user, googleEvent) {
     });
     console.log("Existing event if any:", existingEvent);
 
-    // const eventExists = user.events.some(event => event.googleId === googleEvent.id);
-
     const startDate = googleEvent.start.dateTime || googleEvent.start.date;
     const endDate = googleEvent.end.dateTime || googleEvent.end.date;
 
@@ -197,16 +175,6 @@ async function importEventToUser(user, googleEvent) {
     const adjustedEndDate = new Date(newEndDate.getTime() + (8 * 60 * 60 * 1000));
 
     if (existingEvent) {
-        /*const event = await Event.findOneAndUpdate({ googleId: googleEvent.id },
-            {
-                name: googleEvent.summary || "No title given",
-                description: googleEvent.description,
-                owner: user,
-                dueDate: new Date(adjustedStartDate),
-                endDate: new Date(adjustedEndDate),
-                venue: googleEvent.location
-            }
-        );*/
         existingEvent.name = googleEvent.summary || "No title given";
         existingEvent.description = googleEvent.description;
         existingEvent.owner = user._id;

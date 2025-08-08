@@ -7,34 +7,6 @@ const {verifyGoogleToken} = require('../utils/verifyGoogleToken.js');
 const {createJWT} = require('../utils/createJWT.js');
 const { createOAuth2Client, generateTokens } = require('../utils/googleapi.js');
 
-// Login screen
-const login = async (req, res, next) => {
-  res.render('login');
-};
-
-// Basic password email login method
-const initiatePasswordAuth = async (req, res) => {
-  try {
-    const requestedEmail = req.body.email;
-    const requestedPassword = req.body.password;
-    
-    const user = await User.findOne({ email: requestedEmail });
-
-    if (!user) {
-      return res.status(404).json({message: "User not found"});
-    }
-
-    if (requestedPassword != user.password) {
-      return res.status(401).json({message: "Incorrect password"});
-    }
-
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({message: error.message});
-  }
-};
-
-
 // Android Oauth method
 const initiateAndroidAuth = async (req, res) => {
   try {
@@ -96,6 +68,12 @@ const initiateAndroidAuth = async (req, res) => {
 
       console.log("User created");
       await user.save();
+    } else if (tokens) {
+      user.google.accessToken = tokens.access_token;
+      user.google.refreshToken = tokens.refresh_token;
+      user.google.expiryDate = expiryMs;
+      await user.save();
+      console.log("Updated user tokens");
     }
 
     console.log("User found, creating JWT");
@@ -130,8 +108,6 @@ const logout = async (req, res) => {
 };
 
 module.exports = {
-  login,
-  initiatePasswordAuth,
   initiateAndroidAuth,
   getProfileInfo,
   logout
